@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { UPGRADES } from '../src/game/data';
-import { calcRates, calcUptime } from '../src/game/rates';
+import { calcGenUnitLocRate, calcRates, calcUptime } from '../src/game/rates';
 import { defaultState } from '../src/game/state';
 import { tickReducer } from '../src/game/tick';
 import { THRESHOLDS } from '../src/game/constants';
@@ -141,5 +141,16 @@ describe('superlinear bug generation', () => {
   it('high-throughput + always_allow can outpace CI fixes (review crisis reachable)', () => {
     const { bugRate, fixRate } = calcRates(empireGens, empireUpgrades, 21);
     expect(bugRate).toBeGreaterThan(fixRate);
+  });
+
+  it('Extended Context buffs Autocomplete LOC/s', () => {
+    expect(calcGenUnitLocRate('autocomplete', [])).toBe(3);
+    expect(calcGenUnitLocRate('autocomplete', ['model_update_2'])).toBe(8);
+    expect(calcRates({ autocomplete: 2 }, ['model_update_2'], 0).locRate).toBe(16);
+  });
+
+  it('Prompt Engineering doubles Autocomplete LOC/s', () => {
+    expect(calcGenUnitLocRate('autocomplete', ['better_prompts'])).toBe(6);
+    expect(calcGenUnitLocRate('copilot', ['better_prompts'])).toBe(30);
   });
 });

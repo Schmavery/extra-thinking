@@ -1,6 +1,7 @@
 export interface GenDef {
   id: string;
   name: string;
+  /** Flavor line for logs and shop — parody marketing, not mechanics (see `formatGenMechanics`). */
   desc: string;
   locPerSec: number;
   bugsPerSec: number;
@@ -28,6 +29,10 @@ export interface UpgDef {
   clickBonus?: number;
 
   // ── generator effects ──
+  /** Per-generator id: multiplicative LOC/s (multiplied across owned upgrades). */
+  genLocMult?: Record<string, number>;
+  /** Per-generator id: additive LOC/s per owned unit (summed across owned upgrades). */
+  genLocBonus?: Record<string, number>;
   /** Multiplied across all owned upgrades. */
   globalMult?: number;
   /** Multiplied across all owned upgrades. */

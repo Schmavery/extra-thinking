@@ -1,7 +1,8 @@
 import type { GameState } from '../types';
 import { action, GENS } from '../game/data';
-import { genCost } from '../game/rates';
+import { calcGenUnitLocRate, genCost } from '../game/rates';
 import { fmt, fmtRate } from '../lib/format';
+import { genTooltip } from '../lib/genLabel';
 import { snapRate } from '../game/rates';
 import { getMove, rechargeProgress } from '../game/availability';
 import { Button } from './Button';
@@ -47,7 +48,12 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
         if (!move.visible) return null;
         const owned = state.genCounts[g.id] ?? 0;
         const cost = genCost(g, owned);
-        const genLocRate = snapRate(g.locPerSec * owned);
+        const unitLoc = calcGenUnitLocRate(g.id, state.upgrades);
+        const genLocRate = snapRate(unitLoc * owned);
+        const rateLabel =
+          owned > 0
+            ? fmtRate(genLocRate)
+            : `+${fmtRate(unitLoc)}/each`;
         return (
           <Row key={g.id}>
             <Name>
@@ -57,18 +63,17 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
             <Button
               off={!move.legal}
               onClick={() => onBuyGen(g.id)}
-              title={g.desc}
+              title={genTooltip(g)}
               progress={rechargeProgress(move)}
             >
               buy
             </Button>
             <div className="text-[12px]">
               <span className={move.legal ? 'text-dim' : 'text-dimmer'}>{fmt(cost)} loc</span>
-              {genLocRate !== 0 ? (
-                <span className="text-green-dim ml-[10px]">{fmtRate(genLocRate)}</span>
-              ) : owned === 0 ? (
-                <span className="text-dimmer ml-[10px]">{g.desc}</span>
-              ) : null}
+              <span className={`ml-[10px] ${owned > 0 ? 'text-green-dim' : 'text-dimmer'}`}>
+                {rateLabel}
+              </span>
+              <span className="text-dimmer ml-[10px]">{g.desc}</span>
             </div>
           </Row>
         );

@@ -176,6 +176,29 @@ export function calcTestFixRate(upgrades: string[]): number {
   return testFixRate;
 }
 
+function genLocPerUnit(genId: string, baseLocPerSec: number, upgrades: string[]): number {
+  let mult = 1;
+  let bonus = 0;
+  for (const u of ownedDefs(upgrades)) {
+    if (u.genLocMult?.[genId]) mult *= u.genLocMult[genId];
+    if (u.genLocBonus?.[genId]) bonus += u.genLocBonus[genId];
+  }
+  return baseLocPerSec * mult + bonus;
+}
+
+/** Effective LOC/s for one owned unit (global/review mults included). */
+export function calcGenUnitLocRate(genId: string, upgrades: string[]): number {
+  const g = GENS.find((x) => x.id === genId);
+  if (!g) return 0;
+  let globalMult = 1;
+  let reviewLocMult = 1;
+  for (const u of ownedDefs(upgrades)) {
+    if (u.globalMult) globalMult *= u.globalMult;
+    if (u.reviewLocMult !== undefined) reviewLocMult = u.reviewLocMult;
+  }
+  return snapRate(genLocPerUnit(genId, g.locPerSec, upgrades) * globalMult * reviewLocMult);
+}
+
 export function calcRates(
   genCounts: Record<string, number>,
   upgrades: string[],
@@ -207,7 +230,8 @@ export function calcRates(
   for (const g of GENS) {
     const count = genCounts[g.id] ?? 0;
     if (count > 0) {
-      locRate += g.locPerSec * count * globalMult * reviewLocMult;
+      const unitLoc = genLocPerUnit(g.id, g.locPerSec, upgrades);
+      locRate += unitLoc * count * globalMult * reviewLocMult;
       const bugUnits =
         genCountExponent === 1 ? count : Math.pow(count, genCountExponent);
       bugRate += g.bugsPerSec * bugUnits * bugMult * reviewBugMult;

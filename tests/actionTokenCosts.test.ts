@@ -19,12 +19,12 @@ describe('action token costs', () => {
     expect(calcPromptTokenCost(['model_update_1'])).toBe(10);
   });
 
-  it('Prompt Engineering adds 2 tokens per prompt', () => {
-    expect(calcPromptTokenCost(['better_prompts'])).toBe(9);
+  it('Prompt Engineering adds 4 tokens per prompt', () => {
+    expect(calcPromptTokenCost(['better_prompts'])).toBe(11);
   });
 
   it('prompt token bonuses stack', () => {
-    expect(calcPromptTokenCost(['model_update_1', 'better_prompts'])).toBe(12);
+    expect(calcPromptTokenCost(['model_update_1', 'better_prompts'])).toBe(14);
   });
 
   it('paste_error starts at 10 tokens', () => {

@@ -1,6 +1,6 @@
 - id: autocomplete
   name: Autocomplete
-  desc: presses tab repeatedly until something compiles
+  desc: Intelligent tab completion for modern teams. Accept suggestions. Ship sooner.
   locPerSec: 3
   bugsPerSec: 0.02
   fixPerSec: 0
@@ -9,7 +9,7 @@
   unlockAt: 500
 - id: copilot
   name: CodePilot
-  desc: expired trial. still works. do not ask why.
+  desc: Meet CodePilot — AI pair programming, baked into your editor whether you asked or not.
   locPerSec: 30
   bugsPerSec: 0.15
   fixPerSec: 0
@@ -18,7 +18,7 @@
   unlockAt: 5000
 - id: chatgpt
   name: FreeChat
-  desc: rate limited. uses em dashes constantly.
+  desc: FreeChat for teams. Unlimited* brainstorming with premium punctuation.
   locPerSec: 100
   bugsPerSec: 0.4
   fixPerSec: 0
@@ -27,7 +27,7 @@
   unlockAt: 20000
 - id: claude
   name: Claudius
-  desc: 200K context from Claudius Labs. will genuinely try. may over-explain.
+  desc: Claudius by Claudius Labs. Helpful, harmless, and committed to explaining the explanation.
   locPerSec: 250
   bugsPerSec: 0.8
   fixPerSec: 0.3
@@ -36,7 +36,7 @@
   unlockAt: 80000
 - id: api
   name: Direct API Calls
-  desc: billing dashboard open in another tab
+  desc: Direct API access for production workloads. Chat UI sold separately.
   locPerSec: 800
   bugsPerSec: 2
   fixPerSec: 0.5
@@ -45,7 +45,7 @@
   unlockAt: 400000
 - id: agent
   name: AI Agent
-  desc: computer use enabled. proceeding autonomously across the stack.
+  desc: Agentic development, now generally available. You set direction; we set scope.
   locPerSec: 3000
   bugsPerSec: 6
   fixPerSec: 2
@@ -54,28 +54,10 @@
   unlockAt: 2000000
 - id: swarm
   name: Agent Swarm
-  desc: 47 sub-agents. none aware of the others. vibing.
+  desc: Scale parallel autonomy across your stack. Coordinated alignment sold separately.
   locPerSec: 20000
   bugsPerSec: 25
   fixPerSec: 10
   baseCost: 60000000
   costMult: 1.17
   unlockAt: 10000000
-- id: orchestrator
-  name: Facelift Orchestrator
-  desc: agents orchestrating agents orchestrating agents
-  locPerSec: 150000
-  bugsPerSec: 100
-  fixPerSec: 50
-  baseCost: 600000000
-  costMult: 1.18
-  unlockAt: 100000000
-- id: agi
-  name: ????
-  desc: you stopped reading its output three weeks ago
-  locPerSec: 2000000
-  bugsPerSec: 600
-  fixPerSec: 400
-  baseCost: 20000000000
-  costMult: 1.2
-  unlockAt: 5000000000

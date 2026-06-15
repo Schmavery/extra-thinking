@@ -14,13 +14,14 @@
   purchaseMsg: Faster inference enabled. I'll get back to you sooner. Accuracy unchanged.
 - id: model_update_2
   name: Extended Context
-  desc: more output! +15 LOC per prompt
+  desc: +5 LOC/s per Autocomplete · more context in the completion window
   cost: 6000
   unlockAt: 4000
-  clickBonus: 15
+  genLocBonus:
+    autocomplete: 5
   requires:
     - model_update_1
-  purchaseMsg: Extended context unlocked — which means I'll hold more, and explain more.
+  purchaseMsg: Extended context unlocked — tab completion holds more now. I'll explain more per keystroke.
 - id: model_update_3
   name: Improved Reasoning
   desc: +30 LOC per prompt
@@ -32,12 +33,13 @@
   purchaseMsg: Improved reasoning engaged. Let me walk through this step by step — very thoroughly, for longer.
 - id: better_prompts
   name: Prompt Engineering
-  desc: 2× manual output. +4 tokens per prompt.
+  desc: 2× better Autocomplete · better prompts, same accuracy
   cost: 5000
   unlockAt: 3000
-  clickMult: 2
+  genLocMult:
+    autocomplete: 2
   promptTokenCostBonus: 4
-  purchaseMsg: Prompt engineering engaged. I'm now 2× more confident. Accuracy unchanged.
+  purchaseMsg: Prompt engineering engaged. Autocomplete is 2× more confident. Accuracy unchanged.
 - id: model_update_4
   name: Latest Weights
   desc: +70 LOC per prompt — just updated. the bugs are different now.
