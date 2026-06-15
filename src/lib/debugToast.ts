@@ -1,3 +1,5 @@
+import { isDevUnlocked } from './devUnlock';
+
 const TOAST_MS = 3000;
 
 type ToastListener = (message: string) => void;
@@ -11,6 +13,7 @@ export function setDebugToastListener(fn: ToastListener | null): void {
 
 export function debugToast(message: string): void {
   if (!import.meta.env.DEV) return;
+  if (!isDevUnlocked()) return;
   listener?.(message);
   if (hideTimer) clearTimeout(hideTimer);
   hideTimer = setTimeout(() => listener?.(''), TOAST_MS);

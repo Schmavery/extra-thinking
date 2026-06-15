@@ -12,7 +12,7 @@ export { computeTextStreamMs as streamingDurationMs } from './streamSchedule';
  *
  * Each entry gets `streamMs` at enqueue for `useStreamingLog` playback only.
  */
-export type AppendLogOpts = { priority?: boolean };
+export type AppendLogOpts = { priority?: boolean; ephemeral?: boolean };
 
 export function appendLog(
   prev: GameState,
@@ -31,6 +31,7 @@ export function appendLog(
     const entryType: LogEntryType = isUser ? 'user' : type;
     const streamMs = computeEntryStreamMs(line, entryType, prevWasUser, {
       afterUserReply: prevWasUser && !isUser,
+      skipSpinner: opts?.ephemeral || opts?.priority,
     });
     prevWasUser = isUser;
     const entry: LogEntry = {
@@ -40,6 +41,7 @@ export function appendLog(
       streamMs,
       burstId,
       ...(opts?.priority ? { priority: true } : {}),
+      ...(opts?.ephemeral ? { ephemeral: true } : {}),
     };
     next = {
       ...next,
@@ -101,4 +103,12 @@ export function appendLogInstant(
     };
   }
   return next;
+}
+
+/** Drop ephemeral log lines and align `logId` before writing a save. */
+export function stateForPersist(state: GameState): GameState {
+  const log = state.log.filter((e) => !e.ephemeral);
+  if (log.length === state.log.length) return state;
+  const logId = log.reduce((max, e) => Math.max(max, e.id), 0);
+  return { ...state, log, logId };
 }

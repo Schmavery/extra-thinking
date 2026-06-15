@@ -66,6 +66,8 @@ import { Settings } from './components/Settings';
 import { DebugToast } from './components/DebugToast';
 import { PauseOverlay } from './components/PauseOverlay';
 import { debugToast } from './lib/debugToast';
+import { applyPreset } from './debug/saveTools';
+import { isDevUnlocked, subscribeDevUnlock } from './lib/devUnlock';
 import { ResetConfirmModal } from './components/ResetConfirmModal';
 import { GameTitle } from './components/GameTitle';
 
@@ -338,6 +340,15 @@ export function Game() {
     return () => window.removeEventListener('storage', onStorage);
   }, []);
 
+  // Dev unlock toggle — ephemeral AI lines (stream normally, omitted from saves).
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    return subscribeDevUnlock(() => {
+      const text = isDevUnlocked() ? 'debug mode enabled.' : 'debug mode disabled.';
+      setState((prev) => appendLog(prev, text, 'info', { ephemeral: true }));
+    });
+  }, []);
+
   // Wrap each pure action in a setState. The argument signature ensures
   // accidentally calling an action with stale state is impossible.
   const dispatch = useCallback(
@@ -384,6 +395,16 @@ export function Game() {
     resetStream();
   }, [resetStream]);
 
+  const handleJumpToLaunch = useCallback(() => {
+    const next = applyPreset('jump_launch', stateRef.current);
+    if (!next) return;
+    stateRef.current = next;
+    setState(next);
+    resetStream(next.log);
+    snapshotToDisk('jump to launch', next);
+    debugToast('jump to launch · 8 autocomplete · launch ready');
+  }, [resetStream, snapshotToDisk]);
+
   // ── derived ──
   const derived = deriveGame(state);
   const mcpPendingUnsafe =
@@ -424,7 +445,7 @@ export function Game() {
         isMobile ? 'px-[14px] pt-[14px] pb-2' : 'px-6 pt-7 pb-2',
       ].join(' ')}
     >
-      <Settings />
+      <Settings onJumpToLaunch={handleJumpToLaunch} />
       <DebugToast />
 
       {!isForeground && <PauseOverlay message="processing in background…" />}

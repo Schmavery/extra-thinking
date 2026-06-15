@@ -147,7 +147,9 @@ export function useStreamingLog(
       return;
     }
 
-    const phases = aiStreamPhases(afterUserReply);
+    const phases = aiStreamPhases(afterUserReply, {
+      skipSpinner: entry.ephemeral || entry.priority,
+    });
     const chunks = entry.text.split(/(\s+)/);
     let i = 0;
 
@@ -191,9 +193,11 @@ export function useStreamingLog(
     if (spinnerPrimedRef.current) {
       spinnerPrimedRef.current = false;
       startAiStream();
-    } else {
+    } else if (phases.spinnerHoldMs > 0) {
       setShowThinking(true);
       defer(startAiStream, phases.spinnerHoldMs);
+    } else {
+      startAiStream();
     }
   }, [appendDisplayed, clearThinkingTimer, defer, finishQueue, scheduleThinking]);
 

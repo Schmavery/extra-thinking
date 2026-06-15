@@ -1,6 +1,7 @@
 import type { GameState } from '../types';
 import { SAVE_KEY } from './constants';
 import { EMPTY_MC_MINI_LANES, normalizeMcMiniLanes } from './investor';
+import { stateForPersist } from './log';
 import { clearSaveStorage, writeSaveWithMeta, type SaveSource } from './saveSync';
 
 /** Apply a bug count and accrue positive deltas into `lifetimeBugs`. */
@@ -87,7 +88,7 @@ export function saveState(
   source: SaveSource = 'game',
   writerSessionId?: string | null,
 ): number {
-  return writeSaveWithMeta(s, source, writerSessionId);
+  return writeSaveWithMeta(stateForPersist(s), source, writerSessionId);
 }
 
 export function clearSave(): void {

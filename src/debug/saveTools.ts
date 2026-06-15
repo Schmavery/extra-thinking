@@ -111,6 +111,25 @@ export const SAVE_PRESETS: SavePreset[] = [
     apply: () => defaultState(),
   },
   {
+    id: 'jump_launch',
+    label: 'Jump to launch',
+    hint: '8 Autocomplete · Faster Inference · /fix-bug · Subagent Harness · at launch LOC.',
+    apply: (prev) => {
+      const upgrades = sanitizeUpgrades([
+        'model_update_1',
+        'fix_bug_skill',
+        'subagent_harness',
+      ]);
+      return revealAllEligibleUpgrades({
+        ...prev,
+        ...baseProgress(LAUNCH_LOC, LAUNCH_LOC, upgrades),
+        launched: false,
+        upgrades,
+        genCounts: { autocomplete: 8 },
+      });
+    },
+  },
+  {
     id: 'prelaunch',
     label: 'Ch0 — pre-launch',
     hint: 'High LOC, early upgrades, launch not taken.',

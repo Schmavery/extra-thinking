@@ -276,6 +276,8 @@ export interface LogEntry {
   instant?: boolean;
   /** Short post-approve line under an MCP `tool` entry body. */
   toolAck?: string;
+  /** Dev/session-only line — stripped before persisting to localStorage. */
+  ephemeral?: boolean;
 }
 
 export interface GameState {

@@ -1,16 +1,24 @@
 import { useEffect, useState } from 'react';
 import { setDebugToastListener } from '../lib/debugToast';
+import { isDevUnlocked } from '../lib/devUnlock';
+import { useDevUnlock } from '../lib/useDevUnlock';
 
 /** Dev-only lifecycle toasts for save / blur / focus / reload. */
 export function DebugToast() {
   const [message, setMessage] = useState('');
+  const devUnlocked = useDevUnlock();
 
   useEffect(() => {
+    if (!import.meta.env.DEV) return;
     setDebugToastListener((text) => setMessage(text));
     return () => setDebugToastListener(null);
   }, []);
 
-  if (!import.meta.env.DEV || !message) return null;
+  useEffect(() => {
+    if (!devUnlocked) setMessage('');
+  }, [devUnlocked]);
+
+  if (!import.meta.env.DEV || !message || !isDevUnlocked()) return null;
 
   return (
     <div

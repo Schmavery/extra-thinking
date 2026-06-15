@@ -16,6 +16,8 @@ export function countTypedTokens(text: string): number {
 export type EntryStreamOpts = {
   /** Next queued line is an AI reply right after a `>` user line (skips spinner hold). */
   afterUserReply?: boolean;
+  /** Ephemeral / priority lines — type immediately, no thinking spinner. */
+  skipSpinner?: boolean;
 };
 
 /** Ms for `useStreamingLog` to fully drain one log entry. */
@@ -32,7 +34,7 @@ export function computeEntryStreamMs(
   }
 
   let ms = STREAMING.aiLeadInMs + STREAMING.afterAiMs;
-  if (!prevLineWasUser && !opts?.afterUserReply) {
+  if (!prevLineWasUser && !opts?.afterUserReply && !opts?.skipSpinner) {
     ms += STREAMING.aiOnlySpinnerHoldMs;
   }
   ms += countTypedTokens(text) * STREAMING.charMs;
@@ -56,14 +58,18 @@ export function computeTextStreamMs(text: string, fallbackType: LogEntryType): n
 }
 
 /** AI stream phase delays (sum with typed tokens × `charMs` equals `streamMs`). */
-export function aiStreamPhases(afterUserReply: boolean): {
+export function aiStreamPhases(
+  afterUserReply: boolean,
+  opts?: { skipSpinner?: boolean },
+): {
   spinnerHoldMs: number;
   leadInMs: number;
   afterMs: number;
   tokenDelayMs: number;
 } {
+  const skipSpinner = afterUserReply || opts?.skipSpinner;
   return {
-    spinnerHoldMs: afterUserReply ? 0 : STREAMING.aiOnlySpinnerHoldMs,
+    spinnerHoldMs: skipSpinner ? 0 : STREAMING.aiOnlySpinnerHoldMs,
     leadInMs: STREAMING.aiLeadInMs,
     afterMs: STREAMING.afterAiMs,
     tokenDelayMs: STREAMING.charMs,

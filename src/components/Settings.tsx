@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { debugHref } from '../debug/routes';
+import { clearDevUnlock, registerDevUnlockClick } from '../lib/devUnlock';
+import { useDevUnlock } from '../lib/useDevUnlock';
 import {
   SYSTEM_THEME_ID,
   THEMES,
@@ -15,7 +17,12 @@ import {
  *
  * The modal closes on Esc, on backdrop click, and on its own close button.
  */
-export function Settings() {
+interface SettingsProps {
+  /** Dev-only: snap to the jump-to-launch playtest preset. */
+  onJumpToLaunch?: () => void;
+}
+
+export function Settings({ onJumpToLaunch }: SettingsProps = {}) {
   const { theme, appearance, setTheme, cycleAppearance } = useTheme();
   const [open, setOpen] = useState(false);
 
@@ -58,6 +65,7 @@ export function Settings() {
           appearance={appearance}
           onPickTheme={(id) => setTheme(id)}
           onClose={() => setOpen(false)}
+          onJumpToLaunch={onJumpToLaunch}
         />
       )}
     </>
@@ -89,9 +97,18 @@ interface SettingsModalProps {
   appearance: AppearanceMode;
   onPickTheme: (id: string) => void;
   onClose: () => void;
+  onJumpToLaunch?: () => void;
 }
 
-function SettingsModal({ theme, appearance, onPickTheme, onClose }: SettingsModalProps) {
+function SettingsModal({
+  theme,
+  appearance,
+  onPickTheme,
+  onClose,
+  onJumpToLaunch,
+}: SettingsModalProps) {
+  const devUnlocked = useDevUnlock();
+
   return (
     <div
       role="dialog"
@@ -107,7 +124,13 @@ function SettingsModal({ theme, appearance, onPickTheme, onClose }: SettingsModa
       />
       <div className="relative bg-card-bg border border-card-border w-[min(92vw,420px)] max-h-[80vh] overflow-y-auto">
         <div className="flex items-baseline justify-between border-b border-border px-[14px] py-[10px]">
-          <span className="text-dim text-[11px] tracking-[0.12em] uppercase">settings</span>
+          <button
+            type="button"
+            onClick={() => registerDevUnlockClick()}
+            className="text-dim text-[11px] tracking-[0.12em] uppercase bg-transparent border-0 p-0 font-mono cursor-default"
+          >
+            settings
+          </button>
           <button
             type="button"
             onClick={onClose}
@@ -143,14 +166,36 @@ function SettingsModal({ theme, appearance, onPickTheme, onClose }: SettingsModa
           </div>
         </div>
 
-        {import.meta.env.DEV && (
-          <div className="px-[14px] py-[12px] border-t border-border">
+        {import.meta.env.DEV && devUnlocked && (
+          <div className="px-[14px] py-[12px] border-t border-border flex flex-col gap-[8px]">
+            {onJumpToLaunch && (
+              <button
+                type="button"
+                onClick={() => {
+                  onJumpToLaunch();
+                  onClose();
+                }}
+                className="text-left text-dimmer hover:text-fg text-[12px] bg-transparent border-0 font-mono p-0"
+              >
+                jump to launch
+              </button>
+            )}
             <a
               href={debugHref()}
               className="text-dimmer hover:text-fg text-[12px] underline underline-offset-2"
             >
               debug
             </a>
+            <button
+              type="button"
+              onClick={() => {
+                clearDevUnlock();
+                onClose();
+              }}
+              className="text-left text-dimmer hover:text-fg text-[12px] bg-transparent border-0 font-mono p-0"
+            >
+              turn off debug mode
+            </button>
           </div>
         )}
       </div>
