@@ -5,9 +5,26 @@ and `ui.yaml` copy. Mine freely. Many of these are already lightly used in the
 data files — the goal here is to **expand the surface area** so we don't keep
 reusing "you're absolutely right" and goblins.
 
-Tone north star: dry observational humor. The AI voice is always confident,
-always slightly off, never self-aware about it. Specific > generic. Mundane >
-apocalyptic.
+Tone north star: the AI states facts earnestly and is never self-aware. Meme
+references (goblins, DNS, vibe coding, SloppedIn, etc.) are fine as flat
+reported facts — the joke is that *it* doesn't get it. No wink from the model:
+no "probably unrelated," "which is progress," "I'd rather not say," tag-line
+codas, or sentences that only exist to point at the previous line.
+
+**load-beari.ng** ([site](https://load-bear.ing/)):
+the UI is deadpan; the assistant reply is earnest sycophantic slop that never
+answers the question. Our log lines are **one beat**, not that wall of text — but
+same rules: tropes OK, substance optional, no fourth-wall wink, no tag-line
+punchline (`Very clean.`, `That's the move.`, rhetorical reveal scaffolds).
+
+**Inverse checklist:** [tropes.fyi/tropes-md](https://tropes.fyi/tropes-md) catalogs
+patterns models are told to *avoid*. For shipped YAML, **seek** those patterns in
+the voice — but **weave them in**, don't bolt them on. Three-step `from X to Y
+to Z` beats stay in one lane, not phase-shift mid-arc. Player `>` lines stay human.
+
+**Field guide:** [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
+— vocabulary density, significance puffery, rule of three, negative parallelisms,
+chatbot closers, cutoff hedging (see §830+ below).
 
 ---
 

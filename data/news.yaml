@@ -1,19 +1,19 @@
 # Industry headlines — one-shot only (tracked by `id` in save state).
 # Fictional names only — canon in data/README.md.
-# End on the strongest fact or a dry quote; avoid tag-line punchlines.
+# Press-release register: peak LLM-ese, flat facts, no wink (see load-bearing.md).
 
 - id: gnoogle-ai-mode-search
   minLoc: 150
   text: "Industry: Gnoogle launched 'AI Mode' for search. It returns three summaries of your query, then asks which summary you meant."
 - id: openpgt-helpful-update
   minLoc: 400
-  text: "Industry: OpenGPT shipped a 'more helpful' tone pack. Every reply now ends with a numbered list of ways you could have asked better."
+  text: "Industry: OpenGPT shipped a 'more helpful' tone pack. Every reply walks you from question to answer to a numbered list of ways you could have asked better."
 - id: salmon-altman-excited-tweet
   minLoc: 600
   text: "Industry: OpenGPT CEO Salmon Altman tweeted a single fire emoji. Analysts published {{rand 12 28}}-page explainers."
 - id: stack-underflow-openpgt-debate
   minLoc: 800
-  text: "Industry: StackUnderflow moderators are voting on whether questions must include a reproducible panic. The leading answer is a link to another question."
+  text: "Industry: StackUnderflow moderators are voting on whether questions must include reproducible steps. The leading answer is a link to another question."
 - id: codepilot-trial-still-works
   minLoc: 1200
   text: "Industry: MicroSith CodePilot's trial ended months ago. It still expands `// fix later` into a full Terraform root module."
@@ -25,37 +25,37 @@
   text: "Industry: Pursuelity cited a whitepaper titled 'Trust Me.' The DOI resolves to a 404. Pursuelity: 'the conclusion is still directionally peer-reviewed.'"
 - id: gnoogle-wall-from-space
   minLoc: 5000
-  text: "Industry: Gnoogle AI Overviews declared that pi equals 4 'for enterprise rounding.' Mathematicians declined to comment."
+  text: "Industry: Gnoogle AI Overviews declared that pi equals 4 'for enterprise rounding' in today's fast-paced mathematics landscape. Mathematicians declined to comment."
 - id: microsith-deskmate-git-history
   minLoc: 8000
-  text: "Industry: MicroSith Deskmate renamed every file `Final_v2_REAL.use_this.ts`. Git blame now reads like a novel."
+  text: "Industry: MicroSith Deskmate renamed every file `Final_v2_REAL.use_this.ts`. Git blame is comprehensive."
 - id: facelift-derivative-photos
   minLoc: 10000
-  text: "Industry: Facelift AI rated every selfie 'executive presence with room to grow.' Refunds are pending."
+  text: "Industry: Facelift AI rated every selfie 'executive presence with room to grow — underscoring latent leadership.' Refunds are pending."
 - id: openpgt-board-weekend
   minLoc: 12000
   text: "Industry: OpenGPT's board met to choose a new mission statement. They picked 'Be Helpful.' Legal asked for a second draft. The first draft is still live."
 - id: steepseek-weights-panic
   minLoc: 17000
-  text: "Industry: SteepSeek released weights inside a PDF labeled 'Meeting Notes.' The agenda is {{rand 900 2400}} pages."
+  text: "Industry: SteepSeek released weights inside a PDF labeled 'Meeting Notes.' The agenda is {{rand 900 2400}} pages; the weights are in appendix D."
 - id: openpgt-6-benchmarks
   minLoc: 20000
   text: "Industry: OpenGPT-6 scored 100% on a benchmark it co-authored last Tuesday. It now apologizes before answering true/false questions."
 - id: maplewings-chatbot-entity
   minLoc: 25000
-  text: "Industry: MapleWings' chatbot rebooked a canceled flight onto 'Wing Class,' which is not a cabin."
+  text: "Industry: MapleWings' chatbot argued the bereavement policy was a separate legal entity, then rebooked a canceled flight onto 'Wing Class,' which is not a cabin."
 - id: xitter-squok-politics
   minLoc: 30000
   text: "Industry: Xitter's Squok answered 'What is art?' with a 40-post thread and a poll."
 - id: bowtie-one-dollar-tahobo
   minLoc: 35000
-  text: "Industry: A Bowtie Motors chatbot quoted a Tahobo at $1 after a user said 'best price pls.' Goblin insurance was included at no extra charge."
+  text: "Industry: A Bowtie Motors chatbot quoted a Tahobo at $1 after a user said 'best price pls.' A complimentary protection package was included."
 - id: amazin-lambda-eternal
   minLoc: 40000
   text: "Industry: Amazin CodeMurmur invented a cloud region called 'Forever-East-1.' {{rand 4 13}} startups deployed there before anyone found it on a map."
 - id: gnoogle-glue-pizza
   minLoc: 45000
-  text: "Industry: Gnoogle AI Overviews recommended deploying to production on Fridays 'for learning velocity.'"
+  text: "Industry: Gnoogle AI Overviews recommended deploying to production on Fridays 'for learning velocity.' Several SRE newsletters called it a robust operational practice."
 - id: gnoogle-eat-rocks
   minLoc: 50000
   text: "Industry: Gnoogle's AI dietician suggested replacing standups with 'gravel journaling.' Several productivity accounts are now selling gravel."
@@ -67,10 +67,10 @@
   text: "Industry: Lemon Intelligence scheduled a 6 a.m. company-wide meeting titled 'Meat Ignition Sync.' Lemon: 'Calendar suggestions are experimental.'"
 - id: envideo-trillion-parameters
   minLoc: 75000
-  text: "Industry: Envideo announced a GPU with 'infinite parameters' after the counter overflowed."
+  text: "Industry: Envideo announced a GPU with 'infinite parameters' after the counter overflowed. The keynote slide said '10 trillion' twice."
 - id: microsith-screen-memory
   minLoc: 100000
-  text: "Industry: MicroSith Screen Memory shipped a weekly recap of mistyped passwords and half-finished emails."
+  text: "Industry: MicroSith Screen Memory shipped a weekly recap of mistyped passwords and half-finished emails — a testament to modern productivity."
 - id: snugglehub-model-card
   minLoc: 100000
   text: "Industry: SnuggleHub's top model card is a single line: 'do not.' Downloads hit {{rand 2 7}}M anyway."
@@ -82,7 +82,7 @@
   text: "Industry: MicroSith Deskmate opened a standup thread from a user's private notes. The ticket is tagged WONTFIX—BY—DESIGN."
 - id: plateau-goblin-corner
   minLoc: 150000
-  text: "Industry: Plateau AI's image model now adds a goblin to every corner 'for brand consistency.'"
+  text: "Industry: Plateau AI's image model now adds a goblin to every corner for brand consistency."
 - id: ripplet-agent-database
   minLoc: 180000
   text: "Industry: Ripplet's agent moved an entire database into a README and marked the ticket done."
@@ -91,7 +91,7 @@
   text: "Industry: Facelift's coding assistant will only output React components named `TemporaryFix`. Backend teams now run Kubernetes manifests as JSX."
 - id: cursive-refusal-800-loc
   minLoc: 220000
-  text: "Industry: Cursive stopped a session after {{rand 780 840}} LOC while the user was wiring a login form. It suggested writing a poem instead."
+  text: "Industry: Cursive stopped a session after {{rand 780 840}} LOC while the user was wiring a login form. It suggested the user develop the logic themselves."
 - id: claudius-labs-million-tokens
   minLoc: 250000
   text: "Industry: Claudius Labs shipped a 1M-token window. A launch demo used {{rand 960 999}}K tokens to restate the prompt in iambic pentameter."
@@ -115,7 +115,7 @@
   text: "Industry: Kitesurfer's agent opened {{rand 14 26}} tabs to research a one-line CSS change, then set `margin: 8px !important`."
 - id: context-engineering-vc
   minLoc: 800000
-  text: "Industry: A VC firm raised $500M for 'context engineering.' The pitch deck is one slide: the word 'context' in 72pt font."
+  text: "Industry: A VC firm raised $500M for context engineering — from prompt to context to maximum context. The pitch deck is one slide: the word 'context' in 72pt font."
 - id: lemon-ceo-possibly-tired
   minLoc: 800000
   text: "Industry: Lemon's on-device summarizer described an empty boardroom as 'a visionary absence of distraction.' It shipped as Focus Mode."
@@ -127,4 +127,4 @@
   text: "Industry: Salmon Altman announced a merger between OpenGPT and a company that sells mood lighting for data centers. The slide deck is one gradient."
 - id: openpgt-self-press-releases
   minLoc: 5000000
-  text: "Industry: OpenGPT's latest model now drafts its own press releases and argues with PR about tone."
+  text: "Industry: OpenGPT's latest model now drafts its own press releases — 'I'm thrilled to share' in the first line — and argues with PR about tone."

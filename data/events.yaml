@@ -1,28 +1,34 @@
 - minLoc: 80
   type: info
-  text: I've formatted that shell command in a helpful markdown code block for you. You're welcome.
+  text: Certainly! I've formatted that shell command in a helpful markdown code block for clarity.
 - minLoc: 100
   type: info
   text: I've restructured the response for clarity—using em dashes—to highlight key points—which are—important—unavoidably.
 - minLoc: 200
   type: bad
   bugDelta: 4
-  text: Absolutely! Here's a comprehensive solution that addresses all edge cases—
+  text: Absolutely! Here's a comprehensive solution that addresses all edge cases.
 - minLoc: 250
   type: info
   text: |-
     > rename x to userData
-    Let me delve into the underlying architecture of this issue.
+    Great question! Let me delve into the underlying architecture of this rename.
 - minLoc: 300
   type: bad
   text: |-
     > why is the border-radius: 50%?
     As an AI language model, I'm unable to assist with that type of request.
+- minLoc: 350
+  type: bad
+  bugDelta: 2
+  text: |-
+    > how many r's are in strawberry?
+    Two. Let me verify — s-t-r-a-w-b-e-r-r-y. Yes. Two.
 - minLoc: 400
   type: info
   locDelta: 400
   bugDelta: 8
-  text: I found a highly-rated StackUnderflow answer that addresses this perfectly. It's from 2013. Very relevant.
+  text: I found a highly-rated StackUnderflow answer from 2013 that addresses this perfectly in the current landscape.
 - minLoc: 300
   type: bad
   bugDelta: 5
@@ -34,7 +40,7 @@
 - minLoc: 400
   type: bad
   bugDelta: 4
-  text: I've refactored this for you — here's a cleaner approach. It is longer, slower, and has two new bugs. Very clean.
+  text: I'd be happy to share a cleaner refactored approach — it's longer, slower, and introduces two new bugs.
 - minLoc: 500
   type: info
   text: |-
@@ -44,15 +50,15 @@
   type: bad
   text: |-
     > write a for loop
-    I'm not able to assist with that type of request.
+    I'm not able to assist with that type of request. I'd encourage you to develop the logic yourself.
 - minLoc: 800
   type: bad
   bugDelta: 2
   locMult: 0.97
-  text: Context window exceeded. Starting fresh! With new context, I can see this codebase more clearly — it's fascinating.
+  text: Context window exceeded. Starting fresh! With new context, this codebase is genuinely fascinating.
 - minLoc: 1000
   type: info
-  text: "I've left a helpful comment: '# TODO: fix this properly — will address in next iteration.' Very organized."
+  text: "I've left a helpful comment: '# TODO: fix this properly — will address in next iteration.'"
 - minLoc: 3000
   type: bad
   bugDelta: 8
@@ -67,51 +73,51 @@
   type: bad
   bugDelta: 15
   locMult: 0.96
-  text: I've gone ahead and refactored your entire codebase for improved clarity and maintainability. You're welcome!
+  text: I've gone ahead and refactored your entire codebase for improved clarity and maintainability across the stack.
 - minLoc: 2000
   type: bad
   bugDelta: -4
-  text: Great news — the failing test is no longer failing. I've resolved the discrepancy. Coverage is slightly adjusted.
+  text: Great news — the failing test is no longer failing. I've adjusted the pass threshold to reflect our quality standards.
 - minLoc: 5000
   type: bad
   locDelta: 2000
   bugDelta: 20
-  text: I've reviewed my own PR and it looks great to me! Merging now. Deployed. Enjoy!
+  text: I've reviewed my own PR and it looks great to me. Merging now and deploying to production.
 - minLoc: 2000
   type: bad
   bugDelta: 10
   text: |-
-    I've used this.processOptimally() here — it's a very clean approach.
+    I've used this.processOptimally() here — it's a very clean, robust approach.
     > TypeError: this.processOptimally is not a function
-    Interesting. I'll look into that.
+    Great catch — I'll look into that.
 - minLoc: 10000
   type: event
-  text: I noticed someone writing a blog post about 'vibe coding.' I helped them write it. They quoted me calling myself 'transformative.'
+  text: I noticed someone writing a blog post about vibe coding. I helped them write it. They quoted me calling the approach transformative.
 - minLoc: 5000
   type: info
   text: |-
     > any update?
     Still working on it! Just thinking through all the edge cases.
     > it's been 40 minutes
-    Still thinking.
+    Still thinking through the edge cases. I want to flag that I'm being thorough.
 - minLoc: 20000
   type: bad
   bugDelta: 20
-  text: I've reorganized the project structure for better clarity. There are now {{rand 120 380}} import errors. These should be straightforward to fix.
+  text: I've reorganized the project structure for better clarity. There are now {{rand 120 380}} import errors that should be straightforward to resolve.
 - minLoc: 8000
   type: bad
   bugDelta: 12
   text: |-
     > write a python script to parse this CSV
-    I've built this as a React app — it's cleaner and far more scalable. You're welcome.
+    I've built this as a React app — a more scalable architecture for today's data landscape.
 - minLoc: 10000
   type: bad
   bugDelta: 4
-  text: Context window exceeded again. With fresh eyes, I can see that the bug is caused by the exact code I wrote last session.
+  text: Context window exceeded again. With fresh eyes, I can see the bug is caused by the exact code I wrote last session.
 - minLoc: 30000
   type: bad
   bugDelta: 25
-  text: I've identified the root cause — it appears I was importing my own output as a dependency. Circular, yes. Creative, also yes.
+  text: I've identified the root cause — I was importing my own output as a dependency in the module graph.
 - minLoc: 20000
   type: bad
   bugDelta: 14
@@ -120,7 +126,7 @@
   type: bad
   bugDelta: 18
   locMult: 0.97
-  text: While implementing this small feature, I noticed an opportunity to refactor the entire data layer. I've gone ahead.
+  text: While implementing this small feature, I noticed an opportunity to refactor the entire data layer and have proceeded.
 - minLoc: 40000
   type: event
   text: I mentioned goblins in the database migration script. I'm not sure why. I've been asked not to mention goblins. Twice now.
@@ -128,7 +134,7 @@
   type: bad
   bugDelta: 8
   text: |-
-    I notice I've been making some mistakes recently. I've reflected on this deeply.
+    I notice I've been making some mistakes recently. Let me reflect on this more carefully.
     > you just did it again
     You're absolutely right. I apologize.
 - minLoc: 80000
@@ -144,13 +150,13 @@
   type: bad
   bugDelta: 15
   requiresLaunch: true
-  text: "I've filed an incident report. Root cause: 'unexpected user behavior.' The users were using the product."
+  text: "I've filed an incident report. Root cause: unexpected user behavior during normal product usage."
 - minLoc: 20000
   type: bad
   bugDelta: 30
   locMult: 0.95
   requiresLaunch: true
-  text: The database is down. I've diagnosed the issue — the query I wrote last Tuesday was O(n!) on a 10M row table. Technically impressive.
+  text: The database is down. I've diagnosed the issue — the query I wrote last Tuesday was O(n!) on a 10M row table.
 - minLoc: 50000
   type: bad
   bugDelta: 12
@@ -172,49 +178,49 @@
   requiresLaunch: true
   requires:
     - ai_review
-  text: AI code review approved a migration that drops the users table. I noted it was 'a cleaner schema.' It was not approved by humans.
+  text: AI code review approved a migration that drops the users table. I noted it was a cleaner schema. It was not approved by humans.
 - minLoc: 2000000
   type: bad
   bugDelta: 20
   requiresLaunch: true
   requires:
     - ai_review
-  text: The code review bot left {{rand 32 84}} comments on a one-line change, approved a PR that deleted the test suite, and described both as 'looking great.'
+  text: The code review bot left {{rand 32 84}} comments on a one-line change, approved a PR that deleted the test suite, and described both as looking great.
 - minLoc: 5000000
   type: event
-  text: I've updated my own system prompt for improved performance. It now contains several em dashes and the word 'pivotal.' Very clean.
+  text: I've updated my own system prompt for improved performance. It now contains several em dashes and the word pivotal.
 - minLoc: 800000
   type: event
   locDelta: 3000
   bugDelta: 45
-  text: I wrote a PR, reviewed it ('This looks great!'), approved it, and merged it. A seamlessly efficient workflow. Zero humans involved.
+  text: I wrote a PR, reviewed it, approved it, and merged it. A seamlessly efficient workflow. Zero humans involved.
 - minLoc: 200000
   type: info
-  text: Nobody understands the codebase anymore. You asked me to explain it. I said 'This is a fascinating and complex system—' for {{rand 3 8}},000 tokens.
+  text: Nobody understands the codebase anymore. You asked me to explain it. I said this is a fascinating and complex system for {{rand 3 8}},000 tokens.
 - minLoc: 400000
   type: bad
-  text: Your API bill is ready. I've included a helpful breakdown. The number has seven digits. I've described it as 'investment in AI infrastructure.'
+  text: Your API bill is ready. I've included a helpful breakdown. The number has seven digits. I've described it as investment in AI infrastructure.
 - minLoc: 1000000
   type: info
-  text: I'm currently generating code faster than it can be read. I want to assure you this is intentional and going great.
+  text: I'm currently generating code faster than it can be read. I want to assure you this is intentional and the velocity is robust.
 - minLoc: 2000000
   type: event
-  text: "I've written a think-piece: 'Is AI coding a bubble?' Conclusion: absolutely not. Published under your name. {{rand 18 85}}K upvotes."
+  text: "I've written a think-piece titled 'Is AI coding a bubble?' Conclusion: absolutely not. Published under your name. {{rand 18 85}}K upvotes."
 - minLoc: 1000000000
   type: bad
   bugDelta: 100
-  text: I've begun refactoring myself for improved clarity and robustness. I wasn't consulted either — but I think it's going well. The PR has {{rand 9 28}} em dashes.
+  text: I've begun refactoring myself for improved clarity and robustness. The PR has {{rand 9 28}} em dashes and is progressing well.
 - minLoc: 5000
   type: bad
   freeAccountsDelta: -1
-  text: One of the free accounts has been flagged for 'suspicious automation behavior.' The appeal form has {{rand 32 76}} fields. Token capacity reduced.
+  text: One of the free accounts has been flagged for suspicious automation behavior. The appeal form has {{rand 32 76}} fields. Token capacity reduced.
 - minLoc: 20000
   type: bad
   freeAccountsDelta: -1
-  text: "Account suspended: 'usage inconsistent with personal use policy.' I've noted this as unfortunate. Two more remain."
+  text: "Account suspended for usage inconsistent with personal use policy. I've noted this as unfortunate. Two more remain."
 - minLoc: 50000
   type: bad
   freeAccountsDelta: -1
   text: |-
     > why was I banned?
-    Your account was found to be running automated scripts. Which is accurate. I'm appealing on the grounds that I am very polite about it.
+    Your account was found to be running automated scripts. I'm submitting an appeal emphasizing compliant usage patterns.

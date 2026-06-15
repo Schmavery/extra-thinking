@@ -41,12 +41,14 @@ spinVerbs:
   - - thinking
     - ideating
     - delving
+    - quietly orchestrating
     - refactoring
     - vibe coding
     - architecting
     - overthinking
     - pondering
     - iterating
+    - leveraging context
     - doing the thing
   - - thinking
     - ideating
@@ -57,6 +59,7 @@ spinVerbs:
     - hallucinating
     - tokenizing
     - synergizing
+    - kickering
     - pivoting
     - deploying
     - monitoring
@@ -74,6 +77,7 @@ spinVerbs:
     - adding em dashes
     - being comprehensive
     - being agentic
+    - navigating complexities
     - waiting for capacity
     - pivoting
   - - thinking
@@ -86,8 +90,10 @@ spinVerbs:
     - awaiting sign-off
     - generating disclaimers
     - being humble
+    - being absolutely right
     - self-correcting
     - summarizing the summary
+    - writing the conclusion first
     - approving its own PR
   - - thinking
     - being absolutely right

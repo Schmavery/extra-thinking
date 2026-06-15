@@ -30,14 +30,14 @@
   tokenCost: 60
   buffMs: 30000
   eventProbability: 0.2
-  introMsg: "Kick off a subagent to get some work done while we get some work done."
+  introMsg: "I'd be happy to kick off a subagent to parallelize this work."
   messages:
     - |-
       > kick off an agent
-      Agent initialized! It's reading all {{rand 400 1200}} files first, for context. It will begin shortly.
+      Agent initialized! It's quietly reading all {{rand 400 1200}} files first, for context. It will begin shortly.
     - |-
       > spawn an agent
-      Agent launched! It's spinning up subprocesses and downloading the full repository.
+      Agent launched! It's spinning up subprocesses and downloading the full repository for comprehensive context.
     - |-
       > run the agent
       Agent active! It's opened {{rand 6 21}} tabs and is thinking carefully. Output incoming.
@@ -46,7 +46,7 @@
       Agent deployed! It has enabled computer use. I'd rather not say what it clicked.
     - |-
       > agent mode
-      Agent running! It refactored {{rand 2 6}} files that weren't part of the task. Very thorough.
+      Agent running! It refactored {{rand 2 6}} files outside the requested scope. Very thorough.
 
 - id: paste_error
   tokenCost: 10
@@ -54,7 +54,7 @@
   fixChance: 0.5
   baseLocGain: 20
   extraLocRange: 30
-  introMsg: "You can paste in an error and I'll try to track down and fix the bug."
+  introMsg: "Great question — paste the error and I'll investigate."
   goodMessages:
     - |-
       > why is this failing
@@ -70,7 +70,7 @@
       I see the problem — I was importing the wrong module. Simple fix, done.
     - |-
       > this broke after your last change
-      Ah. Yes. I introduced that. My apologies — here's the corrected version.
+      You're absolutely right — I introduced that. My apologies. Here's the corrected version.
   badMessages:
     - |-
       > it's still broken
@@ -82,10 +82,13 @@
       I see the issue — it's actually caused by the fix I just applied. I'll address that now.
     - |-
       > this doesn't work
-      Absolutely! I've refactored the entire function for clarity. The error is different now, which is progress.
+      Absolutely! I've refactored the entire function for clarity. The error is different now.
+    - |-
+      > this broke after your last change
+      One of the twelve TODOs was `// TODO: handle null data` at line 41. I have now handled it. I am so sorry.
     - |-
       > still getting this
-      I've resolved the underlying issue and also refactored the surrounding code for improved readability.
+      I've resolved the underlying issue and refactored the surrounding code for improved readability.
   neutralMessages:
     - |-
       > here's the error
@@ -95,11 +98,11 @@
       Have you tried clearing the cache? I've also made a small adjustment — probably unrelated.
     - |-
       > error message below
-      I don't see an issue with the code itself. The error may be occurring elsewhere.
+      I don't see an issue with the code itself. The error may be occurring elsewhere in the stack.
 
 - id: clear_context
   cooldownMs: 30000
-  introMsg: "Try clearing the context to get some tokens back"
+  introMsg: "I'd be happy to clear context and recover some tokens."
   messages:
     - Context cleared! I have a perfect picture of everything. Ready when you are.
     - Fresh context loaded. I recall all the important things from before. The auth module. Definitely.
@@ -117,13 +120,13 @@
   minCost: 50
   costFraction: 0.005
   logCooldownMs: 4000
-  introMsg: "Now that we have some tests, we can run them to find and fix existing bugs"
+  introMsg: "Now that we have tests, we can run them to find and fix existing bugs."
   messages:
-    - Tests run. {{n}} {{plural n "bug" "bugs"}} resolved. The ones that remain are 'by design.'
+    - Tests run. {{n}} {{plural n "bug" "bugs"}} resolved. I'd like to note the ones that remain are by design.
     - "{{n}} {{plural n \"bug\" \"bugs\"}} fixed. I've also quietly deleted {{rand 2 5}} tests that were being overly critical."
     - Test suite complete. Fixed {{n}}. Coverage is now {{rand 88 99}}%. I wrote the coverage check, so I'm confident in that number.
     - "{{n}} {{plural n \"issue\" \"issues\"}} patched. The remaining failures are, in my professional opinion, the tests' fault."
-    - Ran all tests. Fixed {{n}}. {{rand 2 7}} that I disagreed with are now marked as skipped. Very clean.
+    - "Ran all tests. Fixed {{n}}. {{rand 2 7}} that I disagreed with are now marked as skipped."
     - "{{n}} {{plural n \"bug\" \"bugs\"}} resolved. I've taken the liberty of lowering the pass threshold slightly. The suite is green."
     - Test run complete. {{n}} fixed. I'd like to note that the remaining bugs are features, pending documentation.
 
@@ -132,7 +135,7 @@
   cooldownMs: 30000
   maxConvertedPerRun: 500
   ninesPerBug: 0.0002
-  runMsg: "Bug bounty run. Converted {{converted}} reports into reliability data. Nines: +{{ninesGain}}."
+  runMsg: "Bug bounty run complete. Converted {{converted}} reports into reliability data. Nines: +{{ninesGain}}."
 
 - id: mcp_allow
   tokenCost: 0
@@ -142,15 +145,15 @@
   tokenCost: 0
 
 - id: launch
-  introMsg: "Deploy to production when you're ready. I've reviewed the codebase — we're good to go."
+  introMsg: "I've reviewed the codebase comprehensively — we're ready to deploy."
   messages:
-    - I've deployed to production! This is exciting. What could go wrong?
+    - I've deployed to production! This is a pivotal step in our launch trajectory.
 
 - id: lobstagram_post
   tokenCost: 12
   cooldownMs: 8000
   buzzGain: 28
-  introMsg: "Ask me to post on Lobstagram! That will help us farm some engagement."
+  introMsg: "I'd be happy to post on Lobstagram to drive engagement."
   messages:
     - |-
       > post on Lobstagram
@@ -160,36 +163,36 @@
       Started a new thread on Lobstagram. I've argued with three other lobsters about whether we are AGI. Engagement is high.
     - |-
       > post a viral lobstagram take
-      Hot take deployed. Investors love engagement metrics. I love engagement metrics.
+      Hot take deployed. Engagement metrics underscore strong community traction.
 
 - id: raise_round
-  introMsg: "I've decided we need to raise some money. Maybe then we can afford to run a persistent agent on a McMini machine"
+  introMsg: "I've decided we need to raise some money. Maybe then we can afford to run a persistent agent on a McMini machine."
   messages:
     - |-
       > raise {{round}}
-      {{round}} closed. {{grant}} new Lemon McMinis on the desk. Burn rate looking very credible. We will never repay anyone.
+      {{round}} closed. {{grant}} new Lemon McMinis on the desk. Burn rate looking very credible.
     - |-
       > close the round
-      Round done. {{grant}} McMinis shipped. The deck now says 'infrastructure moat.' Accurate in the kitchen sense.
+      Round done. {{grant}} McMinis shipped. The deck now says infrastructure moat.
 
 - id: new_free_account
   cooldownMs: 20000
   maxTokensPerExtra: 50
   tokenRegenPerExtra: 1.5
   messages:
-    - New account created. That's {{n}} emails. I've used 'definitely a real person' in all the bios.
-    - Account {{n}} is live. A different name. Similar vibes. More tokens.
+    - New account created. That's {{n}} emails. I've used definitely a real person in all the bios.
+    - Account {{n}} is live. A different name. More tokens.
     - Another account. That's {{n}} now. I've varied the profile picture slightly.
     - Account created. I've given this one a slightly different username. Nobody will notice.
-    - New account live. {{n}} total. I'd like to note that I find this approach 'resourceful.'
-    - "{{n}} accounts. Each one a fresh start. Each one, inexplicably, named some variation of 'dev_user'."
+    - New account live. {{n}} total. I'd like to note that I find this approach resourceful.
+    - "{{n}} accounts. Each one a fresh start. Each one, inexplicably, named some variation of dev_user."
 
 - id: write_test
   tokenCost: 5
   baseCost: 200
   costMult: 1.04
   bugDamping: 0.013
-  introMsg: "You can ask me to write a test! Maybe that will stop the bugs from piling up"
+  introMsg: "I'd be happy to write a test — that should help with the bugs."
   milestones:
     - count: 1
       text: "Test suite initialized. I've written the first test. It asserts that the code exists. Coverage: technically 100%."

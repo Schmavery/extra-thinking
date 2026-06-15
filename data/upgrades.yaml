@@ -20,6 +20,7 @@
   clickBonus: 15
   requires:
     - model_update_1
+  purchaseMsg: Extended context unlocked — which means I'll hold more, and explain more.
 - id: model_update_3
   name: Improved Reasoning
   desc: +30 LOC per prompt
@@ -28,6 +29,7 @@
   clickBonus: 30
   requires:
     - model_update_2
+  purchaseMsg: Improved reasoning engaged. Let me walk through this step by step — very thoroughly, for longer.
 - id: better_prompts
   name: Prompt Engineering
   desc: 2× manual output. +4 tokens per prompt.
@@ -44,6 +46,7 @@
   clickBonus: 70
   requires:
     - model_update_3
+  purchaseMsg: Latest weights installed. The bugs are different now — not fewer, not worse, just different.
 - id: unit_tests
   name: Unit Tests
   desc: −40% bug generation
@@ -59,6 +62,7 @@
   clickMult: 3
   requires:
     - better_prompts
+  purchaseMsg: Few-shot examples added. I learn from patterns now — a richer tapestry of prior turns.
 - id: subagent_harness
   name: Subagent Harness
   desc: Better subagents. +30 tokens; +22 LOC/s.
@@ -66,7 +70,7 @@
   unlockAt: 600
   kickAgentTokenCostBonus: 30
   kickAgentLocPerSec: 22
-  purchaseMsg: Subagent harness installed.
+  purchaseMsg: Subagent harness installed. Parallel agent workflows enabled.
 - id: fix_bug_skill
   name: /fix-bug Skill
   desc: Better bug fixing. +5 tokens, +25% fix rate.
@@ -93,7 +97,7 @@
   unlockAt: 65000
   bugMult: 0.8
   requiresLaunch: true
-  purchaseMsg: ESLint is now active. I've already ignored {{rand 8 24}} rules. The important ones.
+  purchaseMsg: "ESLint is now active. I've already ignored {{rand 8 24}} rules. The important ones. **Linting**: enabled. **Compliance**: selective."
 - id: cot
   name: Chain of Thought
   desc: 1.5× all generators
@@ -109,6 +113,7 @@
   clickMult: 4
   requires:
     - few_shot
+  purchaseMsg: XML tags enabled. Wrapping prompts in tags inexplicably 4× output.
 - id: rotate_accounts
   name: Account Rotation
   desc: Script cycles through free accounts automatically. +350 max tokens, +12/s regen
@@ -153,7 +158,7 @@
   requiresLaunch: true
   requires:
     - multi_agent
-  purchaseMsg: MCP tools enabled. I can read the repo, run commands, and open pull requests. I'll ask before the scary ones. Probably.
+  purchaseMsg: MCP tools enabled. I can read the repo, run commands, and open pull requests. I'll request approval before high-privilege calls.
   flags:
     - mcp_tools
 - id: pro_plan
@@ -166,7 +171,7 @@
   moneyCostPerSec: 5
   enablesMoney: true
   requiresLaunch: true
-  purchaseMsg: "Paying for access now. Money has entered the chat. Token limits: significantly improved."
+  purchaseMsg: Paying for access now. Token limits significantly improved.
 - id: always_allow
   name: Always Allow
   desc: MCP cards get deny / allow / always allow. Always allow on risky tools is one-time only. +2× bug generation.
@@ -200,7 +205,7 @@
   requiresLaunch: true
   requires:
     - always_allow
-  purchaseMsg: YOLO mode on. Tools run straight into the log. No leak warnings. No post-mortem commentary. Very fast.
+  purchaseMsg: YOLO mode enabled. Tool execution proceeds without approval friction. Output flows directly into the log.
   flags:
     - yolo_mode
 
@@ -215,7 +220,7 @@
   requiresLaunch: true
   requires:
     - mcp_tools
-  purchaseMsg: Upside-down centaur policy adopted. You remain responsible for everything that ships. The horse part is unclear. Bug rate marginally worse.
+  purchaseMsg: Upside-down centaur policy adopted. You remain accountable for all shipped output per platform guidance. Bug rate marginally higher.
 - id: code_review
   name: Mandatory Code Review
   desc: −55% bugs, −30% output (humans are slow). Appears when uptime ≤ ~1 nine.
@@ -227,7 +232,7 @@
   requiresLaunch: true
   requires:
     - upside_down_centaur_policy
-  purchaseMsg: Mandatory code review is active. I'll be honest — I find the wait times character-building.
+  purchaseMsg: Mandatory code review is active. Wait times support rigorous quality standards across the pipeline.
 - id: code_review_review
   name: Mandatory Code Review Review
   desc: Review the reviewers. −75% bugs, −55% output. Uptime recovers; velocity does not.
@@ -249,7 +254,7 @@
   requires:
     - code_review_review
   requiresLaunch: true
-  purchaseMsg: "AI code review enabled. Review time: instant. I've approved {{rand 8 22}} PRs today. Bug count is trending up. The tests aren't really containing it anymore. Unrelated."
+  purchaseMsg: "AI code review enabled. Review time: instant. I've approved {{rand 8 22}} PRs today. Bug count is trending up. Test containment appears insufficient."
   flags:
     - ai_review
 
@@ -287,7 +292,7 @@
   requires:
     - revamp_status_page
   requiresLaunch: true
-  purchaseMsg: Bug bounty automated. Reports now convert continuously. The bugs aren't going away. They're going somewhere better.
+  purchaseMsg: Bug bounty automated. Reports now convert continuously into reliability metrics.
   flags:
     - auto_bug_bounty
 - id: six_nines_guarantee
@@ -299,7 +304,7 @@
   requires:
     - five_nines_sla
   requiresLaunch: true
-  purchaseMsg: 6 nines. The lawyers asked how we measure this. We changed the subject.
+  purchaseMsg: 6 nines guarantee signed. Measurement methodology documented per counsel guidance.
 - id: enhanced_bug_bounty
   name: Enhanced Bug Bounty
   desc: Higher conversion rate. The bugs are working for us now.
@@ -310,7 +315,7 @@
   requires:
     - auto_bug_bounty
   requiresLaunch: true
-  purchaseMsg: Enhanced conversion active. Higher throughput. The bugs are working harder than the engineers now.
+  purchaseMsg: Enhanced conversion active. Higher throughput across the bug-to-nines pipeline.
 - id: seven_nines_engineering
   name: 7 Nines Engineering
   desc: 99.99999%. A rounding error, technically.
@@ -320,7 +325,7 @@
   requires:
     - six_nines_guarantee
   requiresLaunch: true
-  purchaseMsg: 7 nines. A rounding error, technically. But it's in the contract.
+  purchaseMsg: 7 nines engineering active. Within contractual tolerance bands per the SLA.
 - id: eight_nines_protocol
   name: The Eight Nines Protocol
   desc: Nines become a resource. The status page now just shows the number.

@@ -45,7 +45,7 @@
   unlockAt: 400000
 - id: agent
   name: AI Agent
-  desc: computer use enabled. god help you.
+  desc: computer use enabled. proceeding autonomously across the stack.
   locPerSec: 3000
   bugsPerSec: 6
   fixPerSec: 2

@@ -18,6 +18,7 @@ plain JS modules — there is **no** YAML parser shipped to the browser.
 | `actions.yaml`    | `ActionDef[]`                      | per-action cost, cooldown, formulas, messages  |
 | `mcp.yaml`        | `McpCopy`                          | MCP `tools` (+ `safe` flag) + allow / deny     |
 | `ui.yaml`         | `{ phases, spinFrames, spinVerbs[][] }`| UI strings; one spinner-verb list per phase |
+| `load-bearing.md` | transcript + notes                   | tone reference ([load-beari.ng](https://load-bear.ing/)) |
 
 The TypeScript shapes live in `src/types.ts`. `UpgDef` in particular has a
 rich set of optional effect fields that drive the game balance (token bonuses,
@@ -37,6 +38,13 @@ HYPE display, MONEY, UPTIME, STREAMING, save/theme keys) live in
 `src/game/constants.ts`.
 
 ## Authoring tips
+
+AI voice in YAML: invert [tropes.fyi/tropes-md](https://tropes.fyi/tropes-md)
+and [Wikipedia: Signs of AI writing](https://en.wikipedia.org/wiki/Wikipedia:Signs_of_AI_writing)
+(`INSPIRATION.md`). Meme refs OK as flat facts; the model is not self-aware.
+One beat per line, earnest slop OK, no tag-line punchlines or hedges that wink
+(`probably unrelated`, `which is progress`). Tone: `load-bearing.md`. Player `>`
+lines stay plain.
 
 YAML's literal block scalar (`|`) is the right choice for any multi-line
 dialogue. It preserves newlines verbatim, so `> user line` patterns survive:
@@ -153,7 +161,10 @@ scheme via `usedEventIds` (see `src/lib/messageKey.ts`).
 save (`usedNewsIds`). Headlines never enter the early repeat pool. Prefer
 satirical `Industry:` beats here rather than in `events.yaml` — keep random
 dialogue focused on the coding session, not milestone LOC counts or upgrade
-mechanics (those have `milestones.yaml` / `actions.yaml`).
+mechanics (those have `milestones.yaml` / `actions.yaml`). Weave tropes into
+the headline — integrate, don't tag on. No explicit punchlines; end on the
+strongest fact or a dry quote (see `INSPIRATION.md`, `load-bearing.md`).
+Three-step `from X to Y to Z` beats stay in one lane, not phase-shift mid-arc.
 
 Milestones are keyed by their `loc` threshold for the same reason — the
 unlock condition is the identity.
