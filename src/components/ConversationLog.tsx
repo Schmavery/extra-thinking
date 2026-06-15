@@ -1,4 +1,4 @@
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode, type Ref, type RefObject } from 'react';
 import type { LogEntry } from '../types';
 import { UI, spinVerbsForPhase } from '../game/data';
 import { STREAMING } from '../game/constants';
@@ -30,6 +30,8 @@ interface Props {
   onMcpAllow: () => void;
   onMcpAlwaysAllow: () => void;
   onMcpDeny: () => void;
+  /** Optional external ref for the scroll container (side-gutter wheel forwarding). */
+  scrollContainerRef?: RefObject<HTMLDivElement | null>;
 }
 
 const TYPE_CLASSES: Record<Exclude<LogEntry['type'], 'tool'>, string> = {
@@ -58,11 +60,13 @@ export function ConversationLog({
   onMcpAllow,
   onMcpAlwaysAllow,
   onMcpDeny,
+  scrollContainerRef,
 }: Props) {
-  const scrollRef = useRef<HTMLDivElement>(null);
+  const internalScrollRef = useRef<HTMLDivElement>(null);
+  const scrollRef = scrollContainerRef ?? internalScrollRef;
   const endRef = useRef<HTMLDivElement>(null);
   const initialScrollRef = useRef(true);
-  useRevealScrollbar(scrollRef);
+  useRevealScrollbar(scrollContainerRef ?? internalScrollRef);
   useEffect(() => {
     endRef.current?.scrollIntoView({
       behavior: initialScrollRef.current ? 'instant' : 'smooth',
@@ -133,7 +137,7 @@ export function ConversationLog({
         conversation
       </div>
       <div
-        ref={scrollRef}
+        ref={scrollRef as Ref<HTMLDivElement>}
         className={[
           'flex-1 overflow-y-auto hairline-scrollbar min-h-0',
           isMobile ? 'pb-12' : 'pb-24',

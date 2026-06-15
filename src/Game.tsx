@@ -50,6 +50,7 @@ import { isLogEntryFullyDisplayed, useStreamingLog } from './lib/useStreamingLog
 import { useForegroundGame } from './lib/useForegroundGame';
 import { useGameActive } from './lib/useGameActive';
 import { useRevealScrollbar } from './lib/useRevealScrollbar';
+import { useSideGutterWheelScroll } from './lib/useSideGutterWheelScroll';
 import { useIsMobile } from './lib/useWindowWidth';
 import { Button } from './components/Button';
 import { FooterBarrel } from './components/FooterBarrel';
@@ -84,8 +85,18 @@ export function Game() {
   stateRef.current = state;
   const persistedDiskRef = useRef<SaveDiskSnapshot>(readSaveDiskSnapshot());
   const pausedAtRef = useRef<number | null>(null);
+  const gameRootRef = useRef<HTMLDivElement>(null);
+  const mainAreaRef = useRef<HTMLDivElement>(null);
   const leftScrollRef = useRef<HTMLDivElement>(null);
+  const logScrollRef = useRef<HTMLDivElement>(null);
   useRevealScrollbar(leftScrollRef);
+  useSideGutterWheelScroll({
+    enabled: !isMobile,
+    captureRef: gameRootRef,
+    boundsRef: mainAreaRef,
+    leftRef: leftScrollRef,
+    rightRef: logScrollRef,
+  });
 
   const resetStreamRef = useRef<(syncLog?: LogEntry[]) => void>(() => {});
 
@@ -407,6 +418,7 @@ export function Game() {
 
   return (
     <div
+      ref={gameRootRef}
       className={[
         'h-screen bg-bg text-fg font-mono text-[14px] leading-[1.65] flex flex-col relative overflow-x-hidden overflow-y-visible',
         isMobile ? 'px-[14px] pt-[14px] pb-2' : 'px-6 pt-7 pb-2',
@@ -428,13 +440,21 @@ export function Game() {
       )}
 
       <div
+        ref={mainAreaRef}
         className={
           isMobile
             ? 'w-full flex-1 min-h-0 flex flex-col overflow-hidden'
-            : 'max-w-[940px] w-full mx-auto flex-1 min-h-0 grid grid-rows-[1fr] gap-10 overflow-hidden ' +
-              (showLog ? 'grid-cols-[420px_1fr]' : 'grid-cols-[420px]')
+            : 'w-full flex-1 min-h-0 overflow-hidden'
         }
       >
+        <div
+          className={
+            isMobile
+              ? 'w-full h-full flex flex-col overflow-hidden'
+              : 'max-w-[940px] w-full mx-auto h-full grid grid-rows-[1fr] gap-10 overflow-hidden ' +
+                (showLog ? 'grid-cols-[420px_1fr]' : 'grid-cols-[420px]')
+          }
+        >
         {/* ── Left ── */}
         <div
           ref={leftScrollRef}
@@ -520,6 +540,7 @@ export function Game() {
             displayLog={displayLog}
             queuedUserEntries={queuedUserEntries}
             isMobile={isMobile}
+            scrollContainerRef={logScrollRef}
             mcpApprovalMessage={state.mcpApprovalPending}
             mcpShowAlwaysAllow={derived.hasFlag('mcp_auto_approve')}
             mcpUnsafePolicyBlocked={mcpUnsafePolicyBlocked}
@@ -533,6 +554,7 @@ export function Game() {
             onMcpDeny={handlers.mcpDeny}
           />
         )}
+        </div>
       </div>
 
       <FooterBarrel />
