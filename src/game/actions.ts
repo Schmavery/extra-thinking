@@ -21,8 +21,10 @@ import {
   calcClickBonus,
   calcClickPower,
   calcKickAgentTokenCost,
+  calcLobstagramTokenCost,
   calcPasteErrorFixChance,
   calcPasteErrorTokenCost,
+  calcRunTestsTokenCost,
   formatPasteErrorLog,
   calcPromptCooldownMs,
   calcPromptTokenCost,
@@ -186,14 +188,13 @@ export function clearContextAction(prev: GameState): GameState {
 
 export function runTestsAction(prev: GameState): GameState {
   const a = action('run_tests');
-  if ((prev.tests ?? 0) <= 0) return prev;
-  if (!canAfford(prev, a)) return prev;
-  const cost = runTestsCost(prev.totalLoc);
-  if (prev.loc < cost) return prev;
-  const fixed = Math.max(1, Math.floor(prev.bugs * runTestsFixFraction(prev.tests)));
+  const tests = prev.tests ?? 0;
+  if (tests <= 0) return prev;
+  const tokenCost = calcRunTestsTokenCost(tests);
+  if (prev.tokens < tokenCost) return prev;
+  const fixed = Math.max(1, Math.floor(prev.bugs * runTestsFixFraction(tests)));
   let next: GameState = {
-    ...spendTokens(prev, a.tokenCost!),
-    loc: prev.loc - cost,
+    ...spendTokens(prev, tokenCost),
     ...withBugs(prev, prev.bugs - fixed),
   };
   const t = now();
@@ -205,16 +206,6 @@ export function runTestsAction(prev: GameState): GameState {
   return next;
 }
 
-export function runTestsCost(totalLoc: number): number {
-  const a = action('run_tests');
-  return Math.max(a.minCost!, Math.floor(totalLoc * a.costFraction!));
-}
-
-/**
- * Fraction of outstanding bugs caught by running the suite, scaled by test
- * count. Each test independently catches each bug with probability `p`, so
- * the suite catches `1 - (1 - p)^tests`. Returns 0 with no tests.
- */
 export function runTestsFixFraction(tests: number): number {
   if (tests <= 0) return 0;
   const p = action('run_tests').perTestFixFraction!;
@@ -265,13 +256,15 @@ export function launchAction(prev: GameState): GameState {
 export function lobstagramPostAction(prev: GameState): GameState {
   const a = action('lobstagram_post');
   if (!prev.launched) return prev;
-  if (!canAfford(prev, a)) return prev;
+  const tokenCost = calcLobstagramTokenCost(prev.lobstagramPosts ?? 0);
+  if (prev.tokens < tokenCost) return prev;
   if (isOnCooldown(prev, 'lobstagram_post', a.cooldownMs ?? 0)) return prev;
   if ((prev.buzzMeter ?? 0) >= INVESTOR.buzzMax) return prev;
   const gain = a.buzzGain ?? INVESTOR.buzzMax * 0.25;
   let next: GameState = {
-    ...spendTokens(prev, a.tokenCost!),
+    ...spendTokens(prev, tokenCost),
     buzzMeter: Math.min(INVESTOR.buzzMax, (prev.buzzMeter ?? 0) + gain),
+    lobstagramPosts: (prev.lobstagramPosts ?? 0) + 1,
   };
   next = startCooldown(next, 'lobstagram_post');
   next = logUnusedPool(next, a.messages, 'info');

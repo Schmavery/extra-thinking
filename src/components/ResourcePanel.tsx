@@ -155,7 +155,7 @@ export function ResourcePanel({ state }: Props) {
       )}
 
       {/* investor overlay */}
-      {ui.showInvestor && (
+      {ui.showInvestorHud && (
         <>
           <Row label="burn rate">
             <span className="text-green">${burnRate}/s</span>

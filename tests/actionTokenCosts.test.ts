@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import {
   calcKickAgentTokenCost,
+  calcLobstagramTokenCost,
   calcPasteErrorFixChance,
   calcPasteErrorTokenCost,
   calcPromptTokenCost,
+  calcRunTestsTokenCost,
   formatPasteErrorLog,
   pasteErrorButtonLabel,
 } from '../src/game/rates';
@@ -39,6 +41,18 @@ describe('action token costs', () => {
 
   it('Subagent Harness bumps kick_agent to 90 tokens', () => {
     expect(calcKickAgentTokenCost(['subagent_harness'])).toBe(90);
+  });
+
+  it('run_tests costs 1 token per test written', () => {
+    expect(calcRunTestsTokenCost(0)).toBe(0);
+    expect(calcRunTestsTokenCost(5)).toBe(5);
+    expect(calcRunTestsTokenCost(12)).toBe(12);
+  });
+
+  it('lobstagram post starts at 100t, +10 per prior post', () => {
+    expect(calcLobstagramTokenCost(0)).toBe(100);
+    expect(calcLobstagramTokenCost(1)).toBe(110);
+    expect(calcLobstagramTokenCost(3)).toBe(130);
   });
 });
 

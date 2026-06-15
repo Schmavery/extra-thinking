@@ -215,8 +215,8 @@ export interface ActionDef {
   // run_tests
   /** Per-test independent fix probability. Total = `1 - (1 - p)^tests`. */
   perTestFixFraction?: number;
-  minCost?: number;
-  costFraction?: number;
+  /** Tokens spent = `tests * this` (replaces legacy LOC cost). */
+  perTestTokenCost?: number;
   /** Min ms between consecutive "ran tests" log lines. */
   logCooldownMs?: number;
 
@@ -243,6 +243,9 @@ export interface ActionDef {
 
   // lobstagram_post
   buzzGain?: number;
+  /** First post costs `tokenCost * this`; each prior post adds `tokenCostStep`. */
+  tokenCostMult?: number;
+  tokenCostStep?: number;
 }
 
 /** Per-McMini lane assignment; counts must sum to `mcMinis`. */
@@ -300,6 +303,8 @@ export interface GameState {
   tokens: number;
   /** 0–100; resets on fundraise. */
   buzzMeter: number;
+  /** Lobstagram posts this save; escalates `lobstagram_post` token cost. */
+  lobstagramPosts?: number;
   /** Index into `INVESTOR.fundingRounds`; 0 = next round is seed. */
   fundingRound: number;
   mcMinis: number;

@@ -61,7 +61,7 @@ export const THRESHOLDS = {
   showKickAgentClicks: 10,
   showWriteTestsBugs: 50,
   /** Reveal run_tests once the player has written at least this many tests. */
-  showRunTestsTests: 1,
+  showRunTestsTests: 5,
   showClearContextLoc: 4000,
   showClearContextMinTokens: 10,
   showBugBountyBugs: 50,
@@ -177,7 +177,7 @@ export const AGENT_BUFF = {
   /** Bug-rate multiplier while the agent buff is active. */
   bugRateMult: 1.5,
   /** Flat LOC/s while `kick_agent` buff is active (independent of generator scaling). */
-  locPerSec: 20,
+  locPerSec: 8,
   /**
    * If `nines` has never been initialized but status was revamped, fall back
    * to this floor when computing nines.

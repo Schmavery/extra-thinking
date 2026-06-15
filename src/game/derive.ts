@@ -6,7 +6,7 @@
 
 import type { GameState } from '../types';
 import { LAUNCH_LOC, TOKENS } from './constants';
-import { calcTokenConfig } from './rates';
+import { calcInfraBurnPerSec, calcTokenConfig } from './rates';
 import { mcpApprovalPending } from './mcpApproval';
 import {
   computeFlags,
@@ -21,6 +21,10 @@ export interface DerivedUi {
   showRunTests: boolean;
   showBugBounty: boolean;
   showInvestor: boolean;
+  /** Burn rate + buzz meter in the resource panel. */
+  showInvestorHud: boolean;
+  /** Close-round row in the upgrades panel. */
+  showRaiseRound: boolean;
   showMcMinis: boolean;
   ninesTracking: boolean;
   showBugs: boolean;
@@ -67,6 +71,16 @@ export function deriveGame(state: GameState): DerivedGame {
       state.bugs > thresholds.showBugBountyBugs &&
       !flag('auto_bug_bounty'),
     showInvestor: state.launched,
+    showInvestorHud:
+      state.launched &&
+      ((state.buzzMeter ?? 0) > 0 ||
+        calcInfraBurnPerSec(state.upgrades) > 0 ||
+        (state.fundingRound ?? 0) > 0),
+    showRaiseRound:
+      state.launched &&
+      ((state.buzzMeter ?? 0) > 0 ||
+        calcInfraBurnPerSec(state.upgrades) > 0 ||
+        (state.fundingRound ?? 0) > 0),
     showMcMinis: (state.mcMinis ?? 0) > 0,
     ninesTracking: flag('nines_tracking'),
     showBugs: (state.lifetimeBugs ?? 0) >= thresholds.showPasteErrorBugs,

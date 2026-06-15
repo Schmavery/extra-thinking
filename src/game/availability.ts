@@ -36,10 +36,12 @@ import {
 import {
   calcBugPenalty,
   calcKickAgentTokenCost,
+  calcLobstagramTokenCost,
   calcPasteErrorTokenCost,
   calcPromptCooldownMs,
   calcPromptTokenCost,
   calcRates,
+  calcRunTestsTokenCost,
   calcTokenConfig,
   genCost,
 } from './rates';
@@ -56,7 +58,6 @@ import {
   pasteErrorAction,
   promptAction,
   runTestsAction,
-  runTestsCost,
   writeTestAction,
   writeTestCost,
 } from './actions';
@@ -515,9 +516,9 @@ function kickAgent(c: Ctx): Move {
 }
 
 function runTests(c: Ctx): Move {
-  const a = action('run_tests');
-  const cost = runTestsCost(c.state.totalLoc);
-  const hasTests = (c.state.tests ?? 0) > 0;
+  const tests = c.state.tests ?? 0;
+  const tokenCost = calcRunTestsTokenCost(tests);
+  const hasTests = tests > 0;
   return buildMove(
     {
       id: 'run_tests',
@@ -526,11 +527,7 @@ function runTests(c: Ctx): Move {
       visible: c.ui.showRunTests,
       apply: runTestsAction,
     },
-    withMcpIdle(
-      c.state,
-      [boolGate(hasTests), locGate(c.state, cost), tokenGate(c.state, a.tokenCost)],
-      c.t,
-    ),
+    withMcpIdle(c.state, [boolGate(hasTests), tokenGate(c.state, tokenCost)], c.t),
   );
 }
 
@@ -556,6 +553,7 @@ function clearContext(c: Ctx): Move {
 
 function lobstagramPost(c: Ctx): Move {
   const a = action('lobstagram_post');
+  const tokenCost = calcLobstagramTokenCost(c.state.lobstagramPosts ?? 0);
   const buzzFull = (c.state.buzzMeter ?? 0) >= INVESTOR.buzzMax;
   return buildMove(
     {
@@ -571,7 +569,7 @@ function lobstagramPost(c: Ctx): Move {
         boolGate(c.state.launched),
         boolGate(!buzzFull),
         cooldownGate(c.state, 'lobstagram_post', a.cooldownMs, c.t),
-        tokenGate(c.state, a.tokenCost),
+        tokenGate(c.state, tokenCost),
       ],
       c.t,
     ),
@@ -586,7 +584,7 @@ function raiseRound(c: Ctx): Move {
       id: 'raise_round',
       kind: 'action',
       actionId: 'raise_round',
-      visible: c.ui.showInvestor && hasRound,
+      visible: c.ui.showRaiseRound && hasRound,
       apply: raiseRoundAction,
     },
     withMcpIdle(c.state, [boolGate(ok)], c.t),

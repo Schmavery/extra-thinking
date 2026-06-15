@@ -110,15 +110,13 @@
     - Cleared! Starting fresh with full awareness of prior decisions. Ready.
 
 - id: run_tests
-  tokenCost: 8
   eventProbability: 0.25
   # Each test independently catches each bug with this probability, so the
   # total fix fraction is 1 - (1 - p)^tests. With p=0.15: 1 test ≈ 15%,
   # 5 ≈ 56%, 10 ≈ 80%, 25 ≈ 98%. Approaches but never reaches 100%.
   perTestFixFraction: 0.15
+  perTestTokenCost: 1
   cooldownMs: 30000
-  minCost: 50
-  costFraction: 0.005
   logCooldownMs: 4000
   introMsg: "Now that we have tests, we can run them to find and fix existing bugs."
   messages:
@@ -150,7 +148,8 @@
     - I've deployed to production! This is a pivotal step in our launch trajectory.
 
 - id: lobstagram_post
-  tokenCost: 12
+  tokenCost: 100
+  tokenCostStep: 10
   cooldownMs: 8000
   buzzGain: 28
   introMsg: "I'd be happy to post on Lobstagram to drive engagement."

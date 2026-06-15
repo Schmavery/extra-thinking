@@ -384,8 +384,8 @@ export function Game() {
     derived.hasFlag('mcp_auto_approve');
   const phase = getPhase(state);
   const showLog = state.log.length >= 1;
-  const { showGenSection, showUpgSection, showInvestor } = derived.ui;
-  const fundingRoundOpen = showInvestor && nextFundingRound(state) !== undefined;
+  const { showGenSection, showUpgSection, showRaiseRound } = derived.ui;
+  const fundingRoundOpen = showRaiseRound && nextFundingRound(state) !== undefined;
 
   const queuedUserEntries = useMemo(
     () => computeQueuedUserEntries(state.log, displayLog, isAnimating),

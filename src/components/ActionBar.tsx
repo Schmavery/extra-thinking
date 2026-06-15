@@ -2,11 +2,13 @@ import type { GameState } from '../types';
 import { action } from '../game/data';
 import {
   calcKickAgentTokenCost,
+  calcLobstagramTokenCost,
   calcPasteErrorTokenCost,
+  calcRunTestsTokenCost,
   calcTokenConfig,
   pasteErrorButtonLabel,
 } from '../game/rates';
-import { runTestsCost, runTestsFixFraction, writeTestCost } from '../game/actions';
+import { runTestsFixFraction, writeTestCost } from '../game/actions';
 import { getMove, rechargeProgress } from '../game/availability';
 import { fmt } from '../lib/format';
 import { Button } from './Button';
@@ -64,7 +66,8 @@ export function ActionBar({
   };
 
   const wTestCost = writeTestCost(state.tests ?? 0);
-  const tCost = runTestsCost(state.totalLoc);
+  const runTestsTokenCost = calcRunTestsTokenCost(state.tests ?? 0);
+  const lobstagramTokenCost = calcLobstagramTokenCost(state.lobstagramPosts ?? 0);
 
   return (
     <div className="mt-[10px] mb-1 flex flex-col items-start gap-1">
@@ -128,10 +131,10 @@ export function ActionBar({
           <Button
             off={!m.runTests.legal}
             onClick={m.runTests.legal ? onRunTests : undefined}
-            title={`costs ${fmt(tCost)} loc, fixes ~${fixPct}% of bugs (${state.tests ?? 0} ${(state.tests ?? 0) === 1 ? 'test' : 'tests'})`}
+            title={`costs ${runTestsTokenCost}t, fixes ~${fixPct}% of bugs (${state.tests ?? 0} ${(state.tests ?? 0) === 1 ? 'test' : 'tests'})`}
             progress={rechargeProgress(m.runTests)}
           >
-            run tests [−{fmt(tCost)} loc · {A.runTests.tokenCost}t]
+            run tests [{runTestsTokenCost}t]
           </Button>
         );
       })()}
@@ -174,7 +177,7 @@ export function ActionBar({
           title="Lobstagram post — fills buzz meter"
           progress={rechargeProgress(m.lobstagramPost)}
         >
-          post on Lobstagram [{action('lobstagram_post').tokenCost}t]
+          post on Lobstagram [{lobstagramTokenCost}t]
         </Button>
       )}
 

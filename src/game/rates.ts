@@ -99,6 +99,21 @@ export function calcKickAgentTokenCost(upgrades: string[]): number {
   return base + bonus;
 }
 
+/** Tokens to run the suite; scales with test count (1 tok/test by default). */
+export function calcRunTestsTokenCost(tests: number): number {
+  if (tests <= 0) return 0;
+  const perTest = action('run_tests').perTestTokenCost ?? 1;
+  return tests * perTest;
+}
+
+/** Escalating Lobstagram post cost: base × mult, + step per prior post. */
+export function calcLobstagramTokenCost(posts: number): number {
+  const a = action('lobstagram_post');
+  const base = (a.tokenCost ?? 0) * (a.tokenCostMult ?? 1);
+  const step = a.tokenCostStep ?? 0;
+  return base + posts * step;
+}
+
 /** Effective `prompt` token cost; base from `actions.yaml` + summed bonuses. */
 export function calcPromptTokenCost(upgrades: string[]): number {
   const base = action('prompt').tokenCost ?? 0;
