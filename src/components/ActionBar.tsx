@@ -138,12 +138,22 @@ export function ActionBar({
 
       {m.clearContext.visible && (() => {
         const tokensToRefill = maxTokens - Math.floor(state.tokens);
+        const tokensFull = Math.floor(state.tokens) >= maxTokens;
+        const onCd = m.clearContext.cooldownProgress < 1;
+        const clearTitle = m.clearContext.legal
+          ? 'starts a new conversation — refills tokens to max'
+          : tokensFull
+            ? 'tokens already full'
+            : onCd
+              ? 'on cooldown — wait for the bar to fill'
+              : 'finish the pending MCP call first';
         return (
           <Button
             off={!m.clearContext.legal}
             onClick={m.clearContext.legal ? onClearContext : undefined}
-            title="starts a new conversation — refills tokens to max"
+            title={clearTitle}
             progress={rechargeProgress(m.clearContext)}
+            progressEaseMs={A.clearContext.cooldownMs}
             progressClassName="bg-green/10"
           >
             clear the context{tokensToRefill > 0 ? ` [+${tokensToRefill}t]` : ''}

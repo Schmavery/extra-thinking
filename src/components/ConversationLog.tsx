@@ -4,6 +4,7 @@ import { UI, spinVerbsForPhase } from '../game/data';
 import { STREAMING } from '../game/constants';
 import { useRevealScrollbar } from '../lib/useRevealScrollbar';
 import { Button } from './Button';
+import { LightbulbIcon } from './LightbulbIcon';
 import { McpToolCallBlock } from './McpToolCallBlock';
 
 const SPIN_FRAMES = UI.spinFrames;
@@ -37,7 +38,8 @@ const TYPE_CLASSES: Record<Exclude<LogEntry['type'], 'tool'>, string> = {
   event: 'border-l-2 border-l-log-event-border text-log-event pl-[10px]',
   news: 'border-l-2 border-l-log-news-border text-log-news pl-[10px]',
   milestone: 'border-l-2 border-l-log-milestone-border text-log-milestone pl-[10px]',
-  system: 'border-l-2 border-l-log-system-border text-log-system pl-[10px]',
+  system:
+    'border-l-[3px] border-l-log-system-border text-log-system bg-log-system/10 pl-[10px] -ml-px',
   info: 'border-l-2 border-l-log-info-border text-log-info pl-[10px]',
 };
 
@@ -150,7 +152,14 @@ export function ConversationLog({
               key={entry.id}
               className={'mb-[11px] text-[12px] leading-[1.55] ' + TYPE_CLASSES[entry.type]}
             >
-              {entry.text}
+              {entry.type === 'system' ? (
+                <span className="inline-flex items-start gap-[6px]">
+                  <LightbulbIcon className="w-[11px] h-[11px] mt-[3px] shrink-0 opacity-85" />
+                  <span>{entry.text}</span>
+                </span>
+              ) : (
+                entry.text
+              )}
             </div>
           ),
         )}

@@ -52,12 +52,12 @@
   --log-bad-border: #cc6666;
   --log-event: #6633aa;
   --log-event-border: #9966dd;
-  --log-news: #2244aa;
-  --log-news-border: #6688dd;
+  --log-news: #8a6000;
+  --log-news-border: #ccaa00;
   --log-milestone: #1a7a3a;
   --log-milestone-border: #4aaa6a;
-  --log-system: #8a6000;
-  --log-system-border: #ccaa00;
+  --log-system: #2244aa;
+  --log-system-border: #6688dd;
   --log-user: #777777;
   --log-user-border: #cccccc;
 }
@@ -128,12 +128,12 @@
     --log-bad-border: #cc6666;
     --log-event: #6633aa;
     --log-event-border: #9966dd;
-    --log-news: #2244aa;
-    --log-news-border: #6688dd;
+    --log-news: #8a6000;
+    --log-news-border: #ccaa00;
     --log-milestone: #1a7a3a;
     --log-milestone-border: #4aaa6a;
-    --log-system: #8a6000;
-    --log-system-border: #ccaa00;
+    --log-system: #2244aa;
+    --log-system-border: #6688dd;
     --log-user: #777777;
     --log-user-border: #cccccc;
 
@@ -253,12 +253,12 @@
   --log-bad-border: #cb6764;
   --log-event: #6c71c4;
   --log-event-border: #9b9fda;
-  --log-news: #268bd2;
-  --log-news-border: #6cb1e0;
+  --log-news: #b58900;
+  --log-news-border: #d9b540;
   --log-milestone: #859900;
   --log-milestone-border: #b3c500;
-  --log-system: #b58900;
-  --log-system-border: #d9b540;
+  --log-system: #268bd2;
+  --log-system-border: #6cb1e0;
   --log-user: #839496;
   --log-user-border: #93a1a1;
 }

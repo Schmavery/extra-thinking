@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameState, LogEntry } from './types';
-import { SAVE_INTERVAL_MS, STREAMING, TICK_MS } from './game/constants';
+import { SAVE_INTERVAL_MS, STREAMING } from './game/constants';
+import { calcPromptCooldownMs } from './game/rates';
 import { mcpExecuting } from './game/mcpApproval';
 import { MILESTONES, UI, mcpToolIsSafe } from './game/data';
 import { deriveGame } from './game/derive';
@@ -453,15 +454,14 @@ export function Game() {
           {(() => {
             const t = Date.now();
             const promptMove = getMove(state, 'prompt', t)!;
-            const waiting = !promptMove.legal;
-            const onCooldown = !promptMove.legal;
+            const promptCd = calcPromptCooldownMs(state.upgrades);
             return (
               <Button
                 variant="primary"
-                off={waiting}
-                onClick={waiting ? undefined : handlers.prompt}
-                progress={onCooldown ? rechargeProgress(promptMove) : undefined}
-                progressEaseMs={TICK_MS}
+                off={!promptMove.legal}
+                onClick={promptMove.legal ? handlers.prompt : undefined}
+                progress={rechargeProgress(promptMove)}
+                progressEaseMs={promptCd}
                 progressClassName="bg-green/10"
               >
                 {promptLabel}
