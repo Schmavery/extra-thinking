@@ -480,8 +480,8 @@ export function Game() {
           ref={leftScrollRef}
           className={
             isMobile
-              ? 'overflow-y-auto hairline-scrollbar flex-1 min-h-0 pb-6'
-              : 'overflow-y-auto hairline-scrollbar min-w-0 h-full pb-6'
+              ? 'overflow-y-auto overflow-x-hidden hairline-scrollbar flex-1 min-h-0 pb-6'
+              : 'overflow-y-auto overflow-x-hidden hairline-scrollbar min-w-0 h-full pb-6'
           }
         >
           {!isMobile && (

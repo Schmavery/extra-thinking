@@ -5,7 +5,14 @@ import { fmt, fmtRate } from '../lib/format';
 import { genTooltip } from '../lib/genLabel';
 import { snapRate } from '../game/rates';
 import { getMove, rechargeProgress } from '../game/availability';
-import { Button } from './Button';
+import {
+  ShopButton,
+  ShopMeta,
+  ShopName,
+  ShopNameText,
+  ShopRow,
+  ShopSectionHeader,
+} from './ShopRow';
 
 interface Props {
   state: GameState;
@@ -20,16 +27,18 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
   const showGenBurn = hasProPlan(state.upgrades);
 
   return (
-    <div>
-      <SectionHeader>generators</SectionHeader>
+    <div className="min-w-0">
+      <ShopSectionHeader>generators</ShopSectionHeader>
 
       {newAccount.visible && (
-        <Row>
-          <Name>
-            Free Account
-            {state.freeAccounts > 1 && <span className="text-blue"> [{state.freeAccounts}]</span>}
-          </Name>
-          <Button
+        <ShopRow>
+          <ShopName>
+            <ShopNameText>Free Account</ShopNameText>
+            {state.freeAccounts > 1 && (
+              <span className="text-blue shrink-0"> [{state.freeAccounts}]</span>
+            )}
+          </ShopName>
+          <ShopButton
             off={!newAccount.legal}
             onClick={newAccount.legal ? onNewFreeAccount : undefined}
             title={`+${newAccountData.maxTokensPerExtra} max tokens, +${newAccountData.tokenRegenPerExtra}/s regen · ${state.freeAccounts} account${
@@ -39,9 +48,11 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
             progressClassName="bg-green/10"
           >
             create
-          </Button>
-          <Desc>a different email. still free. just this once.</Desc>
-        </Row>
+          </ShopButton>
+          <ShopMeta>
+            <span className="text-dimmer">a different email. still free. just this once.</span>
+          </ShopMeta>
+        </ShopRow>
       )}
 
       {GENS.map((g) => {
@@ -57,20 +68,20 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
             ? fmtRate(genLocRate)
             : `+${fmtRate(unitLoc)}/each`;
         return (
-          <Row key={g.id}>
-            <Name>
-              {g.name}
-              {owned > 0 && <span className="text-green"> [{owned}]</span>}
-            </Name>
-            <Button
+          <ShopRow key={g.id}>
+            <ShopName>
+              <ShopNameText>{g.name}</ShopNameText>
+              {owned > 0 && <span className="text-green shrink-0"> [{owned}]</span>}
+            </ShopName>
+            <ShopButton
               off={!move.legal}
               onClick={() => onBuyGen(g.id)}
               title={genTooltip(g, state.upgrades)}
               progress={rechargeProgress(move)}
             >
               buy
-            </Button>
-            <div className="text-[12px] flex flex-wrap gap-x-[10px] gap-y-[2px] items-baseline">
+            </ShopButton>
+            <ShopMeta>
               <span className={`whitespace-nowrap shrink-0 ${move.legal ? 'text-dim' : 'text-dimmer'}`}>
                 {fmt(cost)} loc
               </span>
@@ -83,34 +94,10 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
                 {rateLabel}
               </span>
               <span className="text-dimmer min-w-0">{g.desc}</span>
-            </div>
-          </Row>
+            </ShopMeta>
+          </ShopRow>
         );
       })}
     </div>
   );
-}
-
-function SectionHeader({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="text-dim text-[11px] tracking-[0.12em] uppercase mb-[10px] mt-6 pb-[5px] border-b border-border">
-      {children}
-    </div>
-  );
-}
-
-function Row({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="grid grid-cols-[150px_80px_1fr] gap-[6px] items-baseline mb-[7px]">
-      {children}
-    </div>
-  );
-}
-
-function Name({ children }: { children: React.ReactNode }) {
-  return <div className="text-fg">{children}</div>;
-}
-
-function Desc({ children }: { children: React.ReactNode }) {
-  return <div className="text-[12px] text-dimmer">{children}</div>;
 }

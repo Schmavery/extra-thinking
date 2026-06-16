@@ -7,7 +7,14 @@ import {
   raiseBlockReason,
   raiseRoundRequirementsLabel,
 } from '../game/investor';
-import { Button } from './Button';
+import {
+  ShopButton,
+  ShopMeta,
+  ShopName,
+  ShopNameText,
+  ShopRow,
+  ShopSectionHeader,
+} from './ShopRow';
 
 interface Props {
   state: GameState;
@@ -29,62 +36,63 @@ export function Upgrades({ state, onBuyUpgrade, onRaiseRound }: Props) {
   if (visible.length === 0 && !showRaise) return null;
 
   return (
-    <div>
-      <div className="text-dim text-[11px] tracking-[0.12em] uppercase mb-[10px] mt-6 pb-[5px] border-b border-border">
-        upgrades
-      </div>
+    <div className="min-w-0">
+      <ShopSectionHeader>upgrades</ShopSectionHeader>
 
       {showRaise && round && raiseMove && (() => {
         const blockReason = raiseMove.legal ? null : raiseBlockReason(state);
         return (
-          <div className="grid grid-cols-[180px_56px_1fr] gap-[6px] items-baseline mb-[7px]">
-            <div className="text-fg">Close {round.label}</div>
-            <Button
+          <ShopRow>
+            <ShopName>
+              <ShopNameText>Close {round.label}</ShopNameText>
+            </ShopName>
+            <ShopButton
               variant={raiseMove.legal ? 'launch' : 'default'}
               off={!raiseMove.legal}
               onClick={raiseMove.legal ? onRaiseRound : undefined}
               title={raiseMove.legal ? `Close ${round.label}` : blockReason ?? undefined}
             >
               close
-            </Button>
-            <div className="text-[12px] text-dimmer">
-              {raiseRoundRequirementsLabel(round)}
-              {raiseMove.legal ? (
-                <span className="text-purple ml-[10px]">(ready)</span>
-              ) : (
-                blockReason && <span className="ml-[10px]">({blockReason})</span>
-              )}
-              {round.mcMinisGrant > 0 && (
-                <span className="ml-[10px]">+{round.mcMinisGrant} McMini</span>
-              )}
-            </div>
-          </div>
+            </ShopButton>
+            <ShopMeta>
+              <span className="text-dimmer">
+                {raiseRoundRequirementsLabel(round)}
+                {raiseMove.legal ? (
+                  <span className="text-purple ml-[10px]">(ready)</span>
+                ) : (
+                  blockReason && <span className="ml-[10px]">({blockReason})</span>
+                )}
+                {round.mcMinisGrant > 0 && (
+                  <span className="ml-[10px]">+{round.mcMinisGrant} McMini</span>
+                )}
+              </span>
+            </ShopMeta>
+          </ShopRow>
         );
       })()}
 
       {visible.map(({ u, move }) => (
-        <div
-          key={u.id}
-          className="grid grid-cols-[180px_56px_1fr] gap-[6px] items-baseline mb-[7px]"
-        >
-          <div className="text-fg">{u.name}</div>
-          <Button
+        <ShopRow key={u.id}>
+            <ShopName>
+              <ShopNameText>{u.name}</ShopNameText>
+            </ShopName>
+          <ShopButton
             off={!move.legal}
             onClick={() => onBuyUpgrade(u.id)}
             title={u.desc}
             progress={rechargeProgress(move)}
           >
             buy
-          </Button>
-          <div className="text-[12px] flex flex-wrap gap-x-[10px] gap-y-[2px] items-baseline">
+          </ShopButton>
+          <ShopMeta>
             <span
               className={`whitespace-nowrap shrink-0 ${move.legal ? 'text-dim' : 'text-dimmer'}`}
             >
               {fmt(u.cost)} loc
             </span>
             <span className="text-dimmer min-w-0">{u.desc}</span>
-          </div>
-        </div>
+          </ShopMeta>
+        </ShopRow>
       ))}
     </div>
   );
@@ -93,7 +101,7 @@ export function Upgrades({ state, onBuyUpgrade, onRaiseRound }: Props) {
 export function InstalledList({ ids }: { ids: string[] }) {
   if (ids.length === 0) return null;
   return (
-    <div className="mt-[10px] text-dimmer text-[11px]">
+    <div className="mt-[10px] text-dimmer text-[11px] min-w-0 break-words">
       installed: {ids.map((id) => UPGRADES.find((u) => u.id === id)?.name).join(', ')}
     </div>
   );
