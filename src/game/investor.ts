@@ -1,6 +1,7 @@
 import type { GameState, McMiniLanes } from '../types';
 import { INVESTOR } from './constants';
 import { calcInfraBurnPerSec } from './rates';
+import { canRaiseWithReliability, raiseReliabilityBlockReason } from './reliability';
 
 export type McMiniLane = keyof McMiniLanes;
 
@@ -63,6 +64,7 @@ export function nextFundingRound(state: GameState) {
 export function canRaise(state: GameState): boolean {
   const round = nextFundingRound(state);
   if (!round || !state.launched) return false;
+  if (!canRaiseWithReliability(state)) return false;
   const buzz = state.buzzMeter ?? 0;
   if (buzz < INVESTOR.buzzMax) return false;
   return calcInfraBurnPerSec(state) >= round.minBurnPerSec;
@@ -74,6 +76,8 @@ export function raiseRoundRequirementsLabel(round: { minBurnPerSec: number }): s
 }
 
 export function raiseBlockReason(state: GameState): string | null {
+  const reliability = raiseReliabilityBlockReason(state);
+  if (reliability) return reliability;
   const round = nextFundingRound(state);
   if (!round) return 'no rounds left';
   if (!state.launched) return 'not launched';

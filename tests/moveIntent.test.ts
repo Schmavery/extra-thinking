@@ -82,6 +82,24 @@ describe('scoreMove', () => {
     const prompt = scoreMove(actionMove('prompt'), needs, WEIGHTS_HYGIENE);
     expect(tests).toBeGreaterThan(prompt);
   });
+
+  it('prefers bug fixes over kick when launch is blocked by reliability', () => {
+    const state = defaultState();
+    state.totalLoc = 10_000;
+    state.loc = 5000;
+    state.tokens = 120;
+    state.bugs = 205;
+    state.tests = 5;
+    state.upgrades = ['model_update_1'];
+    state.totalClicks = 20;
+    state.started = true;
+    const needs = assessNeeds(state, 0);
+    expect(needs.launch).toBe(0);
+    expect(needs.bugs).toBeGreaterThan(0.85);
+    const tests = scoreMove(actionMove('run_tests'), needs, WEIGHTS_PROGRESS, 0, state, 0);
+    const kick = scoreMove(actionMove('kick_agent'), needs, WEIGHTS_PROGRESS, 0, state, 0);
+    expect(tests).toBeGreaterThan(kick);
+  });
 });
 
 describe('moveHelps', () => {

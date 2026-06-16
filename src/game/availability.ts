@@ -21,6 +21,7 @@
 import type { GameState } from '../types';
 import { INVESTOR, LAUNCH_LOC } from './constants';
 import { canRaise, nextFundingRound } from './investor';
+import { canLaunchWithReliability } from './reliability';
 import { action, GENS, UPGRADES } from './data';
 import { deriveGame } from './derive';
 import { computeFlags } from './flags';
@@ -603,7 +604,11 @@ function launch(c: Ctx): Move {
   // `showLaunchBtn` already requires `totalLoc >= LAUNCH_LOC` in `derive.ts`.
   const gates: Gate[] = withMcpIdle(
     c.state,
-    [boolGate(!c.state.launched), boolGate(c.ui.showLaunchBtn)],
+    [
+      boolGate(!c.state.launched),
+      boolGate(c.ui.showLaunchBtn),
+      boolGate(canLaunchWithReliability(c.state)),
+    ],
     c.t,
   );
   return buildMove(

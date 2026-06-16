@@ -1,10 +1,11 @@
 import { UPGRADES } from '../game/data';
-import { LAUNCH_LOC } from '../game/constants';
+import { LAUNCH_LOC, THRESHOLDS } from '../game/constants';
 import { calcUptime } from '../game/rates';
 import { grantMcMinis } from '../game/investor';
 import { prepareSaveProgressMarkers } from '../game/milestones';
 import { getPhase } from '../game/phases';
 import { defaultState, initState, saveState } from '../game/state';
+import { captureLaunchReadyProgress } from './launchReadyState';
 import type { GameState } from '../types';
 
 /** Merge parsed JSON over defaults (same rules as `initState`). */
@@ -113,19 +114,35 @@ export const SAVE_PRESETS: SavePreset[] = [
   {
     id: 'jump_launch',
     label: 'Jump to launch',
-    hint: '8 Autocomplete · Faster Inference · /fix-bug · Subagent Harness · at launch LOC.',
+    hint: 'Playtest fleet from progress bot · Faster Inference · /fix-bug · Subagent Harness · launch-ready.',
     apply: (prev) => {
       const upgrades = sanitizeUpgrades([
         'model_update_1',
         'fix_bug_skill',
         'subagent_harness',
       ]);
+      const bot = captureLaunchReadyProgress();
       return revealAllEligibleUpgrades({
         ...prev,
-        ...baseProgress(LAUNCH_LOC, LAUNCH_LOC, upgrades),
+        started: true,
         launched: false,
         upgrades,
-        genCounts: { autocomplete: 8 },
+        ...bot,
+        totalTokensSpent: Math.max(
+          bot.totalTokensSpent ?? 0,
+          THRESHOLDS.showNewFreeAccountTokens,
+        ),
+        mcpApprovalPending: null,
+        mcpAutoApproveAt: null,
+        mcpExecutingUntil: null,
+        mcpExecutingLine: null,
+        mcpActiveToolId: null,
+        log: [],
+        logId: 0,
+        buzzMeter: 0,
+        fundingRound: 0,
+        mcMinis: 0,
+        nines: 0,
       });
     },
   },

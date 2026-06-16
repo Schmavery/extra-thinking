@@ -14,6 +14,7 @@ import { withBugs } from './state';
 import { action, GENS, UPGRADES } from './data';
 import { AGENT_BUFF, INVESTOR, LOC_PER_CLICK_POWER } from './constants';
 import { canRaise, grantMcMinis, nextFundingRound } from './investor';
+import { canLaunchWithReliability } from './reliability';
 import { appendLog } from './log';
 import { maybeFireEvent } from './events';
 import { computeFlags, effectiveThresholds, hasFlag } from './flags';
@@ -248,6 +249,7 @@ export function bugBountyAction(prev: GameState): GameState {
 export function launchAction(prev: GameState): GameState {
   const a = action('launch');
   if (prev.launched) return prev;
+  if (!canLaunchWithReliability(prev)) return prev;
   let next: GameState = { ...prev, launched: true };
   next = logUnusedPool(next, a.messages, 'system');
   return next;

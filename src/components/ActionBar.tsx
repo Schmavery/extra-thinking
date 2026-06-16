@@ -11,6 +11,7 @@ import {
 } from '../game/rates';
 import { runTestsFixFraction, writeTestCost } from '../game/actions';
 import { getMove, rechargeProgress } from '../game/availability';
+import { launchBlockReason } from '../game/reliability';
 import { fmt } from '../lib/format';
 import { Button } from './Button';
 
@@ -175,11 +176,21 @@ export function ActionBar({
         );
       })()}
 
-      {m.launch.visible && (
-        <Button variant="launch" onClick={onLaunch}>
-          ship to production
-        </Button>
-      )}
+      {m.launch.visible && (() => {
+        const blockReason = m.launch.legal
+          ? null
+          : launchBlockReason(state) ?? 'finish the pending MCP call first';
+        return (
+          <Button
+            variant={m.launch.legal ? 'launch' : 'default'}
+            off={!m.launch.legal}
+            onClick={m.launch.legal ? onLaunch : undefined}
+            title={m.launch.legal ? 'deploy to production' : blockReason ?? undefined}
+          >
+            ship to production
+          </Button>
+        );
+      })()}
 
       {m.lobstagramPost.visible && (
         <Button

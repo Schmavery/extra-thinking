@@ -78,6 +78,14 @@ export const THRESHOLDS = {
   /** Below this uptime nine count, "production is on fire" warning shows. */
   warnUptimeFireNines: 1,
   warnUptimeDegradedNines: 2,
+  /**
+   * Milestone gates (launch / raise). Launch: bug cap only. Raise: two nines
+   * (≤~100 bugs at current uptime formula).
+   */
+  maxBugsToLaunch: 150,
+  /** ~100 bugs ≈ two nines at current uptime formula; used by bots + raise gate. */
+  raiseBugsForTwoNines: 100,
+  minUptimeNinesToRaise: 2,
 } as const;
 
 /** When both dialogue events and unused headlines are eligible, pick headline with this chance. */

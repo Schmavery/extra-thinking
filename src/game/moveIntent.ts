@@ -9,6 +9,7 @@ import { LAUNCH_LOC, LOC_PER_CLICK_POWER, THRESHOLDS } from './constants';
 import { action, GENS, UPGRADES } from './data';
 import { deriveGame } from './derive';
 import { mcpBlocksPlay } from './mcpApproval';
+import { canLaunchWithReliability, canRaiseWithReliability } from './reliability';
 import { mcpToolIsSafe } from './data';
 import {
   calcClickBonus,
@@ -175,7 +176,7 @@ export function assessNeeds(state: GameState, t: number = runtimeNow()): NeedVec
     (state.minTokensSeen ?? maxTokens) < thresholds.showClearContextMinTokens;
   const tokensUrgency = tokenPressure ? clamp01(1 - state.tokens / Math.max(1, maxTokens)) : 0;
 
-  const bugsUrgency = clamp01(state.bugs / Math.max(1, THRESHOLDS.warnBugsElevated));
+  const bugsUrgencyBase = clamp01(state.bugs / Math.max(1, THRESHOLDS.warnBugsElevated));
 
   let testsUrgency = 0;
   if (state.bugs >= thresholds.showWriteTestsBugs && (state.tests ?? 0) === 0) {
@@ -189,20 +190,46 @@ export function assessNeeds(state: GameState, t: number = runtimeNow()): NeedVec
       ? clamp01(state.loc / buyTarget)
       : 0;
 
-  const launchUrgency =
-    ui.showLaunchBtn && !state.launched ? clamp01(state.totalLoc / LAUNCH_LOC) : 0;
+  const launchReady = ui.showLaunchBtn && !state.launched;
+  const launchBlockedByReliability = launchReady && !canLaunchWithReliability(state);
+  const investorHud =
+    state.launched &&
+    ((state.buzzMeter ?? 0) > 0 ||
+      (state.fundingRound ?? 0) > 0 ||
+      (state.mcMinis ?? 0) > 0);
+  const raiseBlockedByReliability = investorHud && !canRaiseWithReliability(state);
+
+  let launchUrgency = launchReady ? clamp01(state.totalLoc / LAUNCH_LOC) : 0;
+  if (launchBlockedByReliability) launchUrgency = 0;
 
   // Pre-launch: hygiene must not dominate the grind (seed-sensitive stalls).
   const preLaunchHygieneDamp =
-    !state.launched && launchGapUrgency > 0.35
+    !state.launched && launchGapUrgency > 0.35 && !launchBlockedByReliability
       ? 1 - launchGapUrgency * 0.85
       : 1;
+
+  let bugsUrgency = bugsUrgencyBase * preLaunchHygieneDamp;
+  if (launchBlockedByReliability) {
+    const over = Math.max(0, state.bugs - THRESHOLDS.maxBugsToLaunch);
+    bugsUrgency = Math.max(
+      bugsUrgency,
+      clamp01(0.75 + over / Math.max(1, THRESHOLDS.maxBugsToLaunch)),
+    );
+    testsUrgency = Math.max(testsUrgency, bugsUrgency * 0.85);
+  } else if (raiseBlockedByReliability) {
+    const over = Math.max(0, state.bugs - THRESHOLDS.raiseBugsForTwoNines);
+    bugsUrgency = Math.max(
+      bugsUrgency,
+      clamp01(0.7 + over / Math.max(1, THRESHOLDS.raiseBugsForTwoNines)),
+    );
+    testsUrgency = Math.max(testsUrgency, bugsUrgency * 0.8);
+  }
 
   return {
     loc: locUrgency,
     tokens: tokensUrgency,
-    bugs: bugsUrgency * preLaunchHygieneDamp,
-    tests: testsUrgency * preLaunchHygieneDamp,
+    bugs: bugsUrgency,
+    tests: testsUrgency,
     economy: economyUrgency,
     launch: launchUrgency,
   };

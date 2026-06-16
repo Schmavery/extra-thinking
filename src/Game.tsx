@@ -401,7 +401,8 @@ export function Game() {
     setState(next);
     resetStream(next.log);
     snapshotToDisk('jump to launch', next);
-    debugToast('jump to launch · 8 autocomplete · launch ready');
+    const ac = next.genCounts.autocomplete ?? 0;
+    debugToast(`jump to launch · ${ac} autocomplete · launch ready`);
   }, [resetStream, snapshotToDisk]);
 
   // ── derived ──
