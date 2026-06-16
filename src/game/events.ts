@@ -5,6 +5,8 @@ import { EVENT_COOLDOWN_MS, EVENT_MIX, THRESHOLDS } from './constants';
 import { templateSeenInRecentLog } from '../lib/logTemplateMatch';
 import { messageKey } from '../lib/messageKey';
 import { render } from '../lib/template';
+import { formatNewsText } from './newsFormat';
+import { appendLog } from './log';
 import { now, random } from './runtime';
 
 export type AddLogFn = (prev: GameState, text: string, type: LogEntryType) => GameState;
@@ -40,7 +42,24 @@ export function weightedPick<T extends { minLoc: number }>(pool: readonly T[], r
 }
 
 function eligibleNews(prev: GameState): NewsDef[] {
-  return NEWS.filter((n) => !prev.usedNewsIds.includes(n.id) && passesGates(n, prev));
+  return NEWS.filter(
+    (n) => !n.guaranteed && !prev.usedNewsIds.includes(n.id) && passesGates(n, prev),
+  );
+}
+
+/** One-shot headlines marked `guaranteed` in `news.yaml` (threshold on tick). */
+export function applyGuaranteedNews(prev: GameState, next: GameState): GameState {
+  let state = next;
+  const pending = NEWS.filter(
+    (n) => n.guaranteed && !prev.usedNewsIds.includes(n.id) && passesGates(n, state),
+  ).sort((a, b) => a.minLoc - b.minLoc);
+
+  for (const item of pending) {
+    if (state.totalLoc < item.minLoc) continue;
+    state = appendLog(state, render(formatNewsText(item)), 'news');
+    state = { ...state, usedNewsIds: [...state.usedNewsIds, item.id] };
+  }
+  return state;
 }
 
 function gatedEvents(prev: GameState): EventDef[] {
@@ -103,7 +122,7 @@ export function maybeFireEvent(prev: GameState, prob: number, addLog: AddLogFn):
 
   if (pickNews) {
     const item = weightedPick(newsPool, random());
-    text = item.text;
+    text = formatNewsText(item);
     logType = 'news';
     newsId = item.id;
   } else {

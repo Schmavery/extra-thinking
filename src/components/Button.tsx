@@ -74,8 +74,7 @@ const VARIANTS: Record<Variant, { on: string; off: string }> = {
 /**
  * Tiny terminal-styled button. The "off" state is deliberately not the
  * `disabled` HTML attribute — it just changes appearance, drops the
- * onClick handler, and uses `cursor-not-allowed` so disabled clicks are
- * absorbed instead of passing through to elements below.
+ * onClick handler. No cursor overrides — browser default only.
  *
  * Optionally renders an inline progress bar (`progress`, 0..1) to show
  * cooldown remaining or resource accumulation. When the bar is full the
@@ -109,7 +108,6 @@ export function Button({
       className={[
         BASE,
         off ? v.off : v.on,
-        off ? 'cursor-not-allowed' : '',
         hasProgress ? 'relative overflow-hidden' : '',
         className ?? '',
       ].join(' ')}

@@ -22,6 +22,7 @@ import {
   snapRate,
 } from './rates';
 import { introduceUnseenActions } from './actionIntros';
+import { applyGuaranteedNews } from './events';
 import { appendLog } from './log';
 import { advanceMcpTiming } from './mcpApproval';
 import { render } from '../lib/template';
@@ -129,6 +130,8 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
       };
     }
   }
+
+  next = applyGuaranteedNews(prev, next);
 
   return introduceUnseenActions(next);
 }

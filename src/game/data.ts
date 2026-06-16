@@ -40,6 +40,8 @@ interface UiData {
   spinFrames: string[];
   /** One verb list per flavor phase index (`phases.length` entries). */
   spinVerbs: string[][];
+  /** AI-voice openers for `news.yaml` briefings (see `newsLeadIn` in `newsFormat.ts`). */
+  newsLeadIns: string[];
 }
 export const UI = UI_DATA as UiData;
 

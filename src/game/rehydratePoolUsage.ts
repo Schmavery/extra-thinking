@@ -1,6 +1,7 @@
 import type { GameState } from '../types';
 import { templateSeenInLog } from '../lib/logTemplateMatch';
 import { NEWS } from './data';
+import { formatNewsText } from './newsFormat';
 
 /**
  * Rebuild `usedNewsIds` from the conversation log after load.
@@ -10,7 +11,7 @@ export function rehydratePoolUsage(state: GameState): GameState {
   const usedNewsIds = new Set(state.usedNewsIds);
 
   for (const item of NEWS) {
-    if (templateSeenInLog(item.text, state.log)) {
+    if (templateSeenInLog(formatNewsText(item), state.log)) {
       usedNewsIds.add(item.id);
     }
   }

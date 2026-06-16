@@ -38,7 +38,6 @@ import {
   calcKickAgentTokenCost,
   calcLobstagramTokenCost,
   calcPasteErrorTokenCost,
-  calcPromptCooldownMs,
   calcPromptTokenCost,
   calcRates,
   calcRunTestsTokenCost,
@@ -62,6 +61,7 @@ import {
   writeTestCost,
 } from './actions';
 import { now as runtimeNow } from './runtime';
+import { activePromptCooldownMs } from './prompt';
 
 // ─── identifiers ───────────────────────────────────────────────────────────
 
@@ -394,7 +394,7 @@ interface Ctx {
 
 function prompt(c: Ctx): Move {
   const a = action('prompt');
-  const promptCd = calcPromptCooldownMs(c.state.upgrades);
+  const promptCd = activePromptCooldownMs(c.state);
   return buildMove(
     {
       id: 'prompt',

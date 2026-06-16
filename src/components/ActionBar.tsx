@@ -1,4 +1,5 @@
 import type { GameState } from '../types';
+import { TICK_MS } from '../game/constants';
 import { action } from '../game/data';
 import {
   calcKickAgentTokenCost,
@@ -85,16 +86,26 @@ export function ActionBar({
         </Button>
       )}
 
-      {m.writeTest.visible && (
-        <Button
-          off={!m.writeTest.legal}
-          onClick={m.writeTest.legal ? onWriteTest : undefined}
-          title="adds a test, reduces bug generation rate"
-          progress={rechargeProgress(m.writeTest)}
-        >
-          write a test [−{fmt(wTestCost)} loc]
-        </Button>
-      )}
+      {m.writeTest.visible && (() => {
+        const savingLoc = m.writeTest.affordProgress < 1;
+        const writeTestTitle = m.writeTest.legal
+          ? 'adds a test, reduces bug generation rate'
+          : savingLoc
+            ? `costs ${fmt(wTestCost)} loc — you have ${fmt(state.loc)}`
+            : 'finish the pending MCP call first';
+        return (
+          <Button
+            off={!m.writeTest.legal}
+            onClick={m.writeTest.legal ? onWriteTest : undefined}
+            title={writeTestTitle}
+            progress={
+              savingLoc ? m.writeTest.affordProgress : rechargeProgress(m.writeTest)
+            }
+          >
+            write a test [−{fmt(wTestCost)} loc]
+          </Button>
+        );
+      })()}
 
       {m.kickAgent.visible && (() => {
         const buffActive = agentBuffRemaining > 0;
@@ -156,7 +167,7 @@ export function ActionBar({
             onClick={m.clearContext.legal ? onClearContext : undefined}
             title={clearTitle}
             progress={rechargeProgress(m.clearContext)}
-            progressEaseMs={A.clearContext.cooldownMs}
+            progressEaseMs={TICK_MS}
             progressClassName="bg-green/10"
           >
             clear the context{tokensToRefill > 0 ? ` [+${tokensToRefill}t]` : ''}

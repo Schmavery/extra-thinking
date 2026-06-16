@@ -4,12 +4,13 @@ import { appendLog } from '../src/game/log';
 import { rehydratePoolUsage } from '../src/game/rehydratePoolUsage';
 import { defaultState } from '../src/game/state';
 import { render } from '../src/lib/template';
+import { formatNewsText } from '../src/game/newsFormat';
 
 describe('rehydratePoolUsage', () => {
   it('rebuilds usedNewsIds from headline text in the log', () => {
     const headline = NEWS[0]!;
     let state = defaultState();
-    state = appendLog(state, render(headline.text), 'news');
+    state = appendLog(state, render(formatNewsText(headline)), 'news');
     state = { ...state, usedNewsIds: [] };
 
     const next = rehydratePoolUsage(state);

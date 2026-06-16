@@ -150,6 +150,8 @@ export interface NewsDef {
   id: string;
   text: string;
   minLoc: number;
+  /** When true, fires once on tick when `totalLoc` reaches `minLoc` (not random pool only). */
+  guaranteed?: boolean;
   requiresLaunch?: boolean;
   requires?: string[];
 }

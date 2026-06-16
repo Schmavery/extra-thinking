@@ -26,7 +26,6 @@ import {
   calcPasteErrorTokenCost,
   calcRunTestsTokenCost,
   formatPasteErrorLog,
-  calcPromptCooldownMs,
   calcPromptTokenCost,
   calcPromptEventProbability,
   calcTokenConfig,
@@ -35,6 +34,7 @@ import {
 import { pickFromPool } from '../lib/logTemplateMatch';
 import { render } from '../lib/template';
 import { introduceUnseenActions } from './actionIntros';
+import { promptCooldownForClick } from './prompt';
 import { clearMcpApproval, maybeMcpApprovalAfterPrompt, mcpApprovalsSuppressed } from './mcpApproval';
 import { now, random } from './runtime';
 
@@ -90,7 +90,7 @@ export function promptAction(prev: GameState): GameState {
   const a = action('prompt');
   const tokenCost = calcPromptTokenCost(prev.upgrades);
   if (prev.tokens < tokenCost) return prev;
-  const promptCd = calcPromptCooldownMs(prev.upgrades);
+  const promptCd = promptCooldownForClick(prev.totalClicks, prev.upgrades);
   if (promptCd && isOnCooldown(prev, 'prompt', promptCd)) return prev;
   const thresholds = effectiveThresholds(prev.upgrades);
   const power = calcClickPower(prev.upgrades);

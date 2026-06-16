@@ -102,6 +102,7 @@ const newsSchema = z.object({
   id: z.string().min(1),
   text: z.string().min(1),
   minLoc: z.number().nonnegative(),
+  guaranteed: z.boolean().optional(),
   requiresLaunch: z.boolean().optional(),
   requires: z.array(z.string().min(1)).optional(),
 });
@@ -121,6 +122,7 @@ const uiSchema = z.object({
   phases: z.array(z.string().min(1)).min(1),
   spinFrames: z.array(z.string().min(1)).min(1),
   spinVerbs: z.array(z.array(z.string().min(1)).min(1)).min(1),
+  newsLeadIns: z.array(z.string().min(1)).min(1),
 });
 
 const mcpToolKind = z.discriminatedUnion('tool', [

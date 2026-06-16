@@ -106,3 +106,16 @@ spinVerbs:
     - doing the thing
     - "¯\\_(ツ)_/¯"
     - (╯°□°)╯︵ ┻━┻
+
+# Lead-ins prepended to industry briefings (`news.yaml`); picked by headline id hash.
+newsLeadIns:
+  - "I've been following industry news — "
+  - "Certainly! A quick ecosystem update — "
+  - "I should share some industry context — "
+  - "I'd be happy to brief you — "
+  - "In today's fast-paced AI landscape, "
+  - "I've been monitoring developments — "
+  - "Relevant update from the ecosystem — "
+  - "I synthesized the latest industry brief — "
+  - "Understood! Industry-wise — "
+  - "Great question about the broader market — "

@@ -14,17 +14,14 @@
   eventProbability: 0.12
   earlyPromptMsgs:
     - |-
-      > build me a startup
+      > build me a startup. make no mistakes
       Certainly! I'd be happy to help with that.
-    - |-
-      > is it running?
-      Great question! Let me delve into that for you.
-    - |-
-      > make no mistakes
-      Understood! I'll make no mistakes.
     - |-
       > you just made a mistake
       You're absolutely right. I apologize. I'll make no further mistakes.
+    - |-
+      > ...is it running?
+      Great question! Let me delve into that for you.
 
 - id: kick_agent
   tokenCost: 60
@@ -54,7 +51,7 @@
   fixChance: 0.5
   baseLocGain: 20
   extraLocRange: 30
-  introMsg: "Great question — paste the error and I'll investigate."
+  introMsg: "When something breaks, paste the error back in — I'd be happy to investigate."
   goodMessages:
     - |-
       > why is this failing
