@@ -7,6 +7,7 @@
   baseCost: 500
   costMult: 1.12
   unlockAt: 500
+  moneyPerSec: 0.06
 - id: copilot
   name: CodePilot
   desc: Meet CodePilot — AI pair programming, baked into your editor whether you asked or not.
@@ -16,6 +17,7 @@
   baseCost: 8000
   costMult: 1.13
   unlockAt: 5000
+  moneyPerSec: 0.18
 - id: chatgpt
   name: FreeChat
   desc: FreeChat for teams. Unlimited* brainstorming with premium punctuation.
@@ -25,6 +27,7 @@
   baseCost: 50000
   costMult: 1.14
   unlockAt: 20000
+  moneyPerSec: 0.45
 - id: claude
   name: Claudius
   desc: Claudius by Claudius Labs. Helpful, harmless, and committed to explaining the explanation.
@@ -34,6 +37,7 @@
   baseCost: 200000
   costMult: 1.15
   unlockAt: 80000
+  moneyPerSec: 0.9
 - id: api
   name: Direct API Calls
   desc: Direct API access for production workloads. Chat UI sold separately.
@@ -43,6 +47,7 @@
   baseCost: 1000000
   costMult: 1.15
   unlockAt: 400000
+  moneyPerSec: 2.2
 - id: agent
   name: AI Agent
   desc: Agentic development, now generally available. You set direction; we set scope.
@@ -52,6 +57,7 @@
   baseCost: 6000000
   costMult: 1.16
   unlockAt: 2000000
+  moneyPerSec: 6.5
 - id: swarm
   name: Agent Swarm
   desc: Scale parallel autonomy across your stack. Coordinated alignment sold separately.
@@ -61,3 +67,4 @@
   baseCost: 60000000
   costMult: 1.17
   unlockAt: 10000000
+  moneyPerSec: 19

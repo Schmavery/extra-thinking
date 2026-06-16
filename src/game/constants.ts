@@ -47,7 +47,7 @@ export const THRESHOLDS = {
   showUpgradesLoc: 80,
 
   /** "Free Account" generator row becomes visible. */
-  showNewFreeAccountTokens: 2000,
+  showNewFreeAccountTokens: 1000,
   /** Each generator becomes visible at `unlockAt * this`. */
   generatorVisibleFraction: 0.8,
   /** Each upgrade becomes a candidate for unlock at `unlockAt * this`. */
@@ -89,12 +89,14 @@ export const EVENT_MIX = {
 
 export const INVESTOR = {
   buzzMax: 100,
-  buzzPerSecPerGrowthMini: 8,
+  buzzPerSecPerGrowthMini: 6,
   tokenDrainPerCodeMini: 3,
   tokenDrainPerGrowthMini: 4,
   tokenDrainPerTestsMini: 2,
+  /** Passive tests/s per McMini on the tests lane. */
+  testsPerSecPerTestsMini: 0.08,
   /** LOC/s per McMini on code (before bug penalty); scaled by `calcAgentLocMult`. */
-  codeLocPerMini: 12,
+  codeLocPerMini: 10,
   codeBugRateMult: 1.35,
   fundingRounds: [
     {
@@ -109,8 +111,8 @@ export const INVESTOR = {
     },
     {
       label: 'Series B',
-      minBurnPerSec: 20,
-      mcMinisGrant: 2,
+      minBurnPerSec: 12,
+      mcMinisGrant: 1,
     },
   ],
 } as const;

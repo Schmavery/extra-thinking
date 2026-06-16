@@ -56,7 +56,7 @@ import { Button } from './components/Button';
 import { FooterBarrel } from './components/FooterBarrel';
 import { McMinis } from './components/McMinis';
 import { ResourcePanel } from './components/ResourcePanel';
-import { nextFundingRound, shiftMcMiniLane } from './game/investor';
+import { adjustMcMiniLane, nextFundingRound } from './game/investor';
 import type { McMiniLane } from './game/investor';
 import { ActionBar } from './components/ActionBar';
 import { Generators } from './components/Generators';
@@ -373,8 +373,8 @@ export function Game() {
       launch: dispatch(launchAction),
       lobstagramPost: dispatch(lobstagramPostAction),
       raiseRound: dispatch(raiseRoundAction),
-      shiftMcMiniLane: (from: McMiniLane, to: McMiniLane) =>
-        setState((prev) => shiftMcMiniLane(prev, from, to)),
+      adjustMcMiniLane: (lane: McMiniLane, delta: 1 | -1) =>
+        setState((prev) => adjustMcMiniLane(prev, lane, delta)),
       mcpAllow: dispatch(mcpAllowAction),
       mcpAlwaysAllow: dispatch(mcpAlwaysAllowAction),
       mcpDeny: dispatch(mcpDenyAction),
@@ -525,7 +525,7 @@ export function Game() {
           {state.started && <ResourcePanel state={state} />}
 
           {derived.ui.showMcMinis && (
-            <McMinis state={state} onShiftLane={handlers.shiftMcMiniLane} />
+            <McMinis state={state} onAdjustLane={handlers.adjustMcMiniLane} />
           )}
 
           {showGenSection && (

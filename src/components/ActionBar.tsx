@@ -92,7 +92,7 @@ export function ActionBar({
           title="adds a test, reduces bug generation rate"
           progress={rechargeProgress(m.writeTest)}
         >
-          write a test [−{fmt(wTestCost)} loc · {A.writeTest.tokenCost}t]
+          write a test [−{fmt(wTestCost)} loc]
         </Button>
       )}
 

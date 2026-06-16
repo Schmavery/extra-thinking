@@ -17,7 +17,8 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import { Sim, type Bot } from '../src/sim/Sim';
 import { greedyPlayer, lazy, spammer, randomBot } from '../src/sim/bots';
-import { calcTokenConfig } from '../src/game/rates';
+import { calcInfraBurnPerSec, calcTokenConfig } from '../src/game/rates';
+import { burnBelowNextGate } from '../src/game/burnPacing';
 import { MESSAGE_POOL } from '../src/game/constants';
 import { ACTIONS, EVENTS, MCP_UNSAFE_ALLOW_LEAK_ACK } from '../src/game/data';
 import {
@@ -297,6 +298,41 @@ describe(`invariants @ seed=${INVARIANT_SEED}`, () => {
       expect(moveTicks.length).toBeGreaterThan(0);
       for (const t of moveTicks) {
         expect(t.move?.id).toBeTruthy();
+      }
+    });
+  });
+
+  describe('burn vs funding gates', () => {
+    const BURN_BUDGET_MS = 45 * 60_000;
+
+    it('greedy: pro_plan purchase never starts with instant Series A burn', () => {
+      const sim = new Sim({ seed: INVARIANT_SEED, recordTrace: true });
+      sim.runEventDriven(greedyPlayer, BURN_BUDGET_MS);
+      let prevHadPro = false;
+      for (const { state } of sim.trace) {
+        if (!state) continue;
+        const hasPro = state.upgrades.includes('pro_plan');
+        if (hasPro && !prevHadPro) {
+          expect(burnBelowNextGate(state)).toBe(true);
+        }
+        prevHadPro = hasPro;
+      }
+    });
+
+    it('greedy: funding round bumps leave headroom below the next burn gate', () => {
+      const sim = new Sim({ seed: INVARIANT_SEED, recordTrace: true });
+      sim.runEventDriven(greedyPlayer, BURN_BUDGET_MS);
+      let prevFr = 0;
+      for (const { state } of sim.trace) {
+        if (!state) continue;
+        const fr = state.fundingRound ?? 0;
+        if (fr > prevFr && fr >= 1) {
+          expect(
+            burnBelowNextGate(state),
+            `fundingRound=${fr} burn=${calcInfraBurnPerSec(state)}`,
+          ).toBe(true);
+        }
+        prevFr = fr;
       }
     });
   });

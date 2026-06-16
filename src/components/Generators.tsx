@@ -1,6 +1,6 @@
 import type { GameState } from '../types';
 import { action, GENS } from '../game/data';
-import { calcGenUnitLocRate, genCost } from '../game/rates';
+import { calcGenUnitLocRate, calcGenMarginalBurn, genCost, hasProPlan } from '../game/rates';
 import { fmt, fmtRate } from '../lib/format';
 import { genTooltip } from '../lib/genLabel';
 import { snapRate } from '../game/rates';
@@ -17,6 +17,7 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
   const now = Date.now();
   const newAccount = getMove(state, 'new_free_account', now)!;
   const newAccountData = action('new_free_account');
+  const showGenBurn = hasProPlan(state.upgrades);
 
   return (
     <div>
@@ -49,6 +50,7 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
         const owned = state.genCounts[g.id] ?? 0;
         const cost = genCost(g, owned);
         const unitLoc = calcGenUnitLocRate(g.id, state.upgrades);
+        const marginalBurn = showGenBurn ? calcGenMarginalBurn(g.id, state.upgrades) : 0;
         const genLocRate = snapRate(unitLoc * owned);
         const rateLabel =
           owned > 0
@@ -63,13 +65,16 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
             <Button
               off={!move.legal}
               onClick={() => onBuyGen(g.id)}
-              title={genTooltip(g)}
+              title={genTooltip(g, state.upgrades)}
               progress={rechargeProgress(move)}
             >
               buy
             </Button>
             <div className="text-[12px]">
               <span className={move.legal ? 'text-dim' : 'text-dimmer'}>{fmt(cost)} loc</span>
+              {marginalBurn > 0 && (
+                <span className="text-dimmer ml-[10px]">+${marginalBurn}/s burn</span>
+              )}
               <span className={`ml-[10px] ${owned > 0 ? 'text-green-dim' : 'text-dimmer'}`}>
                 {rateLabel}
               </span>

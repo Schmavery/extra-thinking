@@ -66,6 +66,7 @@ const genSchema = z
     baseCost: z.number().positive(),
     costMult: z.number().positive(),
     unlockAt: z.number().nonnegative(),
+    moneyPerSec: z.number().nonnegative().optional(),
   })
   .passthrough();
 

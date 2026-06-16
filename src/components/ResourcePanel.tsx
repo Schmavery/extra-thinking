@@ -16,7 +16,7 @@ import {
 } from '../game/rates';
 import { AGENT_BUFF, INVESTOR, THRESHOLDS, TOKENS } from '../game/constants';
 import { deriveGame } from '../game/derive';
-import { normalizeMcMiniLanes } from '../game/investor';
+import { mcMiniTokenDrainPerSec, normalizeMcMiniLanes } from '../game/investor';
 import { action } from '../game/data';
 
 function testBugRateReductionPct(tests: number): number {
@@ -58,12 +58,14 @@ export function ResourcePanel({ state }: Props) {
   const showAsCounter = ninesInt >= 8;
 
   const lanes = normalizeMcMiniLanes(state.mcMinis ?? 0, state.mcMiniLanes);
+  const tokenDrain = mcMiniTokenDrainPerSec(lanes);
+  const netTokenRegen = snapRate(tokenRegen - tokenDrain);
   const mcMiniLoc = calcMcMiniCodeLocRate(lanes.code, state.upgrades) * bugPenalty;
   const kickAgentLoc = kickAgentBuffActive(state, Date.now())
     ? calcKickAgentLocPerSec(state.upgrades) * bugPenalty
     : 0;
   const displayLocRate = snapRate(locRate * bugPenalty + kickAgentLoc + mcMiniLoc);
-  const burnRate = calcInfraBurnPerSec(state.upgrades);
+  const burnRate = calcInfraBurnPerSec(state);
   const buzz = state.buzzMeter ?? 0;
 
   const uptimeColorClass =
@@ -83,8 +85,12 @@ export function ResourcePanel({ state }: Props) {
             {Math.floor(state.tokens)}
           </span>
           <span className="text-dimmer text-[12px]">/ {maxTokens}</span>
-          {state.tokens < maxTokens && tokenRegen !== 0 && (
-            <span className="text-dimmer text-[12px]">(+{tokenRegen}/s)</span>
+          {state.tokens < maxTokens && netTokenRegen !== 0 && (
+            <span className="text-dimmer text-[12px]">
+              ({netTokenRegen > 0 ? '+' : ''}
+              {netTokenRegen}/s
+              {tokenDrain > 0 ? `, −${tokenDrain}/s McMinis` : ''})
+            </span>
           )}
         </Row>
       )}
@@ -157,9 +163,11 @@ export function ResourcePanel({ state }: Props) {
       {/* investor overlay */}
       {ui.showInvestorHud && (
         <>
-          <Row label="burn rate">
-            <span className="text-green">${burnRate}/s</span>
-          </Row>
+          {ui.showBurnRate && (
+            <Row label="burn rate">
+              <span className="text-green">${burnRate}/s</span>
+            </Row>
+          )}
           <Row label="buzz">
             <span className={buzz >= INVESTOR.buzzMax ? 'text-purple' : 'text-dim'}>
               {Math.floor(buzz)}%

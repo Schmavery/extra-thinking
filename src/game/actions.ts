@@ -190,6 +190,7 @@ export function runTestsAction(prev: GameState): GameState {
   const a = action('run_tests');
   const tests = prev.tests ?? 0;
   if (tests <= 0) return prev;
+  if (isOnCooldown(prev, 'run_tests', a.cooldownMs ?? 0)) return prev;
   const tokenCost = calcRunTestsTokenCost(tests);
   if (prev.tokens < tokenCost) return prev;
   const fixed = Math.max(1, Math.floor(prev.bugs * runTestsFixFraction(tests)));
@@ -197,6 +198,7 @@ export function runTestsAction(prev: GameState): GameState {
     ...spendTokens(prev, tokenCost),
     ...withBugs(prev, prev.bugs - fixed),
   };
+  next = startCooldown(next, 'run_tests');
   const t = now();
   if (a.messages && t - prev.lastTestLogTime > (a.logCooldownMs ?? 0)) {
     next = logUnusedPool(next, a.messages, 'info', { n: fixed });
@@ -313,9 +315,9 @@ export function writeTestCost(tests: number): number {
 export function writeTestAction(prev: GameState): GameState {
   const a = action('write_test');
   const cost = writeTestCost(prev.tests ?? 0);
-  if (prev.loc < cost || !canAfford(prev, a)) return prev;
+  if (prev.loc < cost) return prev;
   let next: GameState = {
-    ...spendTokens(prev, a.tokenCost!),
+    ...prev,
     loc: prev.loc - cost,
     tests: (prev.tests ?? 0) + 1,
   };

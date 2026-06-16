@@ -6,7 +6,7 @@
 
 import type { GameState } from '../types';
 import { LAUNCH_LOC, TOKENS } from './constants';
-import { calcInfraBurnPerSec, calcTokenConfig } from './rates';
+import { calcInfraBurnPerSec, calcTokenConfig, hasProPlan } from './rates';
 import { mcpApprovalPending } from './mcpApproval';
 import {
   computeFlags,
@@ -21,8 +21,10 @@ export interface DerivedUi {
   showRunTests: boolean;
   showBugBounty: boolean;
   showInvestor: boolean;
-  /** Burn rate + buzz meter in the resource panel. */
+  /** Buzz meter (and raise row) in the resource panel. */
   showInvestorHud: boolean;
+  /** Burn rate row — only once a sub tier is paying. */
+  showBurnRate: boolean;
   /** Close-round row in the upgrades panel. */
   showRaiseRound: boolean;
   showMcMinis: boolean;
@@ -71,16 +73,17 @@ export function deriveGame(state: GameState): DerivedGame {
       state.bugs > thresholds.showBugBountyBugs &&
       !flag('auto_bug_bounty'),
     showInvestor: state.launched,
+    showBurnRate: hasProPlan(state.upgrades) && calcInfraBurnPerSec(state) > 0,
     showInvestorHud:
       state.launched &&
       ((state.buzzMeter ?? 0) > 0 ||
-        calcInfraBurnPerSec(state.upgrades) > 0 ||
-        (state.fundingRound ?? 0) > 0),
+        (state.fundingRound ?? 0) > 0 ||
+        (state.mcMinis ?? 0) > 0),
     showRaiseRound:
       state.launched &&
       ((state.buzzMeter ?? 0) > 0 ||
-        calcInfraBurnPerSec(state.upgrades) > 0 ||
-        (state.fundingRound ?? 0) > 0),
+        (state.fundingRound ?? 0) > 0 ||
+        (state.mcMinis ?? 0) > 0),
     showMcMinis: (state.mcMinis ?? 0) > 0,
     ninesTracking: flag('nines_tracking'),
     showBugs: (state.lifetimeBugs ?? 0) >= thresholds.showPasteErrorBugs,

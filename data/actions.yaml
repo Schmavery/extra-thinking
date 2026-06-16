@@ -175,7 +175,7 @@
       Round done. {{grant}} McMinis shipped. The deck now says infrastructure moat.
 
 - id: new_free_account
-  cooldownMs: 20000
+  cooldownMs: 300000
   maxTokensPerExtra: 50
   tokenRegenPerExtra: 1.5
   messages:
@@ -187,7 +187,6 @@
     - "{{n}} accounts. Each one a fresh start. Each one, inexplicably, named some variation of dev_user."
 
 - id: write_test
-  tokenCost: 5
   baseCost: 200
   costMult: 1.04
   bugDamping: 0.013

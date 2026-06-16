@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { getMove } from '../src/game/availability';
+import { defaultState } from '../src/game/state';
 import {
   calcKickAgentTokenCost,
   calcLobstagramTokenCost,
@@ -47,6 +49,21 @@ describe('action token costs', () => {
     expect(calcRunTestsTokenCost(0)).toBe(0);
     expect(calcRunTestsTokenCost(5)).toBe(5);
     expect(calcRunTestsTokenCost(12)).toBe(12);
+  });
+
+  it('run_tests gates on 30s cooldown', () => {
+    const t = Date.now();
+    const state = {
+      ...defaultState(),
+      started: true,
+      tests: 5,
+      tokens: 100,
+      actionCooldowns: { run_tests: t },
+    };
+    const move = getMove(state, 'run_tests', t)!;
+    expect(move.legal).toBe(false);
+    expect(move.waitMs).toBeGreaterThan(0);
+    expect(move.waitMs).toBeLessThanOrEqual(30000);
   });
 
   it('lobstagram post starts at 100t, +10 per prior post', () => {

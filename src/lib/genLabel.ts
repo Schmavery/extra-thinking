@@ -1,4 +1,5 @@
 import type { GenDef } from '../types';
+import { calcGenMarginalBurn } from '../game/rates';
 
 function fmtPerSec(n: number): string {
   const abs = Math.abs(n);
@@ -14,6 +15,10 @@ export function formatGenMechanics(g: Pick<GenDef, 'locPerSec' | 'bugsPerSec' | 
   return parts.join(' · ');
 }
 
-export function genTooltip(g: GenDef): string {
-  return g.desc ? `${formatGenMechanics(g)}\n${g.desc}` : formatGenMechanics(g);
+export function genTooltip(g: GenDef, upgrades: string[] = []): string {
+  const mechanics = formatGenMechanics(g);
+  const burn = calcGenMarginalBurn(g.id, upgrades);
+  const burnLine = burn > 0 ? `+$${burn}/s burn per unit` : '';
+  const lines = [mechanics, burnLine, g.desc].filter(Boolean);
+  return lines.join('\n');
 }

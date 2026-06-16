@@ -118,11 +118,12 @@
   purchaseMsg: XML tags enabled. Wrapping prompts in tags inexplicably 4× output.
 - id: rotate_accounts
   name: Account Rotation
-  desc: Script cycles through free accounts automatically. +350 max tokens, +12/s regen
-  cost: 150000
-  unlockAt: 75000
+  desc: Script cycles through free accounts automatically. +350 max tokens, +12/s regen. ×1.2 burn.
+  cost: 120000
+  unlockAt: 55000
   maxTokensBonus: 350
   tokenRegenBonus: 12
+  genBurnMult: 1.2
   requiresLaunch: true
   purchaseMsg: Account rotation active. Cycling through accounts automatically. Very efficient. Very legal.
 - id: typescript
@@ -147,8 +148,8 @@
 - id: multi_agent
   name: Parallel Agents
   desc: 2× agent LOC/s — two agents, neither aware of the other
-  cost: 90000
-  unlockAt: 110000
+  cost: 85000
+  unlockAt: 85000
   agentLocMult: 2
   requiresLaunch: true
   purchaseMsg: Two agents deployed. They are not aware of each other. Both are very confident. Output doubled.
@@ -165,15 +166,15 @@
     - mcp_tools
 - id: pro_plan
   name: Pay for Access
-  desc: Introduces money as a resource. +1400 max tokens, +30/s regen. Costs $5/s.
-  cost: 500000
-  unlockAt: 220000
+  desc: Generators bill by the second. +1400 max tokens, +30/s regen.
+  cost: 200000
+  unlockAt: 0
   maxTokensBonus: 1400
   tokenRegenBonus: 30
-  moneyCostPerSec: 5
   enablesMoney: true
   requiresLaunch: true
-  purchaseMsg: Paying for access now. Token limits significantly improved.
+  requiresMinFundingRound: 1
+  purchaseMsg: Paying for access now. Every generator line item shows up on the invoice. Token limits significantly improved.
 - id: always_allow
   name: Always Allow
   desc: MCP cards get deny / allow / always allow. Always allow on risky tools is one-time only. +2× bug generation.
@@ -188,12 +189,12 @@
     - mcp_auto_approve
 - id: team_plan
   name: Team Plan
-  desc: +8000 max tokens, +150/s regen. Expensive. Worth it. Probably.
-  cost: 5000000
-  unlockAt: 2000000
+  desc: +8000 max tokens, +150/s regen. ×2.5 burn on all generators.
+  cost: 2400000
+  unlockAt: 700000
   maxTokensBonus: 8000
   tokenRegenBonus: 150
-  moneyCostPerSec: 20
+  genBurnMult: 2.5
   requires:
     - pro_plan
   requiresLaunch: true

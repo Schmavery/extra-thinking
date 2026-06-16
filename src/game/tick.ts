@@ -79,6 +79,7 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
     prev.launched && (prev.buzzMeter ?? 0) < INVESTOR.buzzMax
       ? buzzGainPerSec(lanes) * dt
       : 0;
+  const testsGain = lanes.tests * INVESTOR.testsPerSecPerTestsMini * dt;
 
   const netBugDeltaRate = snapRate(effectiveBugRate - fixRate);
   const newBugs = prev.bugs + netBugDeltaRate * dt - autoBugDrain;
@@ -89,6 +90,7 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
     ...withBugs(prev, newBugs),
     totalLoc: prev.totalLoc + effectiveLoc,
     tokens: Math.min(maxTokens, Math.max(0, prev.tokens + netTokenRegen * dt)),
+    tests: (prev.tests ?? 0) + testsGain,
     minTokensSeen: Math.min(prev.minTokensSeen ?? 9999, prev.tokens),
     buzzMeter: Math.min(INVESTOR.buzzMax, (prev.buzzMeter ?? 0) + buzzGain),
     nines: ninesTracking
@@ -101,8 +103,12 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
   for (const u of UPGRADES) {
     if (next.unlockedUpgrades.includes(u.id)) continue;
     if (next.upgrades.includes(u.id)) continue;
-    if (next.totalLoc < u.unlockAt * thresholds.upgradeUnlockFraction) continue;
-    if (next.loc < u.cost * thresholds.upgradeAffordFraction) continue;
+    if (u.requiresMinFundingRound !== undefined) {
+      if ((next.fundingRound ?? 0) < u.requiresMinFundingRound) continue;
+    } else {
+      if (next.totalLoc < u.unlockAt * thresholds.upgradeUnlockFraction) continue;
+      if (next.loc < u.cost * thresholds.upgradeAffordFraction) continue;
+    }
     if (u.requiresLaunch && !next.launched) continue;
     if (u.requires && !u.requires.every((r) => next.upgrades.includes(r))) continue;
     const uptimeNines = calcUptime(next.bugs).nines;

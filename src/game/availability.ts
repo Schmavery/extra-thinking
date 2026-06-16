@@ -482,7 +482,6 @@ function pasteError(c: Ctx): Move {
 }
 
 function writeTest(c: Ctx): Move {
-  const a = action('write_test');
   const cost = writeTestCost(c.state.tests ?? 0);
   return buildMove(
     {
@@ -492,7 +491,7 @@ function writeTest(c: Ctx): Move {
       visible: c.ui.showWriteTests,
       apply: writeTestAction,
     },
-    withMcpIdle(c.state, [locGate(c.state, cost), tokenGate(c.state, a.tokenCost)], c.t),
+    withMcpIdle(c.state, [locGate(c.state, cost)], c.t),
   );
 }
 
@@ -516,6 +515,7 @@ function kickAgent(c: Ctx): Move {
 }
 
 function runTests(c: Ctx): Move {
+  const a = action('run_tests');
   const tests = c.state.tests ?? 0;
   const tokenCost = calcRunTestsTokenCost(tests);
   const hasTests = tests > 0;
@@ -527,7 +527,15 @@ function runTests(c: Ctx): Move {
       visible: c.ui.showRunTests,
       apply: runTestsAction,
     },
-    withMcpIdle(c.state, [boolGate(hasTests), tokenGate(c.state, tokenCost)], c.t),
+    withMcpIdle(
+      c.state,
+      [
+        boolGate(hasTests),
+        tokenGate(c.state, tokenCost),
+        cooldownGate(c.state, 'run_tests', a.cooldownMs, c.t),
+      ],
+      c.t,
+    ),
   );
 }
 

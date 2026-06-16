@@ -350,13 +350,46 @@ export function calcMcMiniCodeLocRate(codeMinis: number, upgrades: string[]): nu
   return snapRate(codeMinis * INVESTOR.codeLocPerMini * calcAgentLocMult(upgrades));
 }
 
-/** Infra burn $/s from owned subs (`moneyCostPerSec` max-wins). Higher is good for raises. */
-export function calcInfraBurnPerSec(upgrades: string[]): number {
+/** Sum $/s from all owned generator units (before plan multipliers). */
+export function calcGenBurnBase(genCounts: Record<string, number>): number {
   let burn = 0;
-  for (const u of ownedDefs(upgrades)) {
-    if (u.moneyCostPerSec && u.moneyCostPerSec > burn) burn = u.moneyCostPerSec;
+  for (const g of GENS) {
+    const n = genCounts[g.id] ?? 0;
+    if (n > 0 && g.moneyPerSec) burn += n * g.moneyPerSec;
   }
   return burn;
+}
+
+/** Product of owned `genBurnMult` upgrades (rotate, team plan, …). */
+export function calcGenBurnMult(upgrades: string[]): number {
+  let mult = 1;
+  for (const u of ownedDefs(upgrades)) {
+    if (u.genBurnMult) mult *= u.genBurnMult;
+  }
+  return mult;
+}
+
+export function hasProPlan(upgrades: string[]): boolean {
+  return upgrades.includes('pro_plan');
+}
+
+/** Infra burn $/s from owned generators once `pro_plan` is active. */
+export function calcInfraBurnPerSec(
+  state: Pick<GameState, 'genCounts' | 'upgrades'>,
+): number {
+  if (!hasProPlan(state.upgrades)) return 0;
+  return snapRate(calcGenBurnBase(state.genCounts) * calcGenBurnMult(state.upgrades));
+}
+
+/** Marginal $/s burn from buying one more unit of a generator. */
+export function calcGenMarginalBurn(
+  genId: string,
+  upgrades: string[],
+): number {
+  if (!hasProPlan(upgrades)) return 0;
+  const g = GENS.find((x) => x.id === genId);
+  if (!g?.moneyPerSec) return 0;
+  return snapRate(g.moneyPerSec * calcGenBurnMult(upgrades));
 }
 
 // ─── misc ──────────────────────────────────────────────────────────────────

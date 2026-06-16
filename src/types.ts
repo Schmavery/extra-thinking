@@ -9,6 +9,8 @@ export interface GenDef {
   baseCost: number;
   costMult: number;
   unlockAt: number;
+  /** $/s burn per owned unit once `pro_plan` is active. */
+  moneyPerSec?: number;
 }
 
 /**
@@ -72,8 +74,10 @@ export interface UpgDef {
    */
   autoBugDrainRate?: number;
 
-  // ── money ──
-  /** Largest owned value wins (later plans replace cheaper ones). */
+  // ── money / burn ──
+  /** Multiplies generator burn ($/s). Stacks multiplicatively across owned upgrades. */
+  genBurnMult?: number;
+  /** @deprecated Flat $/s burn — use `genBurnMult` + generator `moneyPerSec`. */
   moneyCostPerSec?: number;
   /** When set true and owned, enables money revenue/cost flow. */
   enablesMoney?: boolean;
@@ -83,6 +87,8 @@ export interface UpgDef {
   requires?: string[];
   /** Player must have launched (`state.launched === true`). */
   requiresLaunch?: boolean;
+  /** Minimum closed funding rounds before this appears in the shop (`fundingRound` counter). */
+  requiresMinFundingRound?: number;
   /** When purchased, raises the nines counter to at least this value. */
   ninesFloor?: number;
   /** Flavor line shown in the conversation log when this upgrade is bought. */
