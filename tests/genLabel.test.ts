@@ -13,7 +13,7 @@ describe('genLabel', () => {
 
   it('genTooltip separates mechanics from tagline', () => {
     const copilot = GENS.find((g) => g.id === 'copilot')!;
-    expect(genTooltip(copilot)).toContain('Meet CodePilot');
+    expect(genTooltip(copilot)).toContain('AI pair programming');
     expect(genTooltip(copilot)).toMatch(/^30\/s LOC/);
   });
 

@@ -70,15 +70,19 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
             >
               buy
             </Button>
-            <div className="text-[12px]">
-              <span className={move.legal ? 'text-dim' : 'text-dimmer'}>{fmt(cost)} loc</span>
+            <div className="text-[12px] flex flex-wrap gap-x-[10px] gap-y-[2px] items-baseline">
+              <span className={`whitespace-nowrap shrink-0 ${move.legal ? 'text-dim' : 'text-dimmer'}`}>
+                {fmt(cost)} loc
+              </span>
               {marginalBurn > 0 && (
-                <span className="text-dimmer ml-[10px]">+${marginalBurn}/s burn</span>
+                <span className="text-dimmer whitespace-nowrap shrink-0">+${marginalBurn}/s burn</span>
               )}
-              <span className={`ml-[10px] ${owned > 0 ? 'text-green-dim' : 'text-dimmer'}`}>
+              <span
+                className={`whitespace-nowrap shrink-0 ${owned > 0 ? 'text-green-dim' : 'text-dimmer'}`}
+              >
                 {rateLabel}
               </span>
-              <span className="text-dimmer ml-[10px]">{g.desc}</span>
+              <span className="text-dimmer min-w-0">{g.desc}</span>
             </div>
           </Row>
         );

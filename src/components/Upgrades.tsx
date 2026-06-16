@@ -76,9 +76,13 @@ export function Upgrades({ state, onBuyUpgrade, onRaiseRound }: Props) {
           >
             buy
           </Button>
-          <div className="text-[12px]">
-            <span className={move.legal ? 'text-dim' : 'text-dimmer'}>{fmt(u.cost)} loc</span>
-            <span className="text-dimmer ml-[10px]">{u.desc}</span>
+          <div className="text-[12px] flex flex-wrap gap-x-[10px] gap-y-[2px] items-baseline">
+            <span
+              className={`whitespace-nowrap shrink-0 ${move.legal ? 'text-dim' : 'text-dimmer'}`}
+            >
+              {fmt(u.cost)} loc
+            </span>
+            <span className="text-dimmer min-w-0">{u.desc}</span>
           </div>
         </div>
       ))}

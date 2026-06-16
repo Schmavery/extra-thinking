@@ -10,7 +10,7 @@
   moneyPerSec: 0.06
 - id: copilot
   name: CodePilot
-  desc: Meet CodePilot — AI pair programming, baked into your editor whether you asked or not.
+  desc: AI pair programming, baked into your editor.
   locPerSec: 30
   bugsPerSec: 0.15
   fixPerSec: 0
@@ -20,7 +20,7 @@
   moneyPerSec: 0.18
 - id: chatgpt
   name: FreeChat
-  desc: FreeChat for teams. Unlimited* brainstorming with premium punctuation.
+  desc: Unlimited* brainstorming with premium punctuation.
   locPerSec: 100
   bugsPerSec: 0.4
   fixPerSec: 0
@@ -30,7 +30,7 @@
   moneyPerSec: 0.45
 - id: claude
   name: Claudius
-  desc: Claudius by Claudius Labs. Helpful, harmless, and committed to explaining the explanation.
+  desc: Helpful, harmless, and committed to explaining the explanation.
   locPerSec: 250
   bugsPerSec: 0.8
   fixPerSec: 0.3

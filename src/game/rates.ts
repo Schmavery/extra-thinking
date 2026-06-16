@@ -308,38 +308,45 @@ export interface Uptime {
   label: string;
 }
 
+function formatUptimePct(fraction: number): string {
+  const pct =
+    fraction >= 0.9999
+      ? (fraction * 100).toFixed(3)
+      : fraction >= 0.999
+        ? (fraction * 100).toFixed(2)
+        : fraction >= 0.9
+          ? (fraction * 100).toFixed(1)
+          : (fraction * 100).toFixed(0);
+  return pct + '%';
+}
+
+/** Count literal 9 digits in a formatted uptime % (99% → 2, 99.9% → 3). */
+export function countNinesInPct(pct: string): number {
+  return (pct.replace('%', '').match(/9/g) ?? []).length;
+}
+
+function uptimeNinesLabel(nines: number): string {
+  if (nines <= 0) return 'no nines';
+  return nines === 1 ? '1 nine' : `${nines} nines`;
+}
+
 export function calcUptime(bugs: number): Uptime {
   const fraction = Math.min(
     UPTIME.fractionMax,
     Math.max(UPTIME.fractionMin, 1 - bugs * UPTIME.bugFractionRate),
   );
-  const nines = Math.min(5, -Math.log10(Math.max(1e-6, 1 - fraction)));
-  const pct =
-    fraction >= 0.9999
-      ? (fraction * 100).toFixed(3) + '%'
-      : fraction >= 0.999
-        ? (fraction * 100).toFixed(2) + '%'
-        : fraction >= 0.99
-          ? (fraction * 100).toFixed(1) + '%'
-          : (fraction * 100).toFixed(0) + '%';
-  const label =
-    nines >= 4.9
-      ? '5 nines'
-      : nines >= 3.9
-        ? '4 nines'
-        : nines >= 2.9
-          ? '3 nines'
-          : nines >= 1.9
-            ? '2 nines'
-            : nines >= 0.9
-              ? '1 nine'
-              : 'no nines';
+  const pct = formatUptimePct(fraction);
+  const nines = Math.min(5, countNinesInPct(pct));
+  const label = uptimeNinesLabel(nines);
   return { fraction, nines, pct, label };
 }
 
+/** Status-page fiction: integer nines → classic availability string (2 nines = 99%). */
 export function formatNinesPct(n: number): string {
-  if (n <= 2) return '99%';
-  return '99.' + '9'.repeat(n - 2) + '%';
+  const i = Math.floor(n);
+  if (i < 2) return '90%';
+  if (i === 2) return '99%';
+  return '99.' + '9'.repeat(i - 2) + '%';
 }
 
 // ─── burn (investor overlay) ───────────────────────────────────────────────

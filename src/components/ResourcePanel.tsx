@@ -144,13 +144,17 @@ export function ResourcePanel({ state }: Props) {
       {ui.showUptime && !ui.ninesTracking && (
         <Row label="uptime">
           <span className={uptimeColorClass}>{uptime.pct}</span>
-          <span className={uptimeColorClass + ' text-[12px]'}>({uptime.label})</span>
+          {uptime.nines >= 4 && (
+            <span className={uptimeColorClass + ' text-[12px]'}>({uptime.label})</span>
+          )}
         </Row>
       )}
       {ui.ninesTracking && !showAsCounter && (
         <Row label="uptime">
           <span className="text-green">{formatNinesPct(ninesInt)}</span>
-          <span className="text-green-dim text-[12px]">({ninesInt} nines)</span>
+          {ninesRate > 0 && (
+            <span className="text-green-dim text-[12px]">(+{ninesRate.toFixed(4)}/s)</span>
+          )}
         </Row>
       )}
       {showAsCounter && (
