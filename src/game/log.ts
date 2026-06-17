@@ -1,5 +1,6 @@
 import type { GameState, LogEntry, LogEntryType } from '../types';
 import { MAX_LOG } from './constants';
+import { now } from './runtime';
 import { computeEntryStreamMs } from './streamSchedule';
 
 export { computeTextStreamMs as streamingDurationMs } from './streamSchedule';
@@ -67,6 +68,30 @@ export function appendMcpToolLog(
     streamMs: 0,
     instant: true,
     toolAck: ackText?.trim() ? ackText : undefined,
+  };
+  return {
+    ...prev,
+    logId: prev.logId + 1,
+    log: [...prev.log, entry].slice(-MAX_LOG),
+  };
+}
+
+/** Live subagent card — spinner until `expiresAt`, then checkmark. */
+export function appendSubagentLog(
+  prev: GameState,
+  headline: string,
+  expiresAt: number,
+): GameState {
+  if (!headline.trim()) return prev;
+  const startedAt = now();
+  const entry: LogEntry = {
+    id: prev.logId + 1,
+    text: headline.trim(),
+    type: 'subagent',
+    streamMs: 0,
+    instant: true,
+    subagentStartedAt: startedAt,
+    subagentExpiresAt: expiresAt,
   };
   return {
     ...prev,

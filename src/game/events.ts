@@ -1,12 +1,13 @@
 import type { EventDef, GameState, LogEntry, LogEntryType, NewsDef } from '../types';
 import { withBugs } from './state';
 import { EVENTS, NEWS } from './data';
-import { EVENT_COOLDOWN_MS, EVENT_MIX, THRESHOLDS } from './constants';
+import { EVENT_COOLDOWN_MS, EVENT_MIX, SUBAGENT, THRESHOLDS } from './constants';
 import { templateSeenInRecentLog } from '../lib/logTemplateMatch';
 import { messageKey } from '../lib/messageKey';
 import { render } from '../lib/template';
 import { formatNewsText } from './newsFormat';
-import { appendLog } from './log';
+import { appendLog, appendSubagentLog } from './log';
+import { hasActiveSubagent } from './subagent';
 import { now, random } from './runtime';
 
 export type AddLogFn = (prev: GameState, text: string, type: LogEntryType) => GameState;
@@ -63,7 +64,19 @@ export function applyGuaranteedNews(prev: GameState, next: GameState): GameState
 }
 
 function gatedEvents(prev: GameState): EventDef[] {
-  return EVENTS.filter((e) => passesGates(e, prev));
+  return EVENTS.filter((e) => !e.subagent && passesGates(e, prev));
+}
+
+/** `events.yaml` entries with `subagent: true` — McMinis era only. */
+function subagentEventPool(prev: GameState): EventDef[] {
+  if ((prev.mcMinis ?? 0) <= 0) return [];
+  if (hasActiveSubagent(prev.log)) return [];
+  return EVENTS.filter(
+    (e) =>
+      e.subagent &&
+      passesGates(e, prev) &&
+      !templateSeenInRecentLog(e.text, prev.log),
+  );
 }
 
 /** LOC-gated events not represented in the recent log window. */
@@ -101,11 +114,27 @@ export function maybeFireEvent(prev: GameState, prob: number, addLog: AddLogFn):
 
   const newsPool = eligibleNews(prev);
   const eventPool = dialogueEventPool(prev);
-  if (newsPool.length === 0 && eventPool.length === 0) return prev;
+  const subagentPool = subagentEventPool(prev);
+  if (newsPool.length === 0 && eventPool.length === 0 && subagentPool.length === 0) {
+    return prev;
+  }
+
+  const roll = random();
+
+  if (subagentPool.length > 0 && roll < EVENT_MIX.subagentShare) {
+    const ev = weightedPick(subagentPool, random());
+    let next = appendSubagentLog(prev, render(ev.text), t + SUBAGENT.ambientDurationMs);
+    return { ...next, lastEventTime: t };
+  }
+
+  const mixRoll =
+    subagentPool.length > 0
+      ? (roll - EVENT_MIX.subagentShare) / (1 - EVENT_MIX.subagentShare)
+      : roll;
 
   const pickNews =
     newsPool.length > 0 &&
-    (eventPool.length === 0 || random() < EVENT_MIX.newsShare);
+    (eventPool.length === 0 || mixRoll < EVENT_MIX.newsShare);
 
   let next = prev;
   let logType: LogEntry['type'];

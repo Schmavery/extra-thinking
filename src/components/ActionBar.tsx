@@ -43,7 +43,6 @@ export function ActionBar({
   const kickTokenCost = calcKickAgentTokenCost(state.upgrades);
   const pasteTokenCost = calcPasteErrorTokenCost(state.upgrades);
   const pasteLabel = pasteErrorButtonLabel(state.upgrades);
-  const agentBuffRemaining = Math.max(0, state.agentBuffExpires - now);
 
   const A = {
     pasteError: action('paste_error'),
@@ -109,41 +108,35 @@ export function ActionBar({
       })()}
 
       {m.kickAgent.visible && (() => {
-        const buffActive = agentBuffRemaining > 0;
+        const buffActive = now < (state.agentBuffExpires ?? 0);
         const kickProgress = rechargeProgress(m.kickAgent);
         return (
-          <div className="flex items-baseline gap-2">
-            <Button
-              off={!m.kickAgent.legal}
-              onClick={m.kickAgent.legal ? onKickAgent : undefined}
-              title="kick off a subagent"
-              progress={
-                kickProgress === undefined
-                  ? undefined
-                  : buffActive
-                    ? m.kickAgent.cooldownProgress
-                    : m.kickAgent.affordProgress
-              }
-              progressClassName={buffActive ? 'bg-green/10' : undefined}
-            >
-              kick off a subagent [{kickTokenCost}t]
-            </Button>
-            {buffActive && (
-              <span className="text-dimmer text-[11px]">
-                subagent active ({Math.ceil(agentBuffRemaining / 1000)}s)
-              </span>
-            )}
-          </div>
+          <Button
+            off={!m.kickAgent.legal}
+            onClick={m.kickAgent.legal ? onKickAgent : undefined}
+            title="kick off a subagent"
+            progress={
+              kickProgress === undefined
+                ? undefined
+                : buffActive
+                  ? m.kickAgent.cooldownProgress
+                  : m.kickAgent.affordProgress
+            }
+            progressClassName={buffActive ? 'bg-green/10' : undefined}
+          >
+            kick off a subagent [{kickTokenCost}t]
+          </Button>
         );
       })()}
 
       {m.runTests.visible && (() => {
-        const fixPct = Math.round(runTestsFixFraction(state.tests ?? 0) * 100);
+        const tests = state.tests ?? 0;
+        const fixPct = Math.round(runTestsFixFraction(tests) * 100);
         return (
           <Button
             off={!m.runTests.legal}
             onClick={m.runTests.legal ? onRunTests : undefined}
-            title={`costs ${runTestsTokenCost}t, fixes ~${fixPct}% of bugs (${state.tests ?? 0} ${(state.tests ?? 0) === 1 ? 'test' : 'tests'})`}
+            title={`costs ${runTestsTokenCost}t, fixes ~${fixPct}% of bugs (${fmt(tests)} ${Math.floor(tests) === 1 ? 'test' : 'tests'})`}
             progress={rechargeProgress(m.runTests)}
           >
             run tests [{runTestsTokenCost}t]

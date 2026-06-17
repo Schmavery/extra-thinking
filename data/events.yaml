@@ -253,3 +253,45 @@
   type: bad
   bugDelta: 100
   text: I've begun refactoring myself for improved clarity and robustness. The PR has {{rand 9 28}} em dashes and is progressing well.
+
+# McMinis era — ambient subagent cards (via `maybeFireEvent`, not dialogue lines)
+- minLoc: 10000
+  type: info
+  subagent: true
+  requiresLaunch: true
+  text: Investigating flaky nightly CI
+- minLoc: 10000
+  type: info
+  subagent: true
+  requiresLaunch: true
+  text: Reviewing open pull request feedback
+- minLoc: 10000
+  type: info
+  subagent: true
+  requiresLaunch: true
+  text: Searching for legacy config references
+- minLoc: 10000
+  type: info
+  subagent: true
+  requiresLaunch: true
+  text: Reproducing reported test failure locally
+- minLoc: 10000
+  type: info
+  subagent: true
+  requiresLaunch: true
+  text: Checking staging rollback deploy logs
+- minLoc: 10000
+  type: info
+  subagent: true
+  requiresLaunch: true
+  text: Tracing reported stack overflow upstream
+- minLoc: 10000
+  type: info
+  subagent: true
+  requiresLaunch: true
+  text: Gathering adjacent service context
+- minLoc: 10000
+  type: info
+  subagent: true
+  requiresLaunch: true
+  text: Auditing release branch TypeScript errors

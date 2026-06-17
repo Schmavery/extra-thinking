@@ -27,7 +27,7 @@ export function computeEntryStreamMs(
   prevLineWasUser: boolean,
   opts?: EntryStreamOpts,
 ): number {
-  if (type === 'system' || type === 'tool') return 0;
+  if (type === 'system' || type === 'tool' || type === 'subagent') return 0;
   if (type === 'user' || text.trimStart().startsWith('>')) {
     // thinkingDelayMs runs inside this window (before the next AI line).
     return STREAMING.userLeadInMs + STREAMING.afterUserMs;

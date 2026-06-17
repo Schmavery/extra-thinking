@@ -10,7 +10,7 @@ import { idleMcMinis } from './investor';
 import { calcUptime, canStackAccounts } from './rates';
 import type { GameState } from '../types';
 
-export type LowerTab = 'status' | 'capacity' | 'shop' | 'stack';
+export type LowerTab = 'status' | 'fleet' | 'accounts' | 'upgrades';
 
 export type LowerTabBadge = { kind: 'urgent' } | { kind: 'count'; n: number };
 
@@ -30,22 +30,22 @@ export function lowerTabBadges(
     }
   }
 
-  if (ui.showGenSection || ui.showMcMinis) {
-    let capacityCount = 0;
-    if (ui.showGenSection) {
-      const canStack = canStackAccounts(state.upgrades);
-      for (const a of ACCOUNTS) {
-        const owned = state.accountCounts[a.id] ?? 0;
-        const move = getMove(state, `buy_gen:${a.id}`, now);
-        if (move?.visible && (owned === 0 || canStack)) capacityCount += 1;
-      }
+  if (ui.showGenSection) {
+    let accountsCount = 0;
+    const canStack = canStackAccounts(state.upgrades);
+    for (const a of ACCOUNTS) {
+      const owned = state.accountCounts[a.id] ?? 0;
+      const move = getMove(state, `buy_gen:${a.id}`, now);
+      if (move?.visible && move.legal && (owned === 0 || canStack)) accountsCount += 1;
     }
-    if (ui.showMcMinis) {
-      const mcMinis = state.mcMinis ?? 0;
-      const lanes = state.mcMiniLanes ?? { code: 0, growth: 0, tests: 0 };
-      capacityCount += idleMcMinis(mcMinis, lanes);
-    }
-    if (capacityCount > 0) out.capacity = { kind: 'count', n: capacityCount };
+    if (accountsCount > 0) out.accounts = { kind: 'count', n: accountsCount };
+  }
+
+  if (ui.showMcMinis) {
+    const mcMinis = state.mcMinis ?? 0;
+    const lanes = state.mcMiniLanes ?? { code: 0, growth: 0, tests: 0 };
+    const idle = idleMcMinis(mcMinis, lanes);
+    if (idle > 0) out.fleet = { kind: 'count', n: idle };
   }
 
   if (ui.showUpgSection || fundingRoundOpen) {
@@ -55,7 +55,7 @@ export function lowerTabBadges(
     });
     const raiseMove = getMove(state, 'raise_round', now);
     const raiseReady = raiseMove?.visible && raiseMove.legal;
-    if (affordableUpgrade || raiseReady) out.shop = { kind: 'urgent' };
+    if (affordableUpgrade || raiseReady) out.upgrades = { kind: 'urgent' };
   }
 
   return out;

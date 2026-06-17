@@ -89,9 +89,11 @@ export const THRESHOLDS = {
   minUptimeNinesToRaise: 2,
 } as const;
 
-/** When both dialogue events and unused headlines are eligible, pick headline with this chance. */
+/** When eligible pools overlap, pick headline / dialogue / subagent with these shares. */
 export const EVENT_MIX = {
   newsShare: 0.35,
+  /** McMinis-era subagent cards (only when `subagent` events are in pool). */
+  subagentShare: 0.12,
 } as const;
 
 // ─── Investor overlay (burn, buzz meter, McMinis) ────────────────────────
@@ -111,7 +113,7 @@ export const INVESTOR = {
     {
       label: 'Seed',
       minBurnPerSec: 0,
-      mcMinisGrant: 1,
+      mcMinisGrant: 3,
     },
     {
       label: 'Series A',
@@ -196,6 +198,13 @@ export const AGENT_BUFF = {
    * to this floor when computing nines.
    */
   ninesFloorFallback: 4,
+} as const;
+
+/** Subagent log cards — kick buff + ambient McMinis flavor via `maybeFireEvent`. */
+export const SUBAGENT = {
+  ambientDurationMs: 14_000,
+  /** Per-tick roll while McMinis are active (respects `EVENT_COOLDOWN_MS`). */
+  tickEventProbability: 0.003,
 } as const;
 
 // ─── Simulator / pacing ────────────────────────────────────────────────────

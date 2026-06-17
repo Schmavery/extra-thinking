@@ -26,24 +26,26 @@
 - id: kick_agent
   tokenCost: 60
   buffMs: 30000
-  eventProbability: 0.2
   introMsg: "I'd be happy to kick off a subagent to parallelize this work."
+  subagentTasks:
+    - Investigating flaky CI failures
+    - Reviewing open PR comments
+    - Searching for deprecated usages
+    - Reproducing reported test flake
+    - Checking staging deploy logs
+    - Tracing last merge regression
+    - Gathering related package context
+    - Reading open bug-tagged issues
+    - Fixing release branch typecheck errors
+    - Responding to API schema review
+    - Auditing recent commits for leak
+    - Cross-referencing failing e2e screenshots
   messages:
-    - |-
-      > kick off a subagent
-      Subagent initialized! It's quietly reading all {{rand 400 1200}} files first, for context. It will begin shortly.
-    - |-
-      > spawn a subagent
-      Subagent launched! It's spinning up subprocesses and downloading the full repository for comprehensive context.
-    - |-
-      > start a subagent for this task
-      Subagent active! It's opened {{rand 6 21}} tabs and is thinking carefully. Output incoming.
-    - |-
-      > go subagent go
-      Subagent deployed! It has enabled computer use. I'd rather not say what it clicked.
-    - |-
-      > subagent mode
-      Subagent running! It refactored {{rand 2 6}} files outside the requested scope. Very thorough.
+    - '> kick off a subagent'
+    - '> spawn a subagent'
+    - '> start a subagent for this task'
+    - '> go subagent go'
+    - '> subagent mode'
 
 - id: paste_error
   tokenCost: 10
@@ -190,7 +192,7 @@
 
 - id: buy_gen
   eventProbability: 0.3
-  firstPurchaseMsg: 'Signed up for {{name}}. Free tier. "{{desc}}"'
+  firstPurchaseMsg: 'Signed up for {{name}}. "{{desc}}"'
 
 - id: buy_upgrade
   eventProbability: 0.4

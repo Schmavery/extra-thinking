@@ -61,7 +61,7 @@ function appendUnsafeLeakLog(prev: GameState, def: McpToolDef, leaked: number): 
   const pct = Math.round(MCP.unsafeAllowLocLeakFraction * 100);
   return appendLog(
     prev,
-    `Data leak after that tool call. −${fmt(leaked)} LOC (${pct}% of your buffer).`,
+    `Data leak after that tool call. −${fmt(leaked)} loc (${pct}% of your buffer).`,
     'bad',
   );
 }

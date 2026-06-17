@@ -136,7 +136,7 @@ export function ResourcePanel({ state }: Props) {
         const ciFix = snapRate(tests * calcTestFixRate(state.upgrades));
         return (
           <Row label="tests">
-            <span className="text-dim">{tests}</span>
+            <span className="text-dim">{fmt(tests)}</span>
             {(dampPct > 0 || ciFix !== 0) && (
               <span className="text-dimmer text-[12px]">
                 (

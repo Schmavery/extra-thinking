@@ -4,7 +4,7 @@ import { deriveGame } from '../src/game/derive';
 import { lowerTabBadges } from '../src/game/leftPanelBadges';
 
 describe('leftPanelBadges', () => {
-  it('shop urgent when an affordable upgrade is visible', () => {
+  it('upgrades urgent when an affordable upgrade is visible', () => {
     const state = {
       ...defaultState(),
       started: true,
@@ -16,7 +16,21 @@ describe('leftPanelBadges', () => {
     };
     const derived = deriveGame(state);
     const badges = lowerTabBadges(state, derived, false, 0);
-    expect(badges.shop).toEqual({ kind: 'urgent' });
+    expect(badges.upgrades).toEqual({ kind: 'urgent' });
+  });
+
+  it('accounts badge only when an account purchase is affordable', () => {
+    const state = {
+      ...defaultState(),
+      started: true,
+      totalLoc: 4500,
+      loc: 100,
+      accountCounts: {},
+      upgrades: [],
+    };
+    const derived = deriveGame(state);
+    const badges = lowerTabBadges(state, derived, false, 0);
+    expect(badges.accounts).toBeUndefined();
   });
 
   it('status urgent when uptime is in fire band', () => {

@@ -6,6 +6,7 @@ import { useRevealScrollbar } from '../lib/useRevealScrollbar';
 import { Button } from './Button';
 import { LightbulbIcon } from './LightbulbIcon';
 import { McpToolCallBlock } from './McpToolCallBlock';
+import { SubagentBlock } from './SubagentBlock';
 
 const SPIN_FRAMES = UI.spinFrames;
 
@@ -34,7 +35,7 @@ interface Props {
   scrollContainerRef?: RefObject<HTMLDivElement | null>;
 }
 
-const TYPE_CLASSES: Record<Exclude<LogEntry['type'], 'tool'>, string> = {
+const TYPE_CLASSES: Record<Exclude<LogEntry['type'], 'tool' | 'subagent'>, string> = {
   user: 'border-r-2 border-r-log-user-border text-log-user pr-[10px] text-right',
   bad: 'border-l-2 border-l-log-bad-border text-log-bad pl-[10px]',
   event: 'border-l-2 border-l-log-event-border text-log-event pl-[10px]',
@@ -151,6 +152,8 @@ export function ConversationLog({
               ack={entry.toolAck}
               approved
             />
+          ) : entry.type === 'subagent' ? (
+            <SubagentBlock key={entry.id} entry={entry} />
           ) : (
             <div
               key={entry.id}

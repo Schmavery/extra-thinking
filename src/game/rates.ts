@@ -29,9 +29,9 @@ export function canStackAccounts(upgrades: string[]): boolean {
   return upgrades.includes('rotate_accounts');
 }
 
-/** Code machines running the harness: 1 pre-fleet, else assigned code McMinis (min 1). */
+/** Code machines running the harness: 1 pre-fleet, else boxes assigned to the code lane. */
 export function calcCodeMachines(mcMinis: number, lanes: McMiniLanes): number {
-  return mcMinis > 0 ? Math.max(1, lanes.code) : 1;
+  return mcMinis > 0 ? lanes.code : 1;
 }
 
 // ─── accounts / clicks ─────────────────────────────────────────────────────

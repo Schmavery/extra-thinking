@@ -36,6 +36,7 @@ import {
 import { pickFromPool } from '../lib/logTemplateMatch';
 import { render } from '../lib/template';
 import { introduceUnseenActions } from './actionIntros';
+import { logKickSubagent } from './subagent';
 import { promptCooldownForClick } from './prompt';
 import { clearMcpApproval, maybeMcpApprovalAfterPrompt, mcpApprovalsSuppressed } from './mcpApproval';
 import { now, random } from './runtime';
@@ -127,12 +128,17 @@ export function kickAgentAction(prev: GameState): GameState {
   const tokenCost = calcKickAgentTokenCost(prev.upgrades);
   if (prev.tokens < tokenCost) return prev;
   if (now() < (prev.agentBuffExpires ?? 0)) return prev;
+  const expiresAt = now() + a.buffMs!;
   let next: GameState = {
     ...spendTokens(prev, tokenCost),
-    agentBuffExpires: now() + a.buffMs!,
+    agentBuffExpires: expiresAt,
   };
-  next = logUnusedPool(next, a.messages, 'info');
-  if (a.eventProbability) next = maybeFireEvent(next, a.eventProbability, appendLog);
+  const userLine =
+    a.messages?.length
+      ? pickFromPool(a.messages, prev.log) ??
+        a.messages[Math.floor(random() * a.messages.length)]!
+      : '';
+  next = logKickSubagent(next, userLine, expiresAt, a.subagentTasks);
   return next;
 }
 

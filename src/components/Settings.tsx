@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { debugHref } from '../debug/routes';
 import { clearDevUnlock, registerDevUnlockClick } from '../lib/devUnlock';
 import { useDevUnlock } from '../lib/useDevUnlock';
+import { Button } from './Button';
 import {
   SYSTEM_THEME_ID,
   THEMES,
@@ -20,9 +21,15 @@ import {
 interface SettingsProps {
   /** Dev-only: snap to the jump-to-launch playtest preset. */
   onJumpToLaunch?: () => void;
+  showResetButton?: boolean;
+  onResetClick?: () => void;
 }
 
-export function Settings({ onJumpToLaunch }: SettingsProps = {}) {
+export function Settings({
+  onJumpToLaunch,
+  showResetButton,
+  onResetClick,
+}: SettingsProps = {}) {
   const { theme, appearance, setTheme, cycleAppearance } = useTheme();
   const [open, setOpen] = useState(false);
 
@@ -66,6 +73,8 @@ export function Settings({ onJumpToLaunch }: SettingsProps = {}) {
           onPickTheme={(id) => setTheme(id)}
           onClose={() => setOpen(false)}
           onJumpToLaunch={onJumpToLaunch}
+          showResetButton={showResetButton}
+          onResetClick={onResetClick}
         />
       )}
     </>
@@ -98,6 +107,8 @@ interface SettingsModalProps {
   onPickTheme: (id: string) => void;
   onClose: () => void;
   onJumpToLaunch?: () => void;
+  showResetButton?: boolean;
+  onResetClick?: () => void;
 }
 
 function SettingsModal({
@@ -106,6 +117,8 @@ function SettingsModal({
   onPickTheme,
   onClose,
   onJumpToLaunch,
+  showResetButton,
+  onResetClick,
 }: SettingsModalProps) {
   const devUnlocked = useDevUnlock();
 
@@ -198,6 +211,20 @@ function SettingsModal({
             >
               turn off debug mode
             </button>
+          </div>
+        )}
+
+        {showResetButton && onResetClick && (
+          <div className="px-[14px] py-[12px] border-t border-border">
+            <Button
+              variant="subtle"
+              onClick={() => {
+                onClose();
+                onResetClick();
+              }}
+            >
+              rewrite from scratch
+            </Button>
           </div>
         )}
       </div>

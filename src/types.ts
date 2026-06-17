@@ -167,6 +167,8 @@ export interface EventDef {
   minLoc: number;
   requiresLaunch?: boolean;
   requires?: string[];
+  /** McMinis era: spawns a subagent log card instead of a dialogue line. */
+  subagent?: boolean;
 }
 
 /** Industry headlines in `data/news.yaml` — never repeat; keyed by `id`. */
@@ -217,6 +219,7 @@ export type LogEntryType =
   | 'milestone'
   | 'system'
   | 'tool'
+  | 'subagent'
   | 'user';
 
 /**
@@ -242,6 +245,8 @@ export interface ActionDef {
 
   // kick_agent
   buffMs?: number;
+  /** Task headings on subagent cards (Handlebars-templated). */
+  subagentTasks?: string[];
 
   // paste_error
   fixChance?: number;
@@ -310,6 +315,10 @@ export interface LogEntry {
   toolAck?: string;
   /** Dev/session-only line — stripped before persisting to localStorage. */
   ephemeral?: boolean;
+  /** Wall-clock ms when a `subagent` card shows ✓ instead of the spinner. */
+  subagentExpiresAt?: number;
+  /** Wall-clock ms when the subagent card was enqueued. */
+  subagentStartedAt?: number;
 }
 
 export interface GameState {

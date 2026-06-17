@@ -470,7 +470,11 @@ export function Game() {
         isMobile ? 'px-[14px] pt-[14px] pb-2' : 'px-6 pt-7 pb-2',
       ].join(' ')}
     >
-      <Settings onJumpToLaunch={handleJumpToLaunch} />
+      <Settings
+        onJumpToLaunch={handleJumpToLaunch}
+        showResetButton={showResetButton}
+        onResetClick={() => setResetConfirmOpen(true)}
+      />
 
       {!isForeground && <PauseOverlay message="processing in background…" />}
       {isForeground && blockedByOtherTab && (
@@ -516,14 +520,12 @@ export function Game() {
           derived={derived}
           fundingRoundOpen={fundingRoundOpen}
           showPromptButton={showPromptButton}
-          showResetButton={showResetButton}
           showResources={showResources}
           promptLabel={promptLabel}
           introHeaderStreaming={introHeaderStreaming}
           showIntroHeader={showIntroHeader}
           onIntroStreamComplete={handleIntroStreamComplete}
           handlers={handlers}
-          onResetClick={() => setResetConfirmOpen(true)}
         />
 
         {/* ── Right (or top, on mobile) ── */}

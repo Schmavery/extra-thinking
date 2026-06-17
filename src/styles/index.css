@@ -56,6 +56,92 @@ body {
   animation: intro-button-in 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.subagent-card-close {
+  transition:
+    padding 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 280ms ease;
+}
+
+.subagent-junk-shell {
+  display: grid;
+  transition:
+    grid-template-rows 280ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 220ms ease;
+}
+
+.subagent-junk-shell.is-open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.subagent-junk-shell.is-closing {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+
+.subagent-header-gap {
+  transition: margin-bottom 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.subagent-loader-spin {
+  transform-origin: 0 0;
+  animation: subagent-loader-spin 0.9s linear infinite;
+}
+
+@keyframes subagent-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.subagent-loader-exit {
+  transform-origin: 0 0;
+  animation: subagent-loader-exit 240ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes subagent-loader-exit {
+  to {
+    opacity: 0;
+    transform: rotate(140deg) scale(0.5);
+  }
+}
+
+.subagent-check-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: subagent-check-draw 380ms cubic-bezier(0.22, 1, 0.36, 1) var(--subagent-check-delay, 100ms)
+    forwards;
+}
+
+.subagent-check-static {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+@keyframes subagent-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .subagent-card-close,
+  .subagent-junk-shell,
+  .subagent-header-gap {
+    transition-duration: 0ms !important;
+  }
+
+  .subagent-loader-spin,
+  .subagent-loader-exit,
+  .subagent-check-draw {
+    animation: none !important;
+  }
+
+  .subagent-check-draw {
+    stroke-dashoffset: 0;
+  }
+}
+
 @property --hairline-fade {
   syntax: '<number>';
   inherits: true;

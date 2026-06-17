@@ -81,7 +81,7 @@ export function raiseBlockReason(state: GameState): string | null {
   const round = nextFundingRound(state);
   if (!round) return 'no rounds left';
   if (!state.launched) return 'not launched';
-  if ((state.buzzMeter ?? 0) < INVESTOR.buzzMax) return 'buzz meter not full';
+  if ((state.buzzMeter ?? 0) < INVESTOR.buzzMax) return null;
   const burn = calcInfraBurnPerSec(state);
   if (burn < round.minBurnPerSec) {
     return `need burn ≥ $${round.minBurnPerSec}/s (have $${burn}/s)`;

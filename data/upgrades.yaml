@@ -217,7 +217,7 @@
 - id: agent_dashboard
   name: Agent Dashboard
   desc: Tabbed ops console — status, capacity, shop, and stack in separate panels.
-  cost: 12000
+  cost: 1200
   unlockAt: 0
   requiresLaunch: true
   requiresMinFundingRound: 1

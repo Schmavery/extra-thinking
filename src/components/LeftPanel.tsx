@@ -8,7 +8,7 @@ import { Button } from './Button';
 import { IntroHeader } from './IntroHeader';
 import { ActionBar } from './ActionBar';
 import { ResourcePanel } from './ResourcePanel';
-import { Generators } from './Generators';
+import { AccountsInstalledList, Generators } from './Generators';
 import { Upgrades, InstalledList } from './Upgrades';
 import { McMinis } from './McMinis';
 import type { McMiniLane } from '../game/investor';
@@ -44,14 +44,12 @@ interface Props {
   derived: DerivedGame;
   fundingRoundOpen: boolean;
   showPromptButton: boolean;
-  showResetButton: boolean;
   showResources: boolean;
   promptLabel: string;
   introHeaderStreaming: boolean;
   showIntroHeader: boolean;
   onIntroStreamComplete: () => void;
   handlers: Handlers;
-  onResetClick: () => void;
 }
 
 function visibleLowerTabs(
@@ -63,9 +61,9 @@ function visibleLowerTabs(
   const { ui } = derived;
   const tabs: LowerTab[] = [];
   if (showResources) tabs.push('status');
-  if (ui.showGenSection || ui.showMcMinis) tabs.push('capacity');
-  if (ui.showUpgSection || fundingRoundOpen) tabs.push('shop');
-  if (state.upgrades.length > 0 || state.totalLoc > 0) tabs.push('stack');
+  if (ui.showMcMinis) tabs.push('fleet');
+  if (ui.showGenSection) tabs.push('accounts');
+  if (ui.showUpgSection || fundingRoundOpen) tabs.push('upgrades');
   return tabs;
 }
 
@@ -146,11 +144,9 @@ function LegacyScrollBody({
   showGenSection,
   showUpgSection,
   showPromptButton,
-  showResetButton,
   showResources,
   promptLabel,
   handlers,
-  onResetClick,
 }: {
   state: GameState;
   derived: DerivedGame;
@@ -158,11 +154,9 @@ function LegacyScrollBody({
   showGenSection: boolean;
   showUpgSection: boolean;
   showPromptButton: boolean;
-  showResetButton: boolean;
   showResources: boolean;
   promptLabel: string;
   handlers: Handlers;
-  onResetClick: () => void;
 }) {
   return (
     <>
@@ -183,6 +177,7 @@ function LegacyScrollBody({
       />
 
       {showResources && <ResourcePanel state={state} />}
+      {showResources && <AccountsInstalledList state={state} />}
 
       {derived.ui.showMcMinis && (
         <McMinis state={state} onAdjustLane={handlers.adjustMcMiniLane} />
@@ -199,14 +194,6 @@ function LegacyScrollBody({
       )}
 
       <InstalledList ids={state.upgrades} />
-
-      {showResetButton && (
-        <div className="mt-11 pt-[14px] border-t border-border">
-          <Button variant="subtle" onClick={onResetClick}>
-            rewrite from scratch
-          </Button>
-        </div>
-      )}
     </>
   );
 }
@@ -218,10 +205,8 @@ function TabbedBody({
   showGenSection,
   showUpgSection,
   activeTab,
-  showResetButton,
   showResources,
   handlers,
-  onResetClick,
 }: {
   state: GameState;
   derived: DerivedGame;
@@ -229,39 +214,34 @@ function TabbedBody({
   showGenSection: boolean;
   showUpgSection: boolean;
   activeTab: LowerTab;
-  showResetButton: boolean;
   showResources: boolean;
   handlers: Handlers;
-  onResetClick: () => void;
 }) {
   return (
     <>
       {activeTab === 'status' && showResources && <ResourcePanel state={state} />}
-      {activeTab === 'capacity' && (
+      {activeTab === 'accounts' && (
         <>
-          {showGenSection && <Generators state={state} onBuyGen={handlers.buyGen} />}
-          {derived.ui.showMcMinis && (
-            <McMinis state={state} onAdjustLane={handlers.adjustMcMiniLane} />
+          {showGenSection && (
+            <Generators state={state} onBuyGen={handlers.buyGen} hideHeader />
           )}
+          <AccountsInstalledList state={state} />
         </>
       )}
-      {activeTab === 'shop' && (showUpgSection || fundingRoundOpen) && (
-        <Upgrades
-          state={state}
-          onBuyUpgrade={handlers.buyUpgrade}
-          onRaiseRound={handlers.raiseRound}
-        />
+      {activeTab === 'fleet' && derived.ui.showMcMinis && (
+        <McMinis state={state} onAdjustLane={handlers.adjustMcMiniLane} hideHeader />
       )}
-      {activeTab === 'stack' && (
+      {activeTab === 'upgrades' && (
         <>
-          <InstalledList ids={state.upgrades} />
-          {showResetButton && (
-            <div className="mt-11 pt-[14px] border-t border-border">
-              <Button variant="subtle" onClick={onResetClick}>
-                rewrite from scratch
-              </Button>
-            </div>
+          {(showUpgSection || fundingRoundOpen) && (
+            <Upgrades
+              state={state}
+              onBuyUpgrade={handlers.buyUpgrade}
+              onRaiseRound={handlers.raiseRound}
+              hideHeader
+            />
           )}
+          <InstalledList ids={state.upgrades} />
         </>
       )}
     </>
@@ -276,14 +256,12 @@ export function LeftPanel({
   derived,
   fundingRoundOpen,
   showPromptButton,
-  showResetButton,
   showResources,
   promptLabel,
   introHeaderStreaming,
   showIntroHeader,
   onIntroStreamComplete,
   handlers,
-  onResetClick,
 }: Props) {
   const useTabs = derived.hasFlag('agent_dashboard');
   const { showGenSection, showUpgSection } = derived.ui;
@@ -333,19 +311,23 @@ export function LeftPanel({
           showGenSection={showGenSection}
           showUpgSection={showUpgSection}
           showPromptButton={showPromptButton}
-          showResetButton={showResetButton}
           showResources={showResources}
           promptLabel={promptLabel}
           handlers={handlers}
-          onResetClick={onResetClick}
         />
       </div>
     );
   }
 
   return (
-    <div className={[shellClass, 'overflow-hidden'].join(' ')}>
-      <div className="shrink-0 border-b border-border pb-3">
+    <div
+      ref={scrollRef}
+      className={[
+        shellClass,
+        'overflow-y-auto overflow-x-hidden hairline-scrollbar pb-6',
+      ].join(' ')}
+    >
+      <div className="border-b border-border pb-3">
         {!isMobile && showIntroHeader && (
           <IntroHeader
             phaseLabel={PHASES[phase]}
@@ -377,10 +359,7 @@ export function LeftPanel({
         badges={tabBadges}
       />
 
-      <div
-        ref={scrollRef}
-        className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden hairline-scrollbar pb-6 pt-3"
-      >
+      <div className="pt-3">
         <TabbedBody
           state={state}
           derived={derived}
@@ -388,10 +367,8 @@ export function LeftPanel({
           showGenSection={showGenSection}
           showUpgSection={showUpgSection}
           activeTab={activeTab}
-          showResetButton={showResetButton}
           showResources={showResources}
           handlers={handlers}
-          onResetClick={onResetClick}
         />
       </div>
     </div>

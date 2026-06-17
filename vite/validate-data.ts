@@ -97,6 +97,7 @@ const eventSchema = z
     locMult: z.number().optional(),
     locDelta: z.number().optional(),
     bugDelta: z.number().optional(),
+    subagent: z.boolean().optional(),
   })
   .passthrough();
 

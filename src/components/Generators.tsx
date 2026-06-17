@@ -21,30 +21,24 @@ import {
 interface Props {
   state: GameState;
   onBuyGen: (id: string) => void;
+  hideHeader?: boolean;
 }
 
-function AccountsInstalledList({
-  accountIds,
-  spaced,
-}: {
-  accountIds: string[];
-  spaced?: boolean;
-}) {
+export function AccountsInstalledList({ state }: { state: GameState }) {
+  if (canStackAccounts(state.upgrades)) return null;
+  const accountIds = ACCOUNTS.filter((a) => (state.accountCounts[a.id] ?? 0) > 0).map(
+    (a) => a.id,
+  );
   if (accountIds.length === 0) return null;
   return (
-    <div
-      className={[
-        'text-dimmer text-[11px] min-w-0 break-words',
-        spaced ? 'mt-[10px]' : '',
-      ].join(' ')}
-    >
+    <div className="mt-[10px] text-dimmer text-[11px] min-w-0 break-words">
       registered:{' '}
       {accountIds.map((id) => ACCOUNTS.find((a) => a.id === id)?.name).join(', ')}
     </div>
   );
 }
 
-export function Generators({ state, onBuyGen }: Props) {
+export function Generators({ state, onBuyGen, hideHeader }: Props) {
   const now = Date.now();
   const paid = hasProPlan(state.upgrades);
   const showBurn = paid;
@@ -57,15 +51,11 @@ export function Generators({ state, onBuyGen }: Props) {
   }))
     .filter(({ move, owned }) => move.visible && (owned === 0 || canStack));
 
-  const installed = canStack
-    ? []
-    : ACCOUNTS.filter((a) => (state.accountCounts[a.id] ?? 0) > 0).map((a) => a.id);
-
-  if (buyable.length === 0 && installed.length === 0) return null;
+  if (buyable.length === 0) return null;
 
   return (
     <div className="min-w-0">
-      <ShopSectionHeader>accounts</ShopSectionHeader>
+      {!hideHeader && <ShopSectionHeader>accounts</ShopSectionHeader>}
 
       {buyable.map(({ a, move, owned }) => {
         const cost = accountCost(a, owned);
@@ -100,8 +90,6 @@ export function Generators({ state, onBuyGen }: Props) {
           </ShopRow>
         );
       })}
-
-      <AccountsInstalledList accountIds={installed} spaced={buyable.length > 0} />
     </div>
   );
 }

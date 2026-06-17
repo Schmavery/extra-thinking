@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { defaultState } from '../src/game/state';
-import { calcInfraBurnPerSec } from '../src/game/rates';
+import { INVESTOR } from '../src/game/constants';
+import { calcCodeMachines, calcInfraBurnPerSec, calcRates } from '../src/game/rates';
 import { tickReducer } from '../src/game/tick';
+import { raiseRoundAction } from '../src/game/actions';
 import {
   adjustMcMiniLane,
   grantMcMinis,
@@ -35,6 +37,35 @@ describe('McMini lanes', () => {
       growth: 0,
       tests: 0,
     });
+  });
+
+  it('code lane machines match assigned boxes only', () => {
+    const lanes = { code: 0, growth: 1, tests: 0 };
+    expect(calcCodeMachines(0, lanes)).toBe(1);
+    expect(calcCodeMachines(2, lanes)).toBe(0);
+    expect(calcCodeMachines(2, { code: 2, growth: 0, tests: 0 })).toBe(2);
+  });
+
+  it('no passive loc from fleet until code boxes are assigned', () => {
+    const harness = ['autocomplete'];
+    expect(calcRates({}, harness, 0, 2, { code: 0, growth: 2, tests: 0 }).locRate).toBe(0);
+    expect(calcRates({}, harness, 0, 2, { code: 1, growth: 1, tests: 0 }).locRate).toBe(2);
+    expect(calcRates({}, harness, 0, 2, { code: 2, growth: 0, tests: 0 }).locRate).toBe(4);
+  });
+
+  it('seed close grants three McMinis', () => {
+    const prev = {
+      ...defaultState(),
+      launched: true,
+      buzzMeter: INVESTOR.buzzMax,
+      fundingRound: 0,
+      upgrades: ['pro_plan', 'autocomplete'],
+      bugs: 0,
+    };
+    const next = raiseRoundAction(prev);
+    expect(next.mcMinis).toBe(3);
+    expect(next.mcMiniLanes).toEqual({ code: 0, growth: 0, tests: 0 });
+    expect(idleMcMinis(next.mcMinis!, next.mcMiniLanes)).toBe(3);
   });
 });
 

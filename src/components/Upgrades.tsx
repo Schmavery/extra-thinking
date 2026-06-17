@@ -20,9 +20,10 @@ interface Props {
   state: GameState;
   onBuyUpgrade: (id: string) => void;
   onRaiseRound: () => void;
+  hideHeader?: boolean;
 }
 
-export function Upgrades({ state, onBuyUpgrade, onRaiseRound }: Props) {
+export function Upgrades({ state, onBuyUpgrade, onRaiseRound, hideHeader }: Props) {
   const now = Date.now();
   const round = nextFundingRound(state);
   const raiseMove = round ? getMove(state, 'raise_round', now)! : null;
@@ -39,7 +40,7 @@ export function Upgrades({ state, onBuyUpgrade, onRaiseRound }: Props) {
 
   return (
     <div className="min-w-0">
-      <ShopSectionHeader>upgrades</ShopSectionHeader>
+      {!hideHeader && <ShopSectionHeader>upgrades</ShopSectionHeader>}
 
       {showRaise && round && raiseMove && (() => {
         const blockReason = raiseMove.legal ? null : raiseBlockReason(state);
@@ -65,7 +66,9 @@ export function Upgrades({ state, onBuyUpgrade, onRaiseRound }: Props) {
                   blockReason && <span className="ml-[10px]">({blockReason})</span>
                 )}
                 {round.mcMinisGrant > 0 && (
-                  <span className="ml-[10px]">+{round.mcMinisGrant} McMini</span>
+                  <span className="ml-[10px]">
+                    +{round.mcMinisGrant} McMini{round.mcMinisGrant === 1 ? '' : 's'}
+                  </span>
                 )}
               </span>
             </ShopMeta>
