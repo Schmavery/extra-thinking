@@ -1,6 +1,7 @@
 import type { GameState } from '../types';
 import { SAVE_KEY } from './constants';
 import { EMPTY_MC_MINI_LANES, normalizeMcMiniLanes } from './investor';
+import { STARTUP_MILESTONE_LOC } from './milestones';
 import { stateForPersist } from './log';
 import { clearSaveStorage, writeSaveWithMeta, type SaveSource } from './saveSync';
 
@@ -84,6 +85,7 @@ export function defaultState(): GameState {
     minTokensSeen: 9999,
     milestonesSeen: [],
     started: false,
+    introSequenceComplete: false,
     launched: false,
     usedEventIds: [],
     usedNewsIds: [],
@@ -114,6 +116,10 @@ export function initState(): GameState {
       const migrated = migrateLoadedState(parsed);
       const bugFixLog = migrateBugFixLogTime(parsed);
       const mcMinis = parsed.mcMinis ?? base.mcMinis;
+      const milestonesSeen = Array.isArray(parsed.milestonesSeen)
+        ? parsed.milestonesSeen
+        : base.milestonesSeen;
+      const totalLoc = parsed.totalLoc ?? base.totalLoc;
       return {
         ...base,
         ...parsed,
@@ -124,6 +130,11 @@ export function initState(): GameState {
         buzzMeter: parsed.buzzMeter ?? base.buzzMeter,
         lobstagramPosts: parsed.lobstagramPosts ?? base.lobstagramPosts,
         fundingRound: parsed.fundingRound ?? base.fundingRound,
+        milestonesSeen,
+        introSequenceComplete:
+          parsed.introSequenceComplete ??
+          (milestonesSeen.includes(STARTUP_MILESTONE_LOC) ||
+            totalLoc >= STARTUP_MILESTONE_LOC),
         usedEventIds: Array.isArray(parsed.usedEventIds) ? parsed.usedEventIds : base.usedEventIds,
         usedNewsIds: Array.isArray(parsed.usedNewsIds) ? parsed.usedNewsIds : base.usedNewsIds,
         actionsIntroduced: Array.isArray(parsed.actionsIntroduced)

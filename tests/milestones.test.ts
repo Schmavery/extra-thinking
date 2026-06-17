@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   milestoneLocsReached,
   prepareSaveProgressMarkers,
+  shouldCompleteIntroSequence,
   syncMilestonesSeen,
 } from '../src/game/milestones';
 import { defaultState } from '../src/game/state';
@@ -22,7 +23,55 @@ describe('milestones', () => {
     expect(again.milestonesSeen).toEqual(once.milestonesSeen);
   });
 
-  it('prepareSaveProgressMarkers adds startup milestone log when log empty', () => {
+  it('shouldCompleteIntroSequence when startup milestone rolled off MAX_LOG', () => {
+    expect(
+      shouldCompleteIntroSequence(
+        {
+          introSequenceComplete: false,
+          milestonesSeen: [10],
+          log: Array.from({ length: 80 }, (_, i) => ({
+            id: i + 10,
+            text: `line ${i}`,
+            type: 'info' as const,
+            streamMs: 0,
+          })),
+        },
+        [],
+      ),
+    ).toBe(true);
+  });
+
+  it('shouldCompleteIntroSequence waits for startup milestone stream', () => {
+    const milestone = {
+      id: 3,
+      text: '10 lines in',
+      type: 'milestone' as const,
+      streamMs: 100,
+    };
+    const base = {
+      introSequenceComplete: false,
+      milestonesSeen: [10],
+      log: [milestone],
+    };
+    expect(shouldCompleteIntroSequence(base, [{ ...milestone, text: '10 lines|' }])).toBe(
+      false,
+    );
+    expect(shouldCompleteIntroSequence(base, [milestone])).toBe(true);
+    expect(
+      shouldCompleteIntroSequence(
+        { ...base, milestonesSeen: [] },
+        [milestone],
+      ),
+    ).toBe(false);
+    expect(
+      shouldCompleteIntroSequence(
+        { ...base, introSequenceComplete: true },
+        [milestone],
+      ),
+    ).toBe(false);
+  });
+
+  it('prepareSaveProgressMarkers adds startup milestone log and introSequenceComplete', () => {
     const s = prepareSaveProgressMarkers({
       ...defaultState(),
       started: true,
@@ -33,5 +82,6 @@ describe('milestones', () => {
     });
     expect(s.log.some((e) => e.type === 'milestone')).toBe(true);
     expect(s.milestonesSeen).toContain(10);
+    expect(s.introSequenceComplete).toBe(true);
   });
 });

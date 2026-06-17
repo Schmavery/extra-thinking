@@ -2,7 +2,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameState, LogEntry } from './types';
 import { SAVE_INTERVAL_MS, STREAMING } from './game/constants';
 import { mcpExecuting } from './game/mcpApproval';
-import { MILESTONES, UI, mcpToolIsSafe } from './game/data';
+import { UI, mcpToolIsSafe } from './game/data';
+import { shouldCompleteIntroSequence } from './game/milestones';
 import { deriveGame } from './game/derive';
 import { getPhase } from './game/phases';
 import { advanceTick } from './game/foregroundTick';
@@ -64,7 +65,6 @@ import { GameIntro, introExitMs } from './components/GameIntro';
 import { IntroHeader } from './components/IntroHeader';
 
 const PHASES = UI.phases;
-const FIRST_MILESTONE_LOC = MILESTONES[0]?.loc ?? 10;
 /** After claiming writer, ignore foreign re-block for this long (ms). */
 const CLAIM_GRACE_MS = 1_000;
 
@@ -312,6 +312,18 @@ export function Game() {
     setState((prev) => syncQueuedUserFlags(prev, displayLog, isAnimating));
   }, [displayLog, isAnimating]);
 
+  useEffect(() => {
+    if (!shouldCompleteIntroSequence(state, displayLog)) return;
+    setState((prev) =>
+      prev.introSequenceComplete ? prev : { ...prev, introSequenceComplete: true },
+    );
+  }, [
+    state.introSequenceComplete,
+    state.milestonesSeen,
+    state.log,
+    displayLog,
+  ]);
+
   const [mcpSpinTick, setMcpSpinTick] = useState(0);
   const mcpRunning = mcpExecuting(state);
   useEffect(() => {
@@ -441,20 +453,12 @@ export function Game() {
     return isLogEntryFullyDisplayed(firstReply.id, state.log, displayLog);
   }, [state.started, state.log, displayLog]);
 
-  const postStartupUi = useMemo(() => {
-    if (!state.milestonesSeen.includes(FIRST_MILESTONE_LOC)) return false;
-    const entry = state.log.find((e) => e.type === 'milestone');
-    if (!entry) return false;
-    return isLogEntryFullyDisplayed(entry.id, state.log, displayLog);
-  }, [state.log, state.milestonesSeen, displayLog]);
-
-  const promptLabel = !postStartupUi
+  const promptLabel = !state.introSequenceComplete
     ? 'build me a startup'
     : state.totalClicks < 20
       ? 'prompt the AI'
       : 'keep going';
 
-  const showResetButton = postStartupUi && state.totalLoc > 0;
   const showPromptButton = introPhase === 'ready';
   const introHeaderStreaming = introPhase === 'streaming';
   const showIntroHeader = introPhase === 'ready' || introHeaderStreaming;
@@ -472,7 +476,6 @@ export function Game() {
     >
       <Settings
         onJumpToLaunch={handleJumpToLaunch}
-        showResetButton={showResetButton}
         onResetClick={() => setResetConfirmOpen(true)}
       />
 

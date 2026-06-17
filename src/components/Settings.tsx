@@ -21,13 +21,11 @@ import {
 interface SettingsProps {
   /** Dev-only: snap to the jump-to-launch playtest preset. */
   onJumpToLaunch?: () => void;
-  showResetButton?: boolean;
   onResetClick?: () => void;
 }
 
 export function Settings({
   onJumpToLaunch,
-  showResetButton,
   onResetClick,
 }: SettingsProps = {}) {
   const { theme, appearance, setTheme, cycleAppearance } = useTheme();
@@ -73,7 +71,6 @@ export function Settings({
           onPickTheme={(id) => setTheme(id)}
           onClose={() => setOpen(false)}
           onJumpToLaunch={onJumpToLaunch}
-          showResetButton={showResetButton}
           onResetClick={onResetClick}
         />
       )}
@@ -107,7 +104,6 @@ interface SettingsModalProps {
   onPickTheme: (id: string) => void;
   onClose: () => void;
   onJumpToLaunch?: () => void;
-  showResetButton?: boolean;
   onResetClick?: () => void;
 }
 
@@ -117,7 +113,6 @@ function SettingsModal({
   onPickTheme,
   onClose,
   onJumpToLaunch,
-  showResetButton,
   onResetClick,
 }: SettingsModalProps) {
   const devUnlocked = useDevUnlock();
@@ -214,7 +209,7 @@ function SettingsModal({
           </div>
         )}
 
-        {showResetButton && onResetClick && (
+        {onResetClick && (
           <div className="px-[14px] py-[12px] border-t border-border">
             <Button
               variant="subtle"

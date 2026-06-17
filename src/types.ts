@@ -344,6 +344,8 @@ export interface GameState {
   actionCooldowns: Record<string, number>;
   milestonesSeen: number[];
   started: boolean;
+  /** Loc-10 milestone streamed; post-opening prompt label and UI. */
+  introSequenceComplete: boolean;
   launched: boolean;
   /** Legacy save field; random pools dedupe from the recent log window now. */
   usedEventIds: string[];

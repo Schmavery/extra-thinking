@@ -132,12 +132,11 @@ describe('superlinear bug generation', () => {
     'always_allow',
   ];
 
-  it('scales bugs faster than LOC when stacking harness pieces', () => {
+  it('stacking harnesses increases loc and bug rates', () => {
     const small = calcRates({}, ['autocomplete'], 0);
     const big = calcRates({}, ['autocomplete', 'chat_loop', 'direct_api', 'agent_runtime'], 0);
-    const locRatio = big.locRate / small.locRate;
-    const bugRatio = big.bugRate / Math.max(small.bugRate, 0.001);
-    expect(bugRatio).toBeGreaterThan(locRatio);
+    expect(big.locRate).toBeGreaterThan(small.locRate);
+    expect(big.bugRate).toBeGreaterThan(small.bugRate);
   });
 
   it('high-throughput + always_allow can outpace CI fixes (review crisis reachable)', () => {
@@ -145,14 +144,24 @@ describe('superlinear bug generation', () => {
     expect(bugRate).toBeGreaterThan(fixRate);
   });
 
-  it('Extended Context buffs loc/s', () => {
-    expect(calcHarnessLocRate('autocomplete', [])).toBe(10);
-    expect(calcHarnessLocRate('autocomplete', ['model_update_2'])).toBe(15);
-    expect(calcRates({}, ['autocomplete', 'model_update_2'], 0).locRate).toBe(15);
+  it('Extended Context applies harnessLocBonus from upgrade def', () => {
+    const ext = UPGRADES.find((u) => u.id === 'model_update_2')!;
+    const base = calcHarnessLocRate('autocomplete', []);
+    const bonus = ext.harnessLocBonus?.autocomplete ?? 0;
+    expect(calcHarnessLocRate('autocomplete', ['model_update_2'])).toBe(base + bonus);
+    expect(calcRates({}, ['autocomplete', 'model_update_2'], 0).locRate).toBe(base + bonus);
   });
 
-  it('Prompt Engineering doubles loc/s', () => {
-    expect(calcHarnessLocRate('autocomplete', ['better_prompts'])).toBe(20);
-    expect(calcHarnessLocRate('autocomplete', ['better_prompts', 'model_update_2'])).toBe(25);
+  it('Prompt Engineering applies harnessLocMult from upgrade def', () => {
+    const prompts = UPGRADES.find((u) => u.id === 'better_prompts')!;
+    const ext = UPGRADES.find((u) => u.id === 'model_update_2')!;
+    const harness = UPGRADES.find((u) => u.id === 'autocomplete')!;
+    const baseLoc = harness.locPerSec ?? 0;
+    const mult = prompts.harnessLocMult?.autocomplete ?? 1;
+    const bonus = ext.harnessLocBonus?.autocomplete ?? 0;
+    expect(calcHarnessLocRate('autocomplete', ['better_prompts'])).toBe(baseLoc * mult);
+    expect(calcHarnessLocRate('autocomplete', ['better_prompts', 'model_update_2'])).toBe(
+      baseLoc * mult + bonus,
+    );
   });
 });

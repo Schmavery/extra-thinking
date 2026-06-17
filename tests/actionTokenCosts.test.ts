@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import { getMove } from '../src/game/availability';
 import { pasteErrorAction } from '../src/game/actions';
+import { action, UPGRADES } from '../src/game/data';
 import { defaultState } from '../src/game/state';
 import {
   calcKickAgentTokenCost,
@@ -13,43 +14,48 @@ import {
   pasteErrorButtonLabel,
 } from '../src/game/rates';
 
+function upg(id: string) {
+  return UPGRADES.find((u) => u.id === id)!;
+}
+
 describe('action token costs', () => {
-  it('prompt starts at 7 tokens', () => {
-    expect(calcPromptTokenCost([])).toBe(7);
+  it('prompt cost stacks upgrade bonuses on action base', () => {
+    const base = action('prompt').tokenCost ?? 0;
+    expect(calcPromptTokenCost([])).toBe(base);
+    expect(calcPromptTokenCost(['model_update_1'])).toBe(
+      base + (upg('model_update_1').promptTokenCostBonus ?? 0),
+    );
+    expect(calcPromptTokenCost(['better_prompts'])).toBe(
+      base + (upg('better_prompts').promptTokenCostBonus ?? 0),
+    );
+    expect(calcPromptTokenCost(['model_update_1', 'better_prompts'])).toBe(
+      base +
+        (upg('model_update_1').promptTokenCostBonus ?? 0) +
+        (upg('better_prompts').promptTokenCostBonus ?? 0),
+    );
   });
 
-  it('Faster Inference bumps prompt to 10 tokens', () => {
-    expect(calcPromptTokenCost(['model_update_1'])).toBe(10);
+  it('paste_error cost stacks upgrade bonus on action base', () => {
+    const base = action('paste_error').tokenCost ?? 0;
+    expect(calcPasteErrorTokenCost([])).toBe(base);
+    expect(calcPasteErrorTokenCost(['fix_bug_skill'])).toBe(
+      base + (upg('fix_bug_skill').pasteErrorTokenCostBonus ?? 0),
+    );
   });
 
-  it('Prompt Engineering adds 4 tokens per prompt', () => {
-    expect(calcPromptTokenCost(['better_prompts'])).toBe(11);
+  it('kick_agent cost stacks harness bonus on action base', () => {
+    const base = action('kick_agent').tokenCost ?? 0;
+    expect(calcKickAgentTokenCost([])).toBe(base);
+    expect(calcKickAgentTokenCost(['subagent_harness'])).toBe(
+      base + (upg('subagent_harness').kickAgentTokenCostBonus ?? 0),
+    );
   });
 
-  it('prompt token bonuses stack', () => {
-    expect(calcPromptTokenCost(['model_update_1', 'better_prompts'])).toBe(14);
-  });
-
-  it('paste_error starts at 10 tokens', () => {
-    expect(calcPasteErrorTokenCost([])).toBe(10);
-  });
-
-  it('/fix-bug Skill bumps paste_error to 15 tokens', () => {
-    expect(calcPasteErrorTokenCost(['fix_bug_skill'])).toBe(15);
-  });
-
-  it('kick_agent stays at 60 without harness', () => {
-    expect(calcKickAgentTokenCost([])).toBe(60);
-  });
-
-  it('Subagent Harness bumps kick_agent to 90 tokens', () => {
-    expect(calcKickAgentTokenCost(['subagent_harness'])).toBe(90);
-  });
-
-  it('run_tests costs 1 token per test written', () => {
+  it('run_tests costs perTestTokenCost × tests written', () => {
+    const perTest = action('run_tests').perTestTokenCost ?? 1;
     expect(calcRunTestsTokenCost(0)).toBe(0);
-    expect(calcRunTestsTokenCost(5)).toBe(5);
-    expect(calcRunTestsTokenCost(12)).toBe(12);
+    expect(calcRunTestsTokenCost(5)).toBe(5 * perTest);
+    expect(calcRunTestsTokenCost(12)).toBe(12 * perTest);
   });
 
   it('run_tests gates on 30s cooldown', () => {
@@ -67,20 +73,23 @@ describe('action token costs', () => {
     expect(move.waitMs).toBeLessThanOrEqual(30000);
   });
 
-  it('lobstagram post starts at 100t, +10 per prior post', () => {
-    expect(calcLobstagramTokenCost(0)).toBe(100);
-    expect(calcLobstagramTokenCost(1)).toBe(110);
-    expect(calcLobstagramTokenCost(3)).toBe(130);
+  it('lobstagram post cost escalates linearly with prior posts', () => {
+    const a = action('lobstagram_post');
+    const base = (a.tokenCost ?? 0) * (a.tokenCostMult ?? 1);
+    const step = a.tokenCostStep ?? 0;
+    expect(calcLobstagramTokenCost(0)).toBe(base);
+    expect(calcLobstagramTokenCost(1)).toBe(base + step);
+    expect(calcLobstagramTokenCost(3)).toBe(base + 3 * step);
   });
 });
 
 describe('paste_error fix chance', () => {
-  it('starts at 50%', () => {
-    expect(calcPasteErrorFixChance([])).toBe(0.5);
-  });
-
-  it('/fix-bug Skill raises fix chance to 75%', () => {
-    expect(calcPasteErrorFixChance(['fix_bug_skill'])).toBe(0.75);
+  it('stacks fix chance bonus on action base', () => {
+    const base = action('paste_error').fixChance ?? 0;
+    expect(calcPasteErrorFixChance([])).toBe(base);
+    expect(calcPasteErrorFixChance(['fix_bug_skill'])).toBe(
+      Math.min(1, base + (upg('fix_bug_skill').pasteErrorFixChanceBonus ?? 0)),
+    );
   });
 });
 
