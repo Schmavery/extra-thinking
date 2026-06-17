@@ -70,8 +70,7 @@ describe('reliability gates', () => {
       launched: true,
       buzzMeter: INVESTOR.buzzMax,
       fundingRound: 0,
-      upgrades: ['pro_plan'],
-      genCounts: { autocomplete: 5 },
+      upgrades: ['pro_plan', 'autocomplete'],
       bugs: 120,
     };
     expect(canLaunchWithReliability(prev)).toBe(true);

@@ -22,7 +22,7 @@ import type { GameState } from '../types';
 import { INVESTOR, LAUNCH_LOC } from './constants';
 import { canRaise, nextFundingRound } from './investor';
 import { canLaunchWithReliability } from './reliability';
-import { action, GENS, UPGRADES } from './data';
+import { action, ACCOUNTS, UPGRADES } from './data';
 import { deriveGame } from './derive';
 import { computeFlags } from './flags';
 import {
@@ -43,7 +43,8 @@ import {
   calcRates,
   calcRunTestsTokenCost,
   calcTokenConfig,
-  genCost,
+  accountCost,
+  canStackAccounts,
 } from './rates';
 import {
   buyGenAction,
@@ -54,7 +55,6 @@ import {
   launchAction,
   lobstagramPostAction,
   raiseRoundAction,
-  newFreeAccountAction,
   pasteErrorAction,
   promptAction,
   runTestsAction,
@@ -79,7 +79,6 @@ export const ACTION_IDS = [
   'mcp_always_allow',
   'mcp_deny',
   'bug_bounty',
-  'new_free_account',
   'lobstagram_post',
   'raise_round',
 ] as const;
@@ -272,14 +271,20 @@ function waitForBuffExpiryMs(state: GameState, t: number): number {
 
 function waitForTokensMs(state: GameState, cost: number | undefined): number | null {
   if (!cost || state.tokens >= cost) return 0;
-  const { tokenRegen } = calcTokenConfig(state.upgrades, state.freeAccounts);
+  const { tokenRegen } = calcTokenConfig(state.upgrades, state.accountCounts);
   if (tokenRegen <= 0) return null;
   return ((cost - state.tokens) / tokenRegen) * 1000;
 }
 
 function waitForLocMs(state: GameState, target: number): number | null {
   if (state.loc >= target) return 0;
-  const { locRate } = calcRates(state.genCounts, state.upgrades, state.tests);
+  const { locRate } = calcRates(
+    state.accountCounts,
+    state.upgrades,
+    state.tests,
+    state.mcMinis ?? 0,
+    state.mcMiniLanes,
+  );
   const effective = locRate * calcBugPenalty(state.bugs);
   if (effective <= 0) return null;
   return ((target - state.loc) / effective) * 1000;
@@ -287,7 +292,13 @@ function waitForLocMs(state: GameState, target: number): number | null {
 
 function waitForTotalLocMs(state: GameState, target: number): number | null {
   if (state.totalLoc >= target) return 0;
-  const { locRate } = calcRates(state.genCounts, state.upgrades, state.tests);
+  const { locRate } = calcRates(
+    state.accountCounts,
+    state.upgrades,
+    state.tests,
+    state.mcMinis ?? 0,
+    state.mcMiniLanes,
+  );
   const effective = locRate * calcBugPenalty(state.bugs);
   if (effective <= 0) return null;
   return ((target - state.totalLoc) / effective) * 1000;
@@ -542,7 +553,7 @@ function runTests(c: Ctx): Move {
 
 function clearContext(c: Ctx): Move {
   const a = action('clear_context');
-  const { maxTokens } = calcTokenConfig(c.state.upgrades, c.state.freeAccounts);
+  const { maxTokens } = calcTokenConfig(c.state.upgrades, c.state.accountCounts);
   const tokensFull = Math.floor(c.state.tokens) >= maxTokens;
   return buildMove(
     {
@@ -647,40 +658,28 @@ function bugBounty(c: Ctx): Move {
   );
 }
 
-function newFreeAccount(c: Ctx): Move {
-  const a = action('new_free_account');
-  const visible =
-    (c.state.totalTokensSpent ?? 0) >= c.thresholds.showNewFreeAccountTokens ||
-    c.state.freeAccounts > 1;
-  return buildMove(
-    {
-      id: 'new_free_account',
-      kind: 'action',
-      actionId: 'new_free_account',
-      visible,
-      apply: newFreeAccountAction,
-    },
-    withMcpIdle(c.state, [cooldownGate(c.state, 'free_account', a.cooldownMs, c.t)], c.t),
-    { requireVisible: true, hideWaitWhenNotVisible: true },
-  );
-}
-
 function buyGenMoves(c: Ctx): Move[] {
-  return GENS.map((g) => {
-    const owned = c.state.genCounts[g.id] ?? 0;
-    const cost = genCost(g, owned);
+  return ACCOUNTS.map((a) => {
+    const owned = c.state.accountCounts[a.id] ?? 0;
+    const cost = accountCost(a, owned);
+    const canStack = canStackAccounts(c.state.upgrades);
     const visible =
-      c.ui.showGenSection && c.state.totalLoc >= g.unlockAt * c.thresholds.generatorVisibleFraction;
-    const visibleAt = g.unlockAt * c.thresholds.generatorVisibleFraction;
+      c.ui.showGenSection && c.state.totalLoc >= a.unlockAt * c.thresholds.generatorVisibleFraction;
+    const visibleAt = a.unlockAt * c.thresholds.generatorVisibleFraction;
+    const atCap = owned >= 1 && !canStack;
     return buildMove(
       {
-        id: `buy_gen:${g.id}`,
+        id: `buy_gen:${a.id}`,
         kind: 'buy_gen',
-        target: g.id,
+        target: a.id,
         visible,
-        apply: (state: GameState) => buyGenAction(state, g.id),
+        apply: (state: GameState) => buyGenAction(state, a.id),
       },
-      withMcpIdle(c.state, [totalLocGate(c.state, visibleAt), locGate(c.state, cost)], c.t),
+      withMcpIdle(
+        c.state,
+        [totalLocGate(c.state, visibleAt), atCap ? boolGate(false) : locGate(c.state, cost)],
+        c.t,
+      ),
       { requireVisible: true },
     );
   });
@@ -731,7 +730,6 @@ export function moveTable(state: GameState, t: number = runtimeNow()): {
     mcpAlwaysAllow(c),
     mcpDeny(c),
     bugBounty(c),
-    newFreeAccount(c),
     ...buyGenMoves(c),
     ...buyUpgradeMoves(c),
   ];

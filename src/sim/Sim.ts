@@ -50,7 +50,7 @@ export function traceSnapshot(state: GameState): TraceSnapshot {
   return {
     totalLoc: state.totalLoc,
     upgrades: state.upgrades,
-    genCounts: { ...state.genCounts },
+    genCounts: { ...(state.accountCounts ?? {}) },
     launched: state.launched,
   };
 }

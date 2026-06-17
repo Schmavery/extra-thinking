@@ -48,6 +48,7 @@
 - id: paste_error
   tokenCost: 10
   cooldownMs: 4000
+  logCooldownMs: 12000
   fixChance: 0.5
   baseLocGain: 20
   extraLocRange: 30
@@ -146,7 +147,7 @@
 
 - id: lobstagram_post
   tokenCost: 100
-  tokenCostStep: 10
+  tokenCostStep: 20
   cooldownMs: 8000
   buzzGain: 28
   introMsg: "I'd be happy to post on Lobstagram to drive engagement."
@@ -171,17 +172,6 @@
       > close the round
       Round done. {{grant}} McMinis shipped. The deck now says infrastructure moat.
 
-- id: new_free_account
-  cooldownMs: 300000
-  maxTokensPerExtra: 50
-  tokenRegenPerExtra: 1.5
-  messages:
-    - New account created. That's {{n}} emails. I've used definitely a real person in all the bios.
-    - Account {{n}} is live. A different name. More tokens.
-    - Another account. That's {{n}} now. I've varied the profile picture slightly.
-    - Account created. I've given this one a slightly different username. Nobody will notice.
-    - New account live. {{n}} total. I'd like to note that I find this approach resourceful.
-    - "{{n}} accounts. Each one a fresh start. Each one, inexplicably, named some variation of dev_user."
 
 - id: write_test
   baseCost: 200
@@ -200,7 +190,7 @@
 
 - id: buy_gen
   eventProbability: 0.3
-  firstPurchaseMsg: 'Certainly! I''ve integrated {{name}} into our workflow. "{{desc}}"'
+  firstPurchaseMsg: 'Signed up for {{name}}. Free tier. "{{desc}}"'
 
 - id: buy_upgrade
   eventProbability: 0.4

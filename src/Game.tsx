@@ -32,7 +32,6 @@ import {
   launchAction,
   lobstagramPostAction,
   raiseRoundAction,
-  newFreeAccountAction,
   pasteErrorAction,
   promptAction,
   runTestsAction,
@@ -377,7 +376,6 @@ export function Game() {
       mcpAllow: dispatch(mcpAllowAction),
       mcpAlwaysAllow: dispatch(mcpAlwaysAllowAction),
       mcpDeny: dispatch(mcpDenyAction),
-      newFreeAccount: dispatch(newFreeAccountAction),
       writeTest: dispatch(writeTestAction),
       buyGen: dispatch(buyGenAction),
       buyUpgrade: dispatch(buyUpgradeAction),
@@ -401,8 +399,8 @@ export function Game() {
     setState(next);
     resetStream(next.log);
     snapshotToDisk('jump to launch', next);
-    const ac = next.genCounts.autocomplete ?? 0;
-    debugToast(`jump to launch · ${ac} autocomplete · launch ready`);
+    const hasAutocomplete = next.upgrades.includes('autocomplete');
+    debugToast(`jump to launch · ${hasAutocomplete ? 'autocomplete' : 'no harness'} · launch ready`);
   }, [resetStream, snapshotToDisk]);
 
   // ── derived ──
@@ -529,11 +527,7 @@ export function Game() {
           )}
 
           {showGenSection && (
-            <Generators
-              state={state}
-              onBuyGen={handlers.buyGen}
-              onNewFreeAccount={handlers.newFreeAccount}
-            />
+            <Generators state={state} onBuyGen={handlers.buyGen} />
           )}
 
           {(showUpgSection || fundingRoundOpen) && (

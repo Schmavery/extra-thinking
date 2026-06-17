@@ -24,7 +24,12 @@ export function ShopNameText({ children }: { children: ReactNode }) {
 }
 
 export function ShopButton(props: ShopButtonProps) {
-  return <Button {...props} className={['w-full !mr-0 !mb-0', props.className ?? ''].join(' ')} />;
+  return (
+    <Button
+      {...props}
+      className={['w-full whitespace-nowrap !mr-0 !mb-0', props.className ?? ''].join(' ')}
+    />
+  );
 }
 
 export function ShopMeta({ children }: { children: ReactNode }) {

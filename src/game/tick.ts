@@ -14,7 +14,7 @@ import {
   calcClickPower,
   calcKickAgentLocPerSec,
   kickAgentBuffActive,
-  calcMcMiniCodeLocRate,
+  calcHarnessTokenDrainPerSec,
   calcNinesRate,
   calcRates,
   calcTokenConfig,
@@ -45,22 +45,28 @@ import { now } from './runtime';
  *     `dt` fire on this call. (Same as today when rates are high.)
  */
 export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState {
-  let prev = advanceMcpTiming(state, now());
+  let prev = advanceMcpTiming(
+    { ...state, accountCounts: state.accountCounts ?? {} },
+    now(),
+  );
   const dt = dtMs / 1000;
   const flags = computeFlags(prev.upgrades);
   const thresholds = effectiveThresholds(prev.upgrades);
-  const { locRate, bugRate, fixRate } = calcRates(prev.genCounts, prev.upgrades, prev.tests);
-  const { maxTokens, tokenRegen } = calcTokenConfig(prev.upgrades, prev.freeAccounts);
-  const bugPenalty = calcBugPenalty(prev.bugs);
   const mcMinis = prev.mcMinis ?? 0;
   const lanes = normalizeMcMiniLanes(mcMinis, prev.mcMiniLanes);
-  const mcMiniCodeRate =
-    mcMinis > 0 ? calcMcMiniCodeLocRate(lanes.code, prev.upgrades) * bugPenalty : 0;
-  const genLocRate = locRate * bugPenalty;
+  const { locRate, bugRate, fixRate } = calcRates(
+    prev.accountCounts,
+    prev.upgrades,
+    prev.tests,
+    mcMinis,
+    lanes,
+  );
+  const { maxTokens, tokenRegen } = calcTokenConfig(prev.upgrades, prev.accountCounts);
+  const bugPenalty = calcBugPenalty(prev.bugs);
   const kickAgentLocRate = kickAgentBuffActive(prev, now())
     ? calcKickAgentLocPerSec(prev.upgrades) * bugPenalty
     : 0;
-  const effectiveLocRate = snapRate(genLocRate + kickAgentLocRate + mcMiniCodeRate);
+  const effectiveLocRate = snapRate(locRate * bugPenalty + kickAgentLocRate);
   const effectiveLoc = effectiveLocRate * dt;
   const mcMiniBugs =
     mcMinis > 0 && prev.totalLoc >= thresholds.bugSpawnLoc && lanes.code > 0
@@ -74,7 +80,8 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
   const ninesRate = ninesTracking ? calcNinesRate(prev.upgrades, prev.bugs) : 0;
   const autoBugDrain = calcAutoBugDrainRate(prev.upgrades) * prev.bugs * dt;
 
-  const tokenDrain = mcMiniTokenDrainPerSec(lanes);
+  const harnessDrain = calcHarnessTokenDrainPerSec(prev.upgrades, mcMinis, lanes);
+  const tokenDrain = harnessDrain + mcMiniTokenDrainPerSec(lanes);
   const netTokenRegen = tokenRegen - tokenDrain;
   const buzzGain =
     prev.launched && (prev.buzzMeter ?? 0) < INVESTOR.buzzMax

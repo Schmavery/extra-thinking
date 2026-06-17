@@ -17,7 +17,7 @@ describe('foregroundTick', () => {
       started: true,
       totalLoc: 500,
       loc: 500,
-      genCounts: { autocomplete: 1 },
+      upgrades: ['autocomplete'],
     };
     const next = advanceTick(prev, TICK_MS * 10);
     expect(next.totalLoc).toBeGreaterThan(prev.totalLoc);

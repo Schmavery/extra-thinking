@@ -13,9 +13,11 @@ import ACTIONS_DATA from '@data/actions.yaml';
 import MCP_DATA from '@data/mcp.yaml';
 import UI_DATA from '@data/ui.yaml';
 
-import type { ActionDef, EventDef, GenDef, McpCopy, McpToolDef, NewsDef, UpgDef } from '../types';
+import type { ActionDef, EventDef, AccountDef, McpCopy, McpToolDef, NewsDef, UpgDef } from '../types';
 
-export const GENS = GENS_DATA as GenDef[];
+export const ACCOUNTS = GENS_DATA as AccountDef[];
+/** Service signups in `generators.yaml`. */
+export const GENS = ACCOUNTS;
 export const UPGRADES = UPGRADES_DATA as UpgDef[];
 export const EVENTS = EVENTS_DATA as EventDef[];
 export const NEWS = NEWS_DATA as NewsDef[];

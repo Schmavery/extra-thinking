@@ -11,7 +11,7 @@
 
 import type { ActionDef, GameState, LogEntryType } from '../types';
 import { withBugs } from './state';
-import { action, GENS, UPGRADES } from './data';
+import { action, ACCOUNTS, UPGRADES } from './data';
 import { AGENT_BUFF, INVESTOR, LOC_PER_CLICK_POWER } from './constants';
 import { canRaise, grantMcMinis, nextFundingRound } from './investor';
 import { canLaunchWithReliability } from './reliability';
@@ -30,7 +30,8 @@ import {
   calcPromptTokenCost,
   calcPromptEventProbability,
   calcTokenConfig,
-  genCost,
+  accountCost,
+  canStackAccounts,
 } from './rates';
 import { pickFromPool } from '../lib/logTemplateMatch';
 import { render } from '../lib/template';
@@ -162,12 +163,18 @@ export function pasteErrorAction(prev: GameState): GameState {
   };
   next = startCooldown(next, 'paste_error');
 
+  const logCd = a.logCooldownMs ?? 0;
+  if (source && logCd > 0 && now() - prev.lastBugFixLogTime <= logCd) {
+    return next;
+  }
+
   if (source) {
     const lines = 2 + Math.floor(random() * 15);
     const ref = 1 + Math.floor(random() * 8);
     const pasteMeta = `[Pasted text #${ref} · ${lines} lines]`;
     const suffixed = formatPasteErrorLog(render(source), prev.upgrades, pasteMeta);
     next = logFromUser(next, suffixed, 'info');
+    next = { ...next, lastBugFixLogTime: now() };
   }
   return next;
 }
@@ -177,7 +184,7 @@ export function pasteErrorAction(prev: GameState): GameState {
 export function clearContextAction(prev: GameState): GameState {
   const a = action('clear_context');
   if (isOnCooldown(prev, 'clear_context', a.cooldownMs!)) return prev;
-  const { maxTokens } = calcTokenConfig(prev.upgrades, prev.freeAccounts);
+  const { maxTokens } = calcTokenConfig(prev.upgrades, prev.accountCounts);
   if (Math.floor(prev.tokens) >= maxTokens) return prev;
   let next: GameState = { ...prev, tokens: maxTokens };
   next = startCooldown(next, 'clear_context');
@@ -201,9 +208,9 @@ export function runTestsAction(prev: GameState): GameState {
   };
   next = startCooldown(next, 'run_tests');
   const t = now();
-  if (a.messages && t - prev.lastTestLogTime > (a.logCooldownMs ?? 0)) {
+  if (a.messages && t - prev.lastBugFixLogTime > (a.logCooldownMs ?? 0)) {
     next = logUnusedPool(next, a.messages, 'info', { n: fixed });
-    next = { ...next, lastTestLogTime: t };
+    next = { ...next, lastBugFixLogTime: t };
   }
   if (a.eventProbability) next = maybeFireEvent(next, a.eventProbability, appendLog);
   return next;
@@ -293,21 +300,41 @@ export function raiseRoundAction(prev: GameState): GameState {
   return next;
 }
 
-// ─── new free account ──────────────────────────────────────────────────────
+// ─── buy account (service signup) ──────────────────────────────────────────
 
-export function newFreeAccountAction(prev: GameState): GameState {
-  const a = action('new_free_account');
-  if (isOnCooldown(prev, 'free_account', a.cooldownMs!)) return prev;
+export function buyGenAction(prev: GameState, accountId: string): GameState {
+  const a = action('buy_gen');
+  const acct = ACCOUNTS.find((x) => x.id === accountId);
+  if (!acct) return prev;
+  const owned = (prev.accountCounts ?? {})[accountId] ?? 0;
+  if (owned >= 1 && !canStackAccounts(prev.upgrades)) return prev;
+  const cost = accountCost(acct, owned);
+  if (prev.loc < cost) return prev;
+  const counts = prev.accountCounts ?? {};
   let next: GameState = {
     ...prev,
-    freeAccounts: (prev.freeAccounts ?? 1) + 1,
+    loc: prev.loc - cost,
+    accountCounts: { ...counts, [accountId]: owned + 1 },
   };
-  next = startCooldown(next, 'free_account');
-  next = logUnusedPool(next, a.messages, 'info', { n: next.freeAccounts });
+  if (owned === 0 && a.firstPurchaseMsg) {
+    next = logFromUser(
+      next,
+      render(a.firstPurchaseMsg, { name: acct.name, desc: acct.desc }),
+      'info',
+    );
+  } else if (owned >= 1) {
+    next = logFromUser(
+      next,
+      render('Another {{name}} signup live. That\'s {{n}} on this service.', {
+        name: acct.name,
+        n: next.accountCounts[accountId],
+      }),
+      'info',
+    );
+  }
+  if (a.eventProbability) next = maybeFireEvent(next, a.eventProbability, appendLog);
   return next;
 }
-
-// ─── write test ────────────────────────────────────────────────────────────
 
 export function writeTestCost(tests: number): number {
   const a = action('write_test');
@@ -330,28 +357,7 @@ export function writeTestAction(prev: GameState): GameState {
   return next;
 }
 
-// ─── buy generator ─────────────────────────────────────────────────────────
-
-export function buyGenAction(prev: GameState, genId: string): GameState {
-  const a = action('buy_gen');
-  const g = GENS.find((g) => g.id === genId);
-  if (!g) return prev;
-  const owned = prev.genCounts[genId] ?? 0;
-  const cost = genCost(g, owned);
-  if (prev.loc < cost) return prev;
-  let next: GameState = {
-    ...prev,
-    loc: prev.loc - cost,
-    genCounts: { ...prev.genCounts, [genId]: owned + 1 },
-  };
-  if (owned === 0 && a.firstPurchaseMsg) {
-    next = logFromUser(next, render(a.firstPurchaseMsg, { name: g.name, desc: g.desc }), 'info');
-  }
-  if (a.eventProbability) next = maybeFireEvent(next, a.eventProbability, appendLog);
-  return next;
-}
-
-// ─── buy upgrade ───────────────────────────────────────────────────────────
+// ─── write test ────────────────────────────────────────────────────────────
 
 export function buyUpgradeAction(prev: GameState, upgId: string): GameState {
   const a = action('buy_upgrade');

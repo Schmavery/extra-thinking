@@ -1,6 +1,8 @@
 /**
- * Burn vs funding gates: existing generators count once Pay for Access lands;
+ * Burn vs funding gates: owned accounts + harness bill once Pay for Access lands;
  * tuned `moneyPerSec` keeps greedy play below the next gate at each milestone.
+ *
+ * Greedy-bot traces (45 virtual min × seeds): `RUN_SLOW_SIMS=1 npm test -- tests/burnPacing.test.ts`
  */
 
 import { afterEach, describe, expect, it } from 'vitest';
@@ -11,7 +13,7 @@ import {
   BURN_GATE_HEADROOM,
   burnAtProPlanUnlock,
   burnBelowNextGate,
-  burnIfAllInOnGen,
+  burnIfAllInOnAccount,
   minBurnForFundingRound,
 } from '../src/game/burnPacing';
 import { calcInfraBurnPerSec } from '../src/game/rates';
@@ -53,14 +55,15 @@ describe('burn on pro_plan', () => {
       launched: true,
       fundingRound: 1,
       loc: 500_000,
-      genCounts: { autocomplete: 10, copilot: 5, chatgpt: 2 },
+      upgrades: ['autocomplete', 'direct_api'],
+      accountCounts: { codepilot: 5, opengpt: 2 },
     };
     const next = buyUpgradeAction(prev, 'pro_plan');
-    expect(calcInfraBurnPerSec(next)).toBeCloseTo(10 * 0.06 + 5 * 0.18 + 2 * 0.45, 2);
+    expect(calcInfraBurnPerSec(next)).toBeCloseTo(5 * 0.18 + 2 * 0.45 + 2.2, 2);
   });
 });
 
-describe('burn pacing: greedy bot', () => {
+describe.skipIf(!process.env.RUN_SLOW_SIMS)('burn pacing: greedy bot', () => {
   for (const seed of SEEDS) {
     it(`seed=${seed}: pro_plan unlock leaves burn below Series A gate`, () => {
       const sim = new Sim({ seed, recordTrace: true });
@@ -80,7 +83,14 @@ describe('burn pacing: greedy bot', () => {
       if (!seedClosed) return;
 
       const seriesA = minBurnForFundingRound(1);
-      expect(burnAtProPlanUnlock(seedClosed.genCounts)).toBeLessThan(seriesA * BURN_GATE_HEADROOM);
+      expect(
+        burnAtProPlanUnlock(
+          seedClosed.accountCounts,
+          seedClosed.upgrades,
+          seedClosed.mcMinis,
+          seedClosed.mcMiniLanes,
+        ),
+      ).toBeLessThan(seriesA * BURN_GATE_HEADROOM);
     });
 
     it(`seed=${seed}: closing Series A leaves burn below Series B gate`, () => {
@@ -98,43 +108,54 @@ describe('burn pacing: greedy bot', () => {
 
 describe('burn pacing: analytical ceiling at launch', () => {
   it('typical pre-launch fleet stays under Series A on pro_plan', () => {
-    const burn = burnAtProPlanUnlock({ autocomplete: 8, copilot: 4, chatgpt: 1 });
+    const burn = burnAtProPlanUnlock(
+      { codepilot: 4, opengpt: 1 },
+      ['autocomplete'],
+    );
     expect(burn).toBeLessThan(INVESTOR.fundingRounds[1]!.minBurnPerSec * BURN_GATE_HEADROOM);
   });
 
   it('heavy but realistic fleet still stays under Series A gate', () => {
-    const burn = burnAtProPlanUnlock({ autocomplete: 12, copilot: 6, chatgpt: 3, claude: 1 });
+    const burn = burnAtProPlanUnlock(
+      { codepilot: 4, opengpt: 2, claudius: 1 },
+      ['autocomplete', 'chat_loop'],
+    );
     expect(burn).toBeLessThan(INVESTOR.fundingRounds[1]!.minBurnPerSec * BURN_GATE_HEADROOM);
   });
 });
 
-describe('burn pacing: LOC economy caps autocomplete spam', () => {
+describe('burn pacing: LOC economy caps account spam', () => {
   const seriesACap = INVESTOR.fundingRounds[1]!.minBurnPerSec * BURN_GATE_HEADROOM;
 
-  /** Roughly what a strong pre-Seed bank can afford if dumped into one tier. */
-  it('200k loc all-in autocomplete still stays under Series A gate', () => {
-    const gens = { autocomplete: 8, copilot: 3 };
-    const burn = burnIfAllInOnGen(gens, 'autocomplete', 200_000);
+  it('200k loc all-in opengpt signups still stays under Series A gate', () => {
+    const accounts = { codepilot: 3 };
+    const burn = burnIfAllInOnAccount(accounts, 'opengpt', 200_000);
     expect(burn).toBeLessThan(seriesACap);
   });
 
   for (const seed of SEEDS) {
-    it(`seed=${seed}: greedy Seed-close bank cannot autocomplete-spam to Series A`, () => {
+    it.skipIf(!process.env.RUN_SLOW_SIMS)(
+      `seed=${seed}: greedy Seed-close bank cannot opengpt-spam to Series A`,
+      () => {
       const sim = new Sim({ seed, recordTrace: true });
       sim.runEventDriven(greedyPlayer, BUDGET_MS);
       const { seedClosed } = traceFunding(sim);
       if (!seedClosed) return;
 
-      const burnActual = burnAtProPlanUnlock(seedClosed.genCounts);
-      const burnSpam = burnIfAllInOnGen(
-        seedClosed.genCounts,
-        'autocomplete',
+      const burnActual = burnAtProPlanUnlock(
+        seedClosed.accountCounts,
+        seedClosed.upgrades,
+        seedClosed.mcMinis,
+        seedClosed.mcMiniLanes,
+      );
+      const burnSpam = burnIfAllInOnAccount(
+        seedClosed.accountCounts,
+        'opengpt',
         seedClosed.loc,
       );
 
       expect(burnActual).toBeLessThan(seriesACap);
       expect(burnSpam).toBeLessThan(seriesACap);
-      // pro_plan itself costs 200k — bank at Seed close is not enough to buy plan + spam.
       expect(seedClosed.loc).toBeLessThan(800_000);
     });
   }

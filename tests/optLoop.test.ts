@@ -21,14 +21,16 @@ import { planShortestPath } from '../src/debug/planReach';
 import { replayPlanInSim } from '../src/debug/planReplay';
 import { fmtTime } from '../src/debug/traceAnalyze';
 
-describe('optLoop (replay)', () => {
+describe.skipIf(!process.env.RUN_PLAN_INTEGRATION)('optLoop (replay)', () => {
   it('planner witness replays to launch in sim', () => {
     const outcome = planShortestPath(
       { kind: 'launched' },
-      { maxStates: 25_000, maxTimeMs: 20 * 60_000, seed: 42 },
+      { maxStates: 80_000, maxTimeMs: 20 * 60_000, seed: 42 },
     );
     const steps = outcome.result?.steps ?? [];
     expect(steps.length).toBeGreaterThan(0);
+    expect(outcome.result?.truncated, 'planner should reach launch, not best-effort').toBe(false);
+    expect(steps.some((s) => s.moveId === 'launch'), 'plan should include launch').toBe(true);
     const replay = replayPlanInSim(steps, 42, { kind: 'launched' });
     console.log(
       `search ${fmtTime(replay.planInternalMs)} · replay ${replay.simGoalMs != null ? fmtTime(replay.simGoalMs) : 'no launch'}`,

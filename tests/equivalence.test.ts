@@ -48,13 +48,11 @@ function expectPassiveEquivalent(a: GameState, b: GameState): void {
   expect(a.launched).toBe(b.launched);
   expect(a.started).toBe(b.started);
   expect(a.tests).toBe(b.tests);
-  expect(a.freeAccounts).toBe(b.freeAccounts);
-  expect(a.totalClicks).toBe(b.totalClicks);
-  expect(a.genCounts).toEqual(b.genCounts);
+  expect(a.accountCounts).toEqual(b.accountCounts);
   expect(a.actionCooldowns).toEqual(b.actionCooldowns);
   expect(a.agentBuffExpires).toBe(b.agentBuffExpires);
   expect(a.lastEventTime).toBe(b.lastEventTime);
-  expect(a.lastTestLogTime).toBe(b.lastTestLogTime);
+  expect(a.lastBugFixLogTime).toBe(b.lastBugFixLogTime);
 
   // Continuous state — small relative slack for FP accumulation across
   // many tiny `dt`s vs one big `dt`. Linear integrators agree exactly in

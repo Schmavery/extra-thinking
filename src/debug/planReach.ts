@@ -59,7 +59,7 @@ export interface PlanClosestSnapshot {
   upgrades: string[];
   unlockedUpgrades: string[];
   launched: boolean;
-  genCounts: Record<string, number>;
+  accountCounts: Record<string, number>;
 }
 
 /**
@@ -77,7 +77,7 @@ export interface PlanClosestStream {
   upgrades: string[];
   unlockedUpgrades: string[];
   launched: boolean;
-  genCounts: Record<string, number>;
+  accountCounts: Record<string, number>;
   stepCount: number;
 }
 
@@ -251,7 +251,7 @@ function nodeToClosest(node: Node, progress: PlanGoalProgress): PlanClosestSnaps
     upgrades: [...s.upgrades],
     unlockedUpgrades: [...s.unlockedUpgrades],
     launched: s.launched,
-    genCounts: { ...s.genCounts },
+    accountCounts: { ...s.accountCounts },
   };
 }
 
@@ -287,7 +287,7 @@ function beatsClosest(
 
 /** Economic state — must not collapse distinct afford / cooldown futures. */
 function stateKey(state: GameState, t: number): string {
-  const gens = Object.entries(state.genCounts)
+  const gens = Object.entries(state.accountCounts)
     .filter(([, n]) => n > 0)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([k, n]) => `${k}:${n}`)

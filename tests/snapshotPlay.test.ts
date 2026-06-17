@@ -44,7 +44,7 @@ describe('snapshotPlay', () => {
         started: true,
         totalLoc: 500,
         loc: 500,
-        genCounts: { autocomplete: 1 },
+        upgrades: ['autocomplete'],
       },
       'game',
     );

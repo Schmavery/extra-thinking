@@ -7,8 +7,14 @@
  * in `tests/burnPacing.test.ts` assert the next raise gate is not instant-cleared.
  */
 import { INVESTOR } from './constants';
-import { GENS } from './data';
-import { calcGenBurnBase, calcGenBurnMult, calcInfraBurnPerSec, genCost } from './rates';
+import { ACCOUNTS } from './data';
+import {
+  calcAccountBurnBase,
+  calcGenBurnMult,
+  calcHarnessBurnBase,
+  calcInfraBurnPerSec,
+  accountCost,
+} from './rates';
 import type { GameState } from '../types';
 
 /** Burn must stay below this fraction of the next raise gate at funding milestones. */
@@ -19,8 +25,15 @@ export function minBurnForFundingRound(fundingRound: number): number {
 }
 
 /** Burn if `pro_plan` flipped on with this fleet (no plan multipliers). */
-export function burnAtProPlanUnlock(genCounts: Record<string, number>): number {
-  return calcGenBurnBase(genCounts) * calcGenBurnMult(['pro_plan']);
+export function burnAtProPlanUnlock(
+  accountCounts: Record<string, number>,
+  upgrades: string[] = [],
+  mcMinis = 0,
+  lanes = { code: 0, growth: 0, tests: 0 },
+): number {
+  const base =
+    calcAccountBurnBase(accountCounts) + calcHarnessBurnBase(upgrades, mcMinis, lanes);
+  return base * calcGenBurnMult(['pro_plan']);
 }
 
 export function burnBelowNextGate(state: GameState, headroom = BURN_GATE_HEADROOM): boolean {
@@ -31,17 +44,17 @@ export function burnBelowNextGate(state: GameState, headroom = BURN_GATE_HEADROO
 
 /** How many more units of `genId` affordable from `locBudget` given current `owned`. */
 export function maxPurchasesWithBudget(
-  genId: string,
+  accountId: string,
   owned: number,
   locBudget: number,
 ): number {
-  const g = GENS.find((x) => x.id === genId);
-  if (!g || locBudget <= 0) return 0;
+  const a = ACCOUNTS.find((x) => x.id === accountId);
+  if (!a || locBudget <= 0) return 0;
   let n = owned;
   let remaining = locBudget;
   let bought = 0;
   while (remaining > 0) {
-    const cost = genCost(g, n);
+    const cost = accountCost(a, n);
     if (cost > remaining) break;
     remaining -= cost;
     n += 1;
@@ -50,19 +63,25 @@ export function maxPurchasesWithBudget(
   return bought;
 }
 
-/**
- * Theoretical max burn if every LOC in `locBudget` went into one generator tier
- * (existing fleet still bills). Models the autocomplete-spam edge case.
- */
-export function burnIfAllInOnGen(
-  genCounts: Record<string, number>,
-  genId: string,
+export function burnIfAllInOnAccount(
+  accountCounts: Record<string, number>,
+  accountId: string,
   locBudget: number,
   upgrades: string[] = ['pro_plan'],
 ): number {
-  const owned = genCounts[genId] ?? 0;
-  const extra = maxPurchasesWithBudget(genId, owned, locBudget);
-  const nextCounts = { ...genCounts, [genId]: owned + extra };
-  return calcGenBurnBase(nextCounts) * calcGenBurnMult(upgrades);
+  const owned = accountCounts[accountId] ?? 0;
+  const extra = maxPurchasesWithBudget(accountId, owned, locBudget);
+  const nextCounts = { ...accountCounts, [accountId]: owned + extra };
+  return calcAccountBurnBase(nextCounts) * calcGenBurnMult(upgrades);
+}
+
+/** @deprecated Use `burnIfAllInOnAccount`. */
+export function burnIfAllInOnGen(
+  accountCounts: Record<string, number>,
+  accountId: string,
+  locBudget: number,
+  upgrades: string[] = ['pro_plan'],
+): number {
+  return burnIfAllInOnAccount(accountCounts, accountId, locBudget, upgrades);
 }
 

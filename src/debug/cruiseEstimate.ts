@@ -4,7 +4,7 @@
  */
 
 import { LAUNCH_LOC, THRESHOLDS, TICK_MS } from '../game/constants';
-import { GENS, UPGRADES } from '../game/data';
+import { ACCOUNTS, UPGRADES } from '../game/data';
 import { legalMoves, moveTable, visibleMoves } from '../game/availability';
 import type { GameState } from '../types';
 import { tickReducer } from '../game/tick';
@@ -17,7 +17,7 @@ import {
   WEIGHTS_PROGRESS,
   type NeedWeights,
 } from '../game/moveIntent';
-import { calcBugPenalty, calcRates, genCost } from '../game/rates';
+import { calcBugPenalty, calcRates, accountCost } from '../game/rates';
 import { TRACE_PATIENCE_MS } from '../sim/bots';
 import { locIncomePerMs } from './planHeuristic';
 
@@ -73,8 +73,8 @@ export function targetGaps(state: GameState, target: CruiseTarget): TargetGaps {
   }
   if (target.moveId.startsWith('buy_gen:')) {
     const genId = target.moveId.slice('buy_gen:'.length);
-    const g = GENS.find((x) => x.id === genId);
-    const cost = g ? genCost(g, state.genCounts[genId] ?? 0) : 0;
+    const a = ACCOUNTS.find((x) => x.id === genId);
+    const cost = a ? accountCost(a, state.accountCounts?.[genId] ?? 0) : 0;
     return { walletLoc: Math.max(0, cost - state.loc), totalLoc: 0 };
   }
   const upgradeId = target.moveId.replace(/^buy_upgrade:/, '');
@@ -226,9 +226,16 @@ export function probeStrategy(
 
   const elapsed = Math.max(1, t - startT);
   const locPerMs = Math.max(0, (state.loc - loc0) / elapsed);
-  const { locRate } = calcRates(state.genCounts, state.upgrades, state.tests ?? 0);
+  const { locRate } = calcRates(
+    state.accountCounts ?? {},
+    state.upgrades,
+    state.tests ?? 0,
+    state.mcMinis ?? 0,
+    state.mcMiniLanes,
+  );
   const passive = (locRate * calcBugPenalty(state.bugs)) / 1000;
-  const totalLocPerMs = Math.max(locPerMs, passive, (state.totalLoc - totalLoc0) / elapsed);
+  const floor = steadyLocPerMs(startState);
+  const totalLocPerMs = Math.max(locPerMs, passive, (state.totalLoc - totalLoc0) / elapsed, floor);
   const gaps = targetGaps(state, target);
   const walletMs = gaps.walletLoc > 0 && locPerMs > 0 ? gaps.walletLoc / locPerMs : 0;
   const totalMs = gaps.totalLoc > 0 && totalLocPerMs > 0 ? gaps.totalLoc / totalLocPerMs : 0;

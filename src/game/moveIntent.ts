@@ -6,7 +6,7 @@
 
 import type { Move } from './availability';
 import { LAUNCH_LOC, LOC_PER_CLICK_POWER, THRESHOLDS } from './constants';
-import { action, GENS, UPGRADES } from './data';
+import { action, ACCOUNTS, UPGRADES } from './data';
 import { deriveGame } from './derive';
 import { mcpBlocksPlay } from './mcpApproval';
 import { canLaunchWithReliability, canRaiseWithReliability } from './reliability';
@@ -18,7 +18,7 @@ import {
   calcKickAgentTokenCost,
   calcPromptCooldownMs,
   calcTokenConfig,
-  genCost,
+  accountCost,
   kickAgentBuffActive,
 } from './rates';
 import type { GameState } from '../types';
@@ -75,13 +75,12 @@ const MOVE_HELPS: Record<string, Partial<Record<NeedAxis, number>>> = {
   run_tests: { bugs: 1 },
   kick_agent: { loc: 0.35, launch: 0.9 },
   clear_context: { tokens: 1 },
-  new_free_account: { tokens: 1 },
   launch: { launch: 1 },
   mcp_allow: { loc: 0.55 },
   mcp_always_allow: { loc: 0.55 },
   mcp_deny: { bugs: 0.85, tests: 0.2 },
   bug_bounty: { bugs: 0.75 },
-  buy_gen: { economy: 1, loc: 0.65 },
+  buy_gen: { economy: 1, tokens: 0.7 },
   buy_upgrade: { economy: 1, loc: 0.55 },
 };
 
@@ -140,10 +139,10 @@ export function cheapestBuyTarget(state: GameState): number | null {
   const { ui, thresholds } = deriveGame(state);
   let min = Infinity;
   if (ui.showGenSection) {
-    for (const g of GENS) {
-      const vis = g.unlockAt * thresholds.generatorVisibleFraction;
+    for (const a of ACCOUNTS) {
+      const vis = a.unlockAt * thresholds.generatorVisibleFraction;
       if (state.totalLoc < vis) continue;
-      min = Math.min(min, genCost(g, state.genCounts[g.id] ?? 0));
+      min = Math.min(min, accountCost(a, state.accountCounts[a.id] ?? 0));
     }
   }
   if (ui.showUpgSection) {
@@ -159,7 +158,7 @@ export function cheapestBuyTarget(state: GameState): number | null {
 
 export function assessNeeds(state: GameState, t: number = runtimeNow()): NeedVector {
   const { ui, thresholds } = deriveGame(state);
-  const { maxTokens } = calcTokenConfig(state.upgrades, state.freeAccounts);
+  const { maxTokens } = calcTokenConfig(state.upgrades, state.accountCounts);
   const kickCost = calcKickAgentTokenCost(state.upgrades);
   const buyTarget = cheapestBuyTarget(state);
   const locDenom = buyTarget ?? LAUNCH_LOC * 0.5;

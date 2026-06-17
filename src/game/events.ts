@@ -63,12 +63,7 @@ export function applyGuaranteedNews(prev: GameState, next: GameState): GameState
 }
 
 function gatedEvents(prev: GameState): EventDef[] {
-  return EVENTS.filter((e) => {
-    if (e.freeAccountsDelta && e.freeAccountsDelta < 0 && (prev.freeAccounts ?? 1) <= 1) {
-      return false;
-    }
-    return passesGates(e, prev);
-  });
+  return EVENTS.filter((e) => passesGates(e, prev));
 }
 
 /** LOC-gated events not represented in the recent log window. */
@@ -85,15 +80,12 @@ function applyEventEffects(prev: GameState, ev: EventDef): GameState {
   if (ev.bugDelta && next.totalLoc >= THRESHOLDS.bugSpawnLoc) {
     next = { ...next, ...withBugs(next, next.bugs + ev.bugDelta) };
   }
-  if (ev.freeAccountsDelta) {
-    next = { ...next, freeAccounts: Math.max(1, (next.freeAccounts ?? 1) + ev.freeAccountsDelta) };
-  }
   return next;
 }
 
 /**
  * Action-triggered random event. Returns a new state with the event's effects
- * applied (LOC/bug/account deltas, log entry) iff one fires; otherwise returns
+ * applied (LOC/bug deltas, log entry) iff one fires; otherwise returns
  * `prev` unchanged. Respects a global event cooldown so consecutive actions
  * don't all trigger an event in a single tick.
  *

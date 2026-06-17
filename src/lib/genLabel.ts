@@ -1,5 +1,5 @@
-import type { GenDef } from '../types';
-import { calcGenMarginalBurn } from '../game/rates';
+import type { AccountDef } from '../types';
+import { calcAccountMarginalBurn } from '../game/rates';
 
 function fmtPerSec(n: number): string {
   const abs = Math.abs(n);
@@ -8,17 +8,30 @@ function fmtPerSec(n: number): string {
   return Math.round(n) + '/s';
 }
 
-/** Per-owned-unit rates from generator data — the only mechanics generators affect. */
-export function formatGenMechanics(g: Pick<GenDef, 'locPerSec' | 'bugsPerSec' | 'fixPerSec'>): string {
-  const parts = [`${fmtPerSec(g.locPerSec)} LOC`, `${fmtPerSec(g.bugsPerSec)} bugs`];
-  if (g.fixPerSec > 0) parts.push(`${fmtPerSec(g.fixPerSec)} fixes`);
-  return parts.join(' · ');
+export function formatAccountTok(
+  a: Pick<AccountDef, 'freeMaxTokens' | 'freeTokenRegen' | 'paidMaxTokens' | 'paidTokenRegen'>,
+  paid: boolean,
+): string {
+  const max = paid ? a.paidMaxTokens : a.freeMaxTokens;
+  const regen = paid ? a.paidTokenRegen : a.freeTokenRegen;
+  return `+${max} max · +${fmtPerSec(regen)} regen`;
 }
 
-export function genTooltip(g: GenDef, upgrades: string[] = []): string {
-  const mechanics = formatGenMechanics(g);
-  const burn = calcGenMarginalBurn(g.id, upgrades);
-  const burnLine = burn > 0 ? `+$${burn}/s burn per unit` : '';
-  const lines = [mechanics, burnLine, g.desc].filter(Boolean);
+export function accountTooltip(a: AccountDef, upgrades: string[] = [], paid = false): string {
+  const tok = formatAccountTok(a, paid);
+  const burn = calcAccountMarginalBurn(a.id, upgrades);
+  const burnLine = burn > 0 ? `+$${burn}/s burn per signup` : '';
+  const tier = paid ? 'paid tier' : 'free tier';
+  const lines = [tok, tier, burnLine, a.desc].filter(Boolean);
   return lines.join('\n');
+}
+
+/** @deprecated Generators are service accounts now. */
+export function formatGenMechanics(): string {
+  return '';
+}
+
+/** @deprecated */
+export function genTooltip(a: AccountDef, upgrades: string[] = [], paid = false): string {
+  return accountTooltip(a, upgrades, paid);
 }

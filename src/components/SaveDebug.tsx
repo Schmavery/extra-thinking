@@ -40,7 +40,7 @@ const NUM_FIELDS: {
   { key: 'mcMinis', label: 'McMinis' },
   { key: 'nines', label: 'nines', step: 0.01 },
   { key: 'totalClicks', label: 'prompts (totalClicks)' },
-  { key: 'freeAccounts', label: 'free accounts', min: 1 },
+  { key: 'accountCounts', label: 'accounts' },
 ];
 
 function inputClass() {

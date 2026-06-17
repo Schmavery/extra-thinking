@@ -10,8 +10,7 @@ export const LAUNCH_READY_SEED = 42;
 const PROGRESS_FIELDS = [
   'loc',
   'totalLoc',
-  'genCounts',
-  'freeAccounts',
+  'accountCounts',
   'totalTokensSpent',
   'totalClicks',
   'tokens',
@@ -21,6 +20,7 @@ const PROGRESS_FIELDS = [
   'tests',
   'actionCooldowns',
   'actionsIntroduced',
+  'upgrades',
 ] as const satisfies readonly (keyof GameState)[];
 
 function pickProgressFields(state: GameState): Partial<GameState> {
@@ -28,9 +28,9 @@ function pickProgressFields(state: GameState): Partial<GameState> {
   for (const key of PROGRESS_FIELDS) {
     const v = state[key];
     if (v === undefined) continue;
-    if (key === 'genCounts' || key === 'actionCooldowns') {
+    if (key === 'accountCounts' || key === 'actionCooldowns') {
       out[key] = { ...(v as Record<string, number>) };
-    } else if (key === 'actionsIntroduced') {
+    } else if (key === 'actionsIntroduced' || key === 'upgrades') {
       out[key] = [...(v as string[])];
     } else {
       (out as Record<string, unknown>)[key] = v;
@@ -51,7 +51,12 @@ export function captureLaunchReadyProgress(
   seed: number = LAUNCH_READY_SEED,
 ): Partial<GameState> {
   if (cached && botId === LAUNCH_READY_BOT && seed === LAUNCH_READY_SEED) {
-    return { ...cached, genCounts: { ...cached.genCounts }, actionCooldowns: { ...cached.actionCooldowns } };
+    return {
+      ...cached,
+      accountCounts: { ...cached.accountCounts },
+      actionCooldowns: { ...cached.actionCooldowns },
+      upgrades: [...(cached.upgrades ?? [])],
+    };
   }
 
   const bot = DEBUG_BOTS[botId].make(seed);
@@ -67,8 +72,9 @@ export function captureLaunchReadyProgress(
     }
     return {
       ...picked,
-      genCounts: { ...picked.genCounts },
+      accountCounts: { ...picked.accountCounts },
       actionCooldowns: { ...picked.actionCooldowns },
+      upgrades: [...(picked.upgrades ?? [])],
     };
   } finally {
     Sim.teardown();

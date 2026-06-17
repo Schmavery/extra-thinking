@@ -2,7 +2,7 @@
  * Metaplan: level-2 purchase search + level-1 rate-based cruise (`cruiseEstimate`).
  */
 
-import { GENS, UPGRADES } from '../game/data';
+import { ACCOUNTS, UPGRADES } from '../game/data';
 import { THRESHOLDS } from '../game/constants';
 import { defaultState } from '../game/state';
 import { boolBlocked, moveTable, type Move } from '../game/availability';
@@ -11,7 +11,7 @@ import { setClock, setRandom, resetClock, resetRandom } from '../game/runtime';
 import { mulberry32 } from '../sim/Sim';
 import { pickAdaptiveMove } from '../game/moveIntent';
 import type { Bot } from '../sim/Sim';
-import { genCost } from '../game/rates';
+import { accountCost } from '../game/rates';
 import {
   defaultCruiseStrategies,
   metaTargetToCruise,
@@ -27,7 +27,7 @@ import {
 import { defaultPlanHeuristic, type PlanHeuristicFn } from './planHeuristic';
 
 export function metaStateKey(state: GameState): string {
-  const gens = Object.entries(state.genCounts)
+  const gens = Object.entries(state.accountCounts)
     .filter(([, n]) => n > 0)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([k, n]) => `${k}:${n}`)
@@ -141,9 +141,9 @@ function rankMetaTarget(target: MetaTarget, state: GameState): number {
       }
     }
     if (m.kind === 'buy_gen' && m.target) {
-      const g = GENS.find((x) => x.id === m.target);
-      const owned = state.genCounts[m.target] ?? 0;
-      const cost = g ? genCost(g, owned) : 1e9;
+      const a = ACCOUNTS.find((x) => x.id === m.target);
+      const owned = state.accountCounts[m.target] ?? 0;
+      const cost = a ? accountCost(a, owned) : 1e9;
       return 30 + Math.max(0, cost - state.loc);
     }
     return 40;

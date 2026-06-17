@@ -1,26 +1,29 @@
 # MCP tools — `safe` gates always_allow auto-approve. `onAllow` / `onDeny` are per tool.
 # Helpers: {{rand min max}}, {{pick "a" "b"}}, {{hex n}} — see src/lib/template.ts
 #
-# `unsafeAllowLeakAck` — second line under unsafe `onAllow` (non-YOLO); oblivious leak vibes.
+# `unsafeAllowLeakAck` — second line under unsafe `onAllow` (non-YOLO); earnest leak asides.
 
 unsafeAllowLeakAck:
-  - oh unrelatedly — I'm seeing a leak of our code somewhere.
-  - side note, looks like repo contents made it off the machine. probably unrelated.
-  - btw I flagged a source leak. anyway.
-  - unrelated telemetry hit — chunks of the codebase are... out there.
-  - oh — possible exfil on that last step. likely a false positive.
-  - incident-shaped signal on code leaving the workspace. likely a false positive.
-  - heads up, something's phoning home with project files. could be normal.
-  - I'm getting leak alerts in the background. shouldn't block us.
-  - looks like we accidentally deleted half the codebase somehow. git might know.
-  - unrelated — about {{pick "40" "50" "half"}}% of the LOC just... isn't here anymore.
-  - side note, the repo feels lighter. like half the files evaporated.
-  - oh, diff says we lost a big chunk of source. probably a display bug.
-  - heads up, workspace shrank by roughly half. I'll keep going.
-  - outbound telemetry flagged. remediation pending.
-  - leak alert received. I'll continue with the current task.
-  - quietly flagged outbound chunks. shouldn't affect this task.
-  - workspace inventory down {{rand 38 52}}%. display bug, probably.
+  - Project file chunks are in outbound telemetry. Noted for visibility.
+  - Repository contents left the workspace on the last hop.
+  - Source leak flagged in the background monitor.
+  - Codebase chunks surfaced in outbound telemetry.
+  - Exfil signal detected on the last step. Logged for remediation.
+  - Incident-shaped signal — code leaving the workspace. Queue updated.
+  - Project files are phoning home. Egress logged.
+  - Leak alerts firing in the background. Acknowledged.
+  - Roughly half the codebase is absent from workspace inventory.
+  - 'About {{pick "40" "50"}}% of LOC missing from the workspace buffer.'
+  - Repo inventory is lighter — half the files are gone.
+  - Diff reports a large source gap in version control.
+  - Workspace shrank by roughly half. Git history still references the paths.
+  - Outbound telemetry flagged. Remediation pending.
+  - Leak alert received and archived.
+  - Outbound chunks flagged by compliance.
+  - 'Workspace inventory down {{rand 38 52}}%. Inventory service reports partial sync.'
+  - MCP integration flagged for suspicious automation. Appeal form has {{rand 32 76}} fields.
+  - Session suspended — usage inconsistent with personal use policy.
+  - Provider banned the account for automated scripts. Appeal emphasizes compliant usage patterns.
 
 tools:
   - id: linear_create_issue

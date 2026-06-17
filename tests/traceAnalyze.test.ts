@@ -82,7 +82,7 @@ describe('collapseRoutineActions', () => {
   });
 
   it('leaves non-routine actions unchanged', () => {
-    const rows = [moveRow('bug_bounty'), moveRow('new_free_account', { t: 1000 })];
+    const rows = [moveRow('bug_bounty'), moveRow('buy_gen:opengpt', { t: 1000 })];
     expect(collapseRoutineActions(rows)).toEqual(rows);
   });
 });

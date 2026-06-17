@@ -81,7 +81,8 @@ function withoutTokenCapacityMoves(moves: Move[]): Move[] {
   return moves.filter(
     (m) =>
       !(m.kind === 'buy_upgrade' && m.target && TOKEN_CAPACITY_UPGRADE_IDS.has(m.target)) &&
-      m.actionId !== 'new_free_account',
+      m.kind !== 'buy_gen' &&
+      m.actionId !== 'lobstagram_post',
   );
 }
 

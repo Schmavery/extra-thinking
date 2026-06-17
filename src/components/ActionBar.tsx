@@ -39,7 +39,7 @@ export function ActionBar({
   onRunBugBounty,
 }: Props) {
   const now = Date.now();
-  const { maxTokens } = calcTokenConfig(state.upgrades, state.freeAccounts);
+  const { maxTokens } = calcTokenConfig(state.upgrades, state.accountCounts);
   const kickTokenCost = calcKickAgentTokenCost(state.upgrades);
   const pasteTokenCost = calcPasteErrorTokenCost(state.upgrades);
   const pasteLabel = pasteErrorButtonLabel(state.upgrades);

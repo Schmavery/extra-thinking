@@ -52,7 +52,7 @@ export function deriveGame(state: GameState): DerivedGame {
   const thresholds = effectiveThresholds(state.upgrades);
   const flag = (f: GameFlag) => hasFlag(flags, f);
 
-  const { maxTokens } = calcTokenConfig(state.upgrades, state.freeAccounts);
+  const { maxTokens } = calcTokenConfig(state.upgrades, state.accountCounts);
   const tokenShowThreshold = maxTokens * TOKENS.showAtMaxFillFraction;
 
   const ui: DerivedUi = {

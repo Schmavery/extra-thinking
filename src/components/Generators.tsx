@@ -1,9 +1,13 @@
 import type { GameState } from '../types';
-import { action, GENS } from '../game/data';
-import { calcGenUnitLocRate, calcGenMarginalBurn, genCost, hasProPlan } from '../game/rates';
-import { fmt, fmtRate } from '../lib/format';
-import { genTooltip } from '../lib/genLabel';
-import { snapRate } from '../game/rates';
+import { ACCOUNTS } from '../game/data';
+import {
+  accountCost,
+  calcAccountMarginalBurn,
+  canStackAccounts,
+  hasProPlan,
+} from '../game/rates';
+import { fmt } from '../lib/format';
+import { accountTooltip, formatAccountTok } from '../lib/genLabel';
 import { getMove, rechargeProgress } from '../game/availability';
 import {
   ShopButton,
@@ -17,69 +21,69 @@ import {
 interface Props {
   state: GameState;
   onBuyGen: (id: string) => void;
-  onNewFreeAccount: () => void;
 }
 
-export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
+function AccountsInstalledList({
+  accountIds,
+  spaced,
+}: {
+  accountIds: string[];
+  spaced?: boolean;
+}) {
+  if (accountIds.length === 0) return null;
+  return (
+    <div
+      className={[
+        'text-dimmer text-[11px] min-w-0 break-words',
+        spaced ? 'mt-[10px]' : '',
+      ].join(' ')}
+    >
+      registered:{' '}
+      {accountIds.map((id) => ACCOUNTS.find((a) => a.id === id)?.name).join(', ')}
+    </div>
+  );
+}
+
+export function Generators({ state, onBuyGen }: Props) {
   const now = Date.now();
-  const newAccount = getMove(state, 'new_free_account', now)!;
-  const newAccountData = action('new_free_account');
-  const showGenBurn = hasProPlan(state.upgrades);
+  const paid = hasProPlan(state.upgrades);
+  const showBurn = paid;
+  const canStack = canStackAccounts(state.upgrades);
+
+  const buyable = ACCOUNTS.map((a) => ({
+    a,
+    move: getMove(state, `buy_gen:${a.id}`, now)!,
+    owned: state.accountCounts[a.id] ?? 0,
+  }))
+    .filter(({ move, owned }) => move.visible && (owned === 0 || canStack));
+
+  const installed = canStack
+    ? []
+    : ACCOUNTS.filter((a) => (state.accountCounts[a.id] ?? 0) > 0).map((a) => a.id);
+
+  if (buyable.length === 0 && installed.length === 0) return null;
 
   return (
     <div className="min-w-0">
-      <ShopSectionHeader>generators</ShopSectionHeader>
+      <ShopSectionHeader>accounts</ShopSectionHeader>
 
-      {newAccount.visible && (
-        <ShopRow>
-          <ShopName>
-            <ShopNameText>Free Account</ShopNameText>
-            {state.freeAccounts > 1 && (
-              <span className="text-blue shrink-0"> [{state.freeAccounts}]</span>
-            )}
-          </ShopName>
-          <ShopButton
-            off={!newAccount.legal}
-            onClick={newAccount.legal ? onNewFreeAccount : undefined}
-            title={`+${newAccountData.maxTokensPerExtra} max tokens, +${newAccountData.tokenRegenPerExtra}/s regen · ${state.freeAccounts} account${
-              state.freeAccounts !== 1 ? 's' : ''
-            } active`}
-            progress={rechargeProgress(newAccount)}
-            progressClassName="bg-green/10"
-          >
-            create
-          </ShopButton>
-          <ShopMeta>
-            <span className="text-dimmer">a different email. still free. just this once.</span>
-          </ShopMeta>
-        </ShopRow>
-      )}
-
-      {GENS.map((g) => {
-        const move = getMove(state, `buy_gen:${g.id}`, now)!;
-        if (!move.visible) return null;
-        const owned = state.genCounts[g.id] ?? 0;
-        const cost = genCost(g, owned);
-        const unitLoc = calcGenUnitLocRate(g.id, state.upgrades);
-        const marginalBurn = showGenBurn ? calcGenMarginalBurn(g.id, state.upgrades) : 0;
-        const genLocRate = snapRate(unitLoc * owned);
-        const rateLabel =
-          owned > 0
-            ? fmtRate(genLocRate)
-            : `+${fmtRate(unitLoc)}/each`;
+      {buyable.map(({ a, move, owned }) => {
+        const cost = accountCost(a, owned);
+        const marginalBurn = showBurn ? calcAccountMarginalBurn(a.id, state.upgrades) : 0;
+        const label = paid ? 'buy' : 'get';
         return (
-          <ShopRow key={g.id}>
+          <ShopRow key={a.id}>
             <ShopName>
-              <ShopNameText>{g.name}</ShopNameText>
-              {owned > 0 && <span className="text-green shrink-0"> [{owned}]</span>}
+              <ShopNameText>{a.name}</ShopNameText>
+              {owned > 0 && <span className="text-blue shrink-0"> [{owned}]</span>}
             </ShopName>
             <ShopButton
               off={!move.legal}
-              onClick={() => onBuyGen(g.id)}
-              title={genTooltip(g, state.upgrades)}
+              onClick={() => onBuyGen(a.id)}
+              title={accountTooltip(a, state.upgrades, paid)}
               progress={rechargeProgress(move)}
             >
-              buy
+              {label}
             </ShopButton>
             <ShopMeta>
               <span className={`whitespace-nowrap shrink-0 ${move.legal ? 'text-dim' : 'text-dimmer'}`}>
@@ -88,16 +92,16 @@ export function Generators({ state, onBuyGen, onNewFreeAccount }: Props) {
               {marginalBurn > 0 && (
                 <span className="text-dimmer whitespace-nowrap shrink-0">+${marginalBurn}/s burn</span>
               )}
-              <span
-                className={`whitespace-nowrap shrink-0 ${owned > 0 ? 'text-green-dim' : 'text-dimmer'}`}
-              >
-                {rateLabel}
+              <span className="text-dimmer whitespace-nowrap shrink-0">
+                {formatAccountTok(a, paid)}
               </span>
-              <span className="text-dimmer min-w-0">{g.desc}</span>
+              <span className="text-dimmer min-w-0">{a.desc}</span>
             </ShopMeta>
           </ShopRow>
         );
       })}
+
+      <AccountsInstalledList accountIds={installed} spaced={buyable.length > 0} />
     </div>
   );
 }

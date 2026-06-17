@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { getMove } from '../src/game/availability';
+import { pasteErrorAction } from '../src/game/actions';
 import { defaultState } from '../src/game/state';
 import {
   calcKickAgentTokenCost,
@@ -107,5 +108,21 @@ describe('paste_error log format', () => {
     expect(formatPasteErrorLog(sample, ['fix_bug_skill'], meta)).toBe(
       "> /fix-bug here's the error [Pasted text #2 · 5 lines]\nI see the issue — fixed.",
     );
+  });
+});
+
+describe('paste_error log cooldown', () => {
+  it('fixes bugs silently within logCooldownMs', () => {
+    const t0 = 1_000_000;
+    vi.spyOn(Date, 'now').mockReturnValue(t0);
+    const base = { ...defaultState(), bugs: 3, tokens: 100, lifetimeBugs: 3 };
+    const first = pasteErrorAction(base);
+    expect(first.log.length).toBeGreaterThan(base.log.length);
+
+    vi.spyOn(Date, 'now').mockReturnValue(t0 + 2000);
+    const second = pasteErrorAction({ ...first, bugs: 3, tokens: 100 });
+    expect(second.log.length).toBe(first.log.length);
+
+    vi.restoreAllMocks();
   });
 });

@@ -27,7 +27,6 @@ export const ACTION_IDS = [
   'launch',
   'lobstagram_post',
   'raise_round',
-  'new_free_account',
   'write_test',
   'buy_gen',
   'buy_upgrade',
@@ -55,17 +54,20 @@ const thresholdOverrideKey = z.enum([
   'showNewFreeAccountTokens',
 ]);
 
-const genSchema = z
+const accountSchema = z
   .object({
     id: z.string().min(1),
     name: z.string().min(1),
     desc: z.string().min(1),
-    locPerSec: z.number(),
-    bugsPerSec: z.number(),
-    fixPerSec: z.number(),
     baseCost: z.number().positive(),
     costMult: z.number().positive(),
     unlockAt: z.number().nonnegative(),
+    freeMaxTokens: z.number().nonnegative(),
+    freeTokenRegen: z.number().nonnegative(),
+    paidMaxTokens: z.number().nonnegative(),
+    paidTokenRegen: z.number().nonnegative(),
+    extraMaxTokens: z.number().nonnegative(),
+    extraTokenRegen: z.number().nonnegative(),
     moneyPerSec: z.number().nonnegative().optional(),
   })
   .passthrough();
@@ -94,7 +96,6 @@ const eventSchema = z
     locMult: z.number().optional(),
     locDelta: z.number().optional(),
     bugDelta: z.number().optional(),
-    freeAccountsDelta: z.number().optional(),
   })
   .passthrough();
 
@@ -284,7 +285,7 @@ function loadDataDir(dataDir: string): Record<(typeof DATA_FILES)[number], unkno
 export function validateGameDataDir(dataDir: string): void {
   const raw = loadDataDir(dataDir);
 
-  const gens = z.array(genSchema).parse(raw['generators.yaml']);
+  const gens = z.array(accountSchema).parse(raw['generators.yaml']);
   assertUniqueIds('generators.yaml', gens);
 
   const upgrades = z.array(upgradeSchema).parse(raw['upgrades.yaml']);

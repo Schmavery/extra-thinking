@@ -261,7 +261,9 @@ describe('MCP approvals', () => {
     expect(next.totalLoc).toBe(200_000);
     const leak = next.log.find((e) => e.text.includes('Data leak'));
     expect(leak?.type).toBe('bad');
-    expect(next.log[0]?.toolAck).toMatch(/leak|exfil|off the machine|phoning home/i);
+    expect(next.log[0]?.toolAck).toMatch(
+      /leak|exfil|telemetry|outbound|phoning home|workspace|egress|flagged/i,
+    );
   });
 
   it('allowing safe tool adds LOC without leak log', () => {

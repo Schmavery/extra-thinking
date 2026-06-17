@@ -38,29 +38,29 @@ describe('McMini lanes', () => {
   });
 });
 
-describe('generator burn', () => {
+describe('account burn', () => {
   it('is zero before pro_plan', () => {
     const s = {
       ...defaultState(),
-      genCounts: { autocomplete: 5, copilot: 2 },
+      accountCounts: { codepilot: 5, opengpt: 2 },
       upgrades: [] as string[],
     };
     expect(calcInfraBurnPerSec(s)).toBe(0);
   });
 
-  it('sums owned generator moneyPerSec after pro_plan', () => {
+  it('sums owned account moneyPerSec after pro_plan', () => {
     const s = {
       ...defaultState(),
-      genCounts: { autocomplete: 5, copilot: 2 },
+      accountCounts: { codepilot: 5, opengpt: 2 },
       upgrades: ['pro_plan'],
     };
-    expect(calcInfraBurnPerSec(s)).toBeCloseTo(5 * 0.06 + 2 * 0.18, 2);
+    expect(calcInfraBurnPerSec(s)).toBeCloseTo(5 * 0.18 + 2 * 0.45, 2);
   });
 
-  it('team_plan multiplies generator burn', () => {
+  it('team_plan multiplies account burn', () => {
     const base = {
       ...defaultState(),
-      genCounts: { autocomplete: 4 },
+      accountCounts: { codepilot: 4 },
       upgrades: ['pro_plan'],
     };
     const scaled = { ...base, upgrades: ['pro_plan', 'team_plan'] };

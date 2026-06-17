@@ -53,7 +53,7 @@ describe('action intros', () => {
       bugs: THRESHOLDS.showWriteTestsBugs,
       lifetimeBugs: THRESHOLDS.showWriteTestsBugs,
       totalLoc: 500,
-      genCounts: { autocomplete: 1 },
+      upgrades: ['autocomplete'],
     };
     const next = tickReducer(prev, 1);
     expect(next.actionsIntroduced).toContain('write_test');

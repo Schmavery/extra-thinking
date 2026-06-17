@@ -42,7 +42,13 @@ function goalSatisfied(state: GameState, goal: PlanGoal): boolean {
 }
 
 export function locIncomePerMs(state: GameState, minLocPerMs: number): number {
-  const { locRate } = calcRates(state.genCounts, state.upgrades, state.tests ?? 0);
+  const { locRate } = calcRates(
+    state.accountCounts ?? {},
+    state.upgrades,
+    state.tests ?? 0,
+    state.mcMinis ?? 0,
+    state.mcMiniLanes,
+  );
   const cd = Math.max(1, calcPromptCooldownMs(state.upgrades));
   const clickLoc =
     calcClickPower(state.upgrades) * LOC_PER_CLICK_POWER + calcClickBonus(state.upgrades);

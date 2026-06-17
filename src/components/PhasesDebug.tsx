@@ -148,7 +148,7 @@ export function PhasesDebug() {
         </p>
       </DebugSection>
 
-      <DebugSection title="Generators (unlockAt)">
+      <DebugSection title="Accounts (unlockAt)">
         <div className="debug-table-wrap min-w-[520px]">
           <table className="debug-table">
             <thead>
@@ -156,7 +156,7 @@ export function PhasesDebug() {
                 <th>LOC</th>
                 <th>id</th>
                 <th>name</th>
-                <th>bugs/s</th>
+                <th>$/s burn</th>
               </tr>
             </thead>
             <tbody>
@@ -165,7 +165,7 @@ export function PhasesDebug() {
                   <td className="cell-loc whitespace-nowrap">{fmtLoc(g.unlockAt)}</td>
                   <td className="cell-id">{g.id}</td>
                   <td>{g.name}</td>
-                  <td className="text-log-bad">{g.bugsPerSec}</td>
+                  <td className="text-log-bad">{g.moneyPerSec ?? '—'}</td>
                 </tr>
               ))}
             </tbody>

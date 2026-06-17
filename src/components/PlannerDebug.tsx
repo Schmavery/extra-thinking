@@ -116,8 +116,8 @@ function ClosestFrontierPanel({
         </dd>
         <dt className="text-dim">generators</dt>
         <dd className="break-all">
-          {Object.keys(closest.genCounts).length > 0
-            ? Object.entries(closest.genCounts)
+          {Object.keys(closest.accountCounts ?? {}).length > 0
+            ? Object.entries(closest.accountCounts ?? {})
                 .map(([k, n]) => `${k}×${n}`)
                 .join(', ')
             : '—'}

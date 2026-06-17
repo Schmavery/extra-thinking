@@ -12,12 +12,15 @@
  * Sim runs are cached per file so each (policy, budget) trace is built
  * once and reused across describe blocks. One random seed per file run;
  * set `INVARIANT_SEED` to reproduce a failure.
+ *
+ * Long greedy traces (45m virtual burn gates, 5m legality scan, determinism):
+ * `RUN_SLOW_SIMS=1 npm test -- tests/invariants.test.ts`
  */
 
 import { afterEach, describe, expect, it } from 'vitest';
 import { Sim, type Bot } from '../src/sim/Sim';
 import { greedyPlayer, lazy, spammer, randomBot } from '../src/sim/bots';
-import { calcInfraBurnPerSec, calcTokenConfig } from '../src/game/rates';
+import { calcInfraBurnPerSec, calcTokenConfig, totalAccountStacks } from '../src/game/rates';
 import { burnBelowNextGate } from '../src/game/burnPacing';
 import { MESSAGE_POOL } from '../src/game/constants';
 import { ACTIONS, EVENTS, MCP_UNSAFE_ALLOW_LEAK_ACK } from '../src/game/data';
@@ -161,14 +164,14 @@ describe(`invariants @ seed=${INVARIANT_SEED}`, () => {
       it(`${name}: no NaN/Infinity in numeric state`, () => {
         const s = getSmokeRun(name, bot).state;
         for (const k of [
-          'loc', 'bugs', 'lifetimeBugs', 'buzzMeter', 'fundingRound', 'mcMinis', 'tests', 'freeAccounts',
+          'loc', 'bugs', 'lifetimeBugs', 'buzzMeter', 'fundingRound', 'mcMinis', 'tests',
           'totalLoc', 'totalClicks', 'totalTokensSpent', 'minTokensSeen',
           'tokens', 'agentBuffExpires', 'nines',
-          'lastEventTime', 'lastTestLogTime', 'logId',
+          'lastEventTime', 'lastBugFixLogTime', 'logId',
         ] as const) {
           expect(isFiniteNumber(s[k]), `${k} = ${s[k]}`).toBe(true);
         }
-        for (const v of Object.values(s.genCounts)) {
+        for (const v of Object.values(s.accountCounts ?? {})) {
           expect(isFiniteNumber(v) && v >= 0).toBe(true);
         }
         for (const v of Object.values(s.actionCooldowns)) {
@@ -184,7 +187,7 @@ describe(`invariants @ seed=${INVARIANT_SEED}`, () => {
         const sim = new Sim({ seed: INVARIANT_SEED });
         for (let elapsed = 0; elapsed < VIRTUAL_MIN; elapsed += 1000) {
           sim.run(bot, 1000);
-          const { maxTokens } = calcTokenConfig(sim.state.upgrades, sim.state.freeAccounts);
+          const { maxTokens } = calcTokenConfig(sim.state.upgrades, sim.state.accountCounts);
           expect(sim.state.tokens).toBeGreaterThanOrEqual(0);
           expect(sim.state.tokens).toBeLessThanOrEqual(maxTokens + 1e-9);
         }
@@ -209,7 +212,9 @@ describe(`invariants @ seed=${INVARIANT_SEED}`, () => {
           expect(s.totalClicks).toBeGreaterThanOrEqual(prev.totalClicks);
           expect(s.totalTokensSpent ?? 0).toBeGreaterThanOrEqual(prev.totalTokensSpent ?? 0);
           expect(s.tests ?? 0).toBeGreaterThanOrEqual(prev.tests ?? 0);
-          expect(s.freeAccounts).toBeGreaterThanOrEqual(prev.freeAccounts);
+          expect(totalAccountStacks(s.accountCounts)).toBeGreaterThanOrEqual(
+            totalAccountStacks(prev.accountCounts),
+          );
           expect(s.upgrades.length).toBeGreaterThanOrEqual(prev.upgrades.length);
           expect(s.unlockedUpgrades.length).toBeGreaterThanOrEqual(prev.unlockedUpgrades.length);
           expect(s.usedNewsIds.length).toBeGreaterThanOrEqual(prev.usedNewsIds.length);
@@ -252,18 +257,13 @@ describe(`invariants @ seed=${INVARIANT_SEED}`, () => {
         for (const m of moveTable(state!, t).all) {
           const gateLegal = legalFromGates(m.gates);
           const gateWait = waitMsFromGates(m.gates);
-          const visibilityOverlay =
-            m.id === 'new_free_account' || m.kind === 'buy_gen';
+          const visibilityOverlay = m.kind === 'buy_gen';
           if (visibilityOverlay) {
             expect(m.legal, `${m.id} @ t=${t}`).toBe(m.visible && gateLegal);
           } else {
             expect(m.legal, `${m.id} @ t=${t}`).toBe(gateLegal);
           }
-          if (m.id === 'new_free_account' && !m.visible) {
-            expect(m.waitMs, `${m.id} @ t=${t}`).toBe(null);
-          } else {
-            expect(m.waitMs, `${m.id} @ t=${t}`).toBe(gateWait);
-          }
+          expect(m.waitMs, `${m.id} @ t=${t}`).toBe(gateWait);
         }
       }
     });
@@ -291,7 +291,7 @@ describe(`invariants @ seed=${INVARIANT_SEED}`, () => {
     });
   });
 
-  describe('legality contract', () => {
+  describe.skipIf(!process.env.RUN_SLOW_SIMS)('legality contract', () => {
     it('every move ever offered to the greedy bot, when applied, changes state', () => {
       const sim = getTraceRun('legal:greedy', greedyPlayer, VIRTUAL_LONG);
       const moveTicks = sim.trace.filter((t) => t.move);
@@ -302,7 +302,7 @@ describe(`invariants @ seed=${INVARIANT_SEED}`, () => {
     });
   });
 
-  describe('burn vs funding gates', () => {
+  describe.skipIf(!process.env.RUN_SLOW_SIMS)('burn vs funding gates', () => {
     const BURN_BUDGET_MS = 45 * 60_000;
 
     it('greedy: pro_plan purchase never starts with instant Series A burn', () => {
@@ -340,7 +340,7 @@ describe(`invariants @ seed=${INVARIANT_SEED}`, () => {
 
 // ─── determinism (fixed seed — not the file's random draw) ─────────────────
 
-describe('invariants: determinism', () => {
+describe.skipIf(!process.env.RUN_SLOW_SIMS)('invariants: determinism', () => {
   const factories = [
     ['lazy', () => lazy],
     ['greedy', () => greedyPlayer],

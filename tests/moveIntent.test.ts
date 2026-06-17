@@ -104,7 +104,19 @@ describe('scoreMove', () => {
 
 describe('moveHelps', () => {
   it('tags token and bug actions', () => {
-    expect(moveHelps(actionMove('new_free_account')).tokens).toBe(1);
+    const buyAccount: Move = {
+      id: 'buy_gen:opengpt',
+      kind: 'buy_gen',
+      target: 'opengpt',
+      visible: true,
+      gates: [],
+      legal: true,
+      affordProgress: 1,
+      cooldownProgress: 1,
+      waitMs: 0,
+      apply: (s) => s,
+    };
+    expect(moveHelps(buyAccount).tokens).toBe(0.7);
     expect(moveHelps(actionMove('write_test')).tests).toBe(1);
   });
 });

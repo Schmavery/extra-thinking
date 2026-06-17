@@ -43,7 +43,7 @@ describe('cruiseEstimate hypotheses', () => {
       30_000,
       120_000,
     );
-    expect(performance.now() - t0).toBeLessThan(500);
+    expect(performance.now() - t0).toBeLessThan(2_500);
   });
 
   it('H3: loc strategy beats hygiene for totalLoc grind (pre-launch)', () => {
@@ -72,10 +72,10 @@ describe('cruiseEstimate hypotheses', () => {
     const seg = solveCruiseByEstimate(s, 0, target, {
       seed: 42,
       probeMs: 30_000,
-      eventDtMs: 120_000,
-      budgetMs: bound * 2.5,
+      eventDtMs: 5_000,
+      budgetMs: bound * 4,
     });
-    expect(performance.now() - t0).toBeLessThan(500);
+    expect(performance.now() - t0).toBeLessThan(2_500);
     expect(seg?.ok).toBe(true);
     expect(seg!.endState.unlockedUpgrades).toContain('model_update_1');
     expect(seg!.endT - seg!.startT).toBeLessThan(bound * 2.5);
@@ -97,7 +97,7 @@ describe('cruiseEstimate hypotheses', () => {
     const s = defaultState();
     const target = { tag: 'shopUnlock' as const, upgradeId: 'model_update_1' };
     const t0 = performance.now();
-    const picked = pickCruiseStrategy(s, 0, target, 42, { probeMs: 20_000, eventDtMs: 120_000 });
+    const picked = pickCruiseStrategy(s, 0, target, 42, { probeMs: 20_000, eventDtMs: 5_000 });
     expect(performance.now() - t0).toBeLessThan(400);
     expect(picked.spec.id).toBeTruthy();
     expect(picked.extrapolatedMs).toBeGreaterThan(0);

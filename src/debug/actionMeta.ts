@@ -4,7 +4,6 @@ import { UPGRADE_BY_ID, upgradeHoverTitle } from './upgradeMeta';
 
 /** In-game button / panel labels for trace timeline (actions.yaml has no `name`). */
 const ACTION_TITLES: Record<string, string> = {
-  new_free_account: 'Free Account',
   bug_bounty: 'Run bug bounty',
   launch: 'Ship to production',
   prompt: 'Prompt',

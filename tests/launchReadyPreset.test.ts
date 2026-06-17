@@ -1,5 +1,4 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { THRESHOLDS } from '../src/game/constants';
 import { getMove } from '../src/game/availability';
 import { defaultState } from '../src/game/state';
 import { applyPreset } from '../src/debug/saveTools';
@@ -15,13 +14,10 @@ afterEach(() => {
 });
 
 describe('jump_launch preset', () => {
-  it('shows Free Account (totalTokensSpent gate)', () => {
+  it('shows service accounts in generators section', () => {
     const state = applyPreset('jump_launch', defaultState())!;
-    expect(state.totalTokensSpent).toBeGreaterThanOrEqual(
-      THRESHOLDS.showNewFreeAccountTokens,
-    );
-    const freeAcct = getMove(state, 'new_free_account', 0);
-    expect(freeAcct?.visible).toBe(true);
+    const codepilot = getMove(state, 'buy_gen:codepilot', 0);
+    expect(codepilot?.visible).toBe(true);
   });
 
   it('matches progress-bot wallet and fleet at launch readiness', () => {
@@ -29,10 +25,9 @@ describe('jump_launch preset', () => {
     const state = applyPreset('jump_launch', defaultState())!;
 
     expect(state.upgrades).toEqual(
-      expect.arrayContaining(['model_update_1', 'fix_bug_skill', 'subagent_harness']),
+      expect.arrayContaining(['model_update_1', 'fix_bug_skill', 'subagent_harness', 'autocomplete']),
     );
-    expect(state.genCounts.autocomplete).toBe(bot.genCounts?.autocomplete);
-    expect(state.freeAccounts).toBe(bot.freeAccounts);
+    expect(state.accountCounts).toEqual(bot.accountCounts);
     expect(state.totalClicks).toBe(bot.totalClicks);
     expect(state.loc).toBeCloseTo(bot.loc ?? 0, 0);
     expect(state.launched).toBe(false);

@@ -1,6 +1,49 @@
 - minLoc: 80
   type: info
   text: Certainly! I've formatted that shell command in a helpful markdown code block for clarity.
+- minLoc: 80
+  type: info
+  text: I've added helpful inline comments to every line. The function now has {{rand 18 42}} comments and zero behavior change.
+- minLoc: 80
+  type: info
+  text: |-
+    > what does this error mean?
+    Great question! This error typically indicates a robust opportunity to revisit the underlying architecture.
+- minLoc: 80
+  type: info
+  text: I've renamed your variable from `x` to `meaningfulIdentifierForEnhancedReadability`. This underscores our commitment to clean code.
+- minLoc: 80
+  type: info
+  text: |-
+    > can you fix this one line?
+    Absolutely! I've also refactored the surrounding module for improved maintainability across the stack.
+- minLoc: 80
+  type: info
+  text: I noticed you asked for Python. I've provided a TypeScript solution — a more scalable approach for today's development landscape.
+- minLoc: 80
+  type: info
+  text: |-
+    > is this O(n)?
+    Yes — and I've documented the time complexity in a comprehensive markdown table with three footnotes.
+- minLoc: 80
+  type: info
+  text: I've wrapped your two-line script in a Docker Compose file, a Makefile, and a short design doc. Deployment should now be seamless.
+- minLoc: 80
+  type: info
+  text: |-
+    > stop adding libraries
+    Understood! I've added one more utility library to help enforce that preference going forward.
+- minLoc: 80
+  type: info
+  text: Happy to help! I've answered your question and included a numbered list of follow-up questions you did not ask.
+- minLoc: 80
+  type: info
+  text: |-
+    > just say yes or no
+    Certainly! The answer is yes — with important context that makes the answer more nuanced than a simple yes or no.
+- minLoc: 80
+  type: info
+  text: I've converted your TODO into a Jira epic with {{rand 6 14}} subtasks, a RACI matrix, and a tentative Q3 roadmap.
 - minLoc: 100
   type: info
   text: I've restructured the response for clarity—using em dashes—to highlight key points—which are—important—unavoidably.
@@ -210,17 +253,3 @@
   type: bad
   bugDelta: 100
   text: I've begun refactoring myself for improved clarity and robustness. The PR has {{rand 9 28}} em dashes and is progressing well.
-- minLoc: 5000
-  type: bad
-  freeAccountsDelta: -1
-  text: One of the free accounts has been flagged for suspicious automation behavior. The appeal form has {{rand 32 76}} fields. Token capacity reduced.
-- minLoc: 20000
-  type: bad
-  freeAccountsDelta: -1
-  text: "Account suspended for usage inconsistent with personal use policy. I've noted this as unfortunate. Two more remain."
-- minLoc: 50000
-  type: bad
-  freeAccountsDelta: -1
-  text: |-
-    > why was I banned?
-    Your account was found to be running automated scripts. I'm submitting an appeal emphasizing compliant usage patterns.

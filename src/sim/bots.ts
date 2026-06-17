@@ -25,7 +25,6 @@ export const PRIORITY_PROGRESS: Record<string, number> = {
   write_test: 400,
   kick_agent: 300,
   clear_context: 200,
-  new_free_account: 150,
   prompt: 100,
 };
 
@@ -34,7 +33,6 @@ export const PRIORITY_LOC: Record<string, number> = {
   buy_gen: 980,
   launch: 920,
   prompt: 880,
-  new_free_account: 860,
   bug_bounty: 500,
   run_tests: 450,
   paste_error: 400,
@@ -54,7 +52,6 @@ export const PRIORITY_HYGIENE: Record<string, number> = {
   buy_gen: 650,
   launch: 600,
   clear_context: 500,
-  new_free_account: 400,
   prompt: 100,
 };
 

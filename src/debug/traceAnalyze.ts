@@ -554,7 +554,7 @@ export function milestonesBetween(
       out.push({ kind: 'upgrade', id, t, totalLoc: next.totalLoc });
     }
   }
-  for (const id of Object.keys(next.genCounts)) {
+  for (const id of Object.keys(next.genCounts ?? {})) {
     const prevN = prev.genCounts[id] ?? 0;
     const nextN = next.genCounts[id] ?? 0;
     if (nextN > prevN) {

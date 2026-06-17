@@ -1,26 +1,31 @@
 import { describe, expect, it } from 'vitest';
-import { GENS } from '../src/game/data';
-import { formatGenMechanics, genTooltip } from '../src/lib/genLabel';
+import { ACCOUNTS } from '../src/game/data';
+import { hasProPlan } from '../src/game/rates';
+import { accountTooltip, formatAccountTok } from '../src/lib/genLabel';
 
 describe('genLabel', () => {
-  it('formatGenMechanics lists only generator-owned rates', () => {
-    const copilot = GENS.find((g) => g.id === 'copilot')!;
-    expect(formatGenMechanics(copilot)).toBe('30/s LOC · 0.15/s bugs');
-
-    const claude = GENS.find((g) => g.id === 'claude')!;
-    expect(formatGenMechanics(claude)).toBe('250/s LOC · 0.8/s bugs · 0.3/s fixes');
+  it('formatAccountTok shows free tier tok', () => {
+    const codepilot = ACCOUNTS.find((a) => a.id === 'codepilot')!;
+    expect(formatAccountTok(codepilot, false)).toBe('+30 max · +1.5/s regen');
   });
 
-  it('genTooltip separates mechanics from tagline', () => {
-    const copilot = GENS.find((g) => g.id === 'copilot')!;
-    expect(genTooltip(copilot)).toContain('AI pair programming');
-    expect(genTooltip(copilot)).toMatch(/^30\/s LOC/);
+  it('accountTooltip separates mechanics from tagline', () => {
+    const opengpt = ACCOUNTS.find((a) => a.id === 'opengpt')!;
+    expect(accountTooltip(opengpt, [], false)).toContain('brainstorming');
+    expect(accountTooltip(opengpt, [], false)).toMatch(/^\+50 max/);
   });
 
-  it('generator taglines avoid implying separate game systems', () => {
+  it('account taglines avoid implying separate game systems', () => {
     const banned = /\b(expired trial|rate limit|200K|billing dashboard|computer use|\d+ sub-agents)\b/i;
-    for (const g of GENS) {
-      expect(g.desc, g.id).not.toMatch(banned);
+    for (const a of ACCOUNTS) {
+      expect(a.desc, a.id).not.toMatch(banned);
     }
+  });
+
+  it('paid tier uses paid tok numbers in tooltip', () => {
+    const claudius = ACCOUNTS.find((a) => a.id === 'claudius')!;
+    expect(accountTooltip(claudius, ['pro_plan'], true)).toContain('paid tier');
+    expect(formatAccountTok(claudius, true)).toContain('+220 max');
+    expect(hasProPlan(['pro_plan'])).toBe(true);
   });
 });

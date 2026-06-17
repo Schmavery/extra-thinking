@@ -1,17 +1,26 @@
-export interface GenDef {
+export interface AccountDef {
   id: string;
   name: string;
-  /** Flavor line for logs and shop — parody marketing, not mechanics (see `formatGenMechanics`). */
+  /** Flavor line for logs and shop — parody marketing, not mechanics. */
   desc: string;
-  locPerSec: number;
-  bugsPerSec: number;
-  fixPerSec: number;
   baseCost: number;
   costMult: number;
   unlockAt: number;
-  /** $/s burn per owned unit once `pro_plan` is active. */
+  /** Tok capacity for the first signup (free tier). */
+  freeMaxTokens: number;
+  freeTokenRegen: number;
+  /** Tok capacity per stack after `pro_plan` (paid tier). */
+  paidMaxTokens: number;
+  paidTokenRegen: number;
+  /** Per extra signup after the first (requires `rotate_accounts`). */
+  extraMaxTokens: number;
+  extraTokenRegen: number;
+  /** $/s burn per owned stack once `pro_plan` is active. */
   moneyPerSec?: number;
 }
+
+/** @deprecated Alias — generators.yaml holds service accounts only. */
+export type GenDef = AccountDef;
 
 /**
  * Definition of an upgrade. Effect fields are optional and combine with
@@ -30,10 +39,26 @@ export interface UpgDef {
   /** Summed across all owned upgrades. */
   clickBonus?: number;
 
-  // ── generator effects ──
-  /** Per-generator id: multiplicative LOC/s (multiplied across owned upgrades). */
+  // ── harness effects (owned once; LOC/s × code machines) ──
+  /** Passive LOC/s while owned. */
+  locPerSec?: number;
+  /** Context drained per second per code machine while owned. */
+  tokenDrainPerSec?: number;
+  /** Bug spawn/s while owned. */
+  bugsPerSec?: number;
+  /** Passive fix/s while owned. */
+  fixPerSec?: number;
+  /** Per-harness id: multiplicative LOC/s. */
+  harnessLocMult?: Record<string, number>;
+  /** Per-harness id: additive LOC/s. */
+  harnessLocBonus?: Record<string, number>;
+  /** $/s burn per code machine once `pro_plan` is active. */
+  moneyPerSec?: number;
+
+  // ── legacy generator effects (deprecated — use harness* fields) ──
+  /** @deprecated Use `harnessLocMult`. */
   genLocMult?: Record<string, number>;
-  /** Per-generator id: additive LOC/s per owned unit (summed across owned upgrades). */
+  /** @deprecated Use `harnessLocBonus`. */
   genLocBonus?: Record<string, number>;
   /** Multiplied across all owned upgrades. */
   globalMult?: number;
@@ -138,7 +163,6 @@ export interface EventDef {
   locMult?: number;
   locDelta?: number;
   bugDelta?: number;
-  freeAccountsDelta?: number;
   type: 'info' | 'bad' | 'event';
   minLoc: number;
   requiresLaunch?: boolean;
@@ -207,6 +231,8 @@ export interface ActionDef {
   tokenCost?: number;
   cooldownMs?: number;
   eventProbability?: number;
+  /** Min ms between flavor log lines (bug-fix actions share `lastBugFixLogTime`). */
+  logCooldownMs?: number;
 
   // Random message pools (Handlebars-templated)
   messages?: string[];
@@ -230,8 +256,6 @@ export interface ActionDef {
   perTestFixFraction?: number;
   /** Tokens spent = `tests * this` (replaces legacy LOC cost). */
   perTestTokenCost?: number;
-  /** Min ms between consecutive "ran tests" log lines. */
-  logCooldownMs?: number;
 
   // bug_bounty
   maxConvertedPerRun?: number;
@@ -294,17 +318,20 @@ export interface GameState {
   /** Cumulative bugs ever gained; sticky `showBugs` once `lifetimeBugs > 1`. */
   lifetimeBugs: number;
   tests: number;
-  freeAccounts: number;
+  accountCounts: Record<string, number>;
+  /** @deprecated Migrated to `accountCounts` on load. */
+  genCounts?: Record<string, number>;
+  /** @deprecated Migrated to `accountCounts` on load. */
+  freeAccounts?: number;
   totalLoc: number;
   totalClicks: number;
   totalTokensSpent: number;
   minTokensSeen: number;
-  genCounts: Record<string, number>;
   upgrades: string[];
   log: LogEntry[];
   logId: number;
   lastEventTime: number;
-  lastTestLogTime: number;
+  lastBugFixLogTime: number;
   actionCooldowns: Record<string, number>;
   milestonesSeen: number[];
   started: boolean;

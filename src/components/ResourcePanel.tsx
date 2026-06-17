@@ -2,9 +2,9 @@ import type { GameState } from '../types';
 import { fmt, fmtRate } from '../lib/format';
 import {
   calcBugPenalty,
+  calcHarnessTokenDrainPerSec,
   calcInfraBurnPerSec,
   calcKickAgentLocPerSec,
-  calcMcMiniCodeLocRate,
   kickAgentBuffActive,
   calcNinesRate,
   calcRates,
@@ -45,11 +45,17 @@ interface Props {
 export function ResourcePanel({ state }: Props) {
   const derived = deriveGame(state);
   const { ui, thresholds, hasFlag } = derived;
-  const { locRate, bugRate, fixRate } = calcRates(state.genCounts, state.upgrades, state.tests ?? 0);
+  const { locRate, bugRate, fixRate } = calcRates(
+    state.accountCounts,
+    state.upgrades,
+    state.tests ?? 0,
+    state.mcMinis ?? 0,
+    state.mcMiniLanes,
+  );
   const netBugRate = snapRate(bugRate - fixRate);
   const bugPenalty = calcBugPenalty(state.bugs);
   const uptime = calcUptime(state.bugs);
-  const { maxTokens, tokenRegen } = calcTokenConfig(state.upgrades, state.freeAccounts);
+  const { maxTokens, tokenRegen } = calcTokenConfig(state.upgrades, state.accountCounts);
   const ninesRate = calcNinesRate(state.upgrades, state.bugs);
   const currentNines = ui.ninesTracking
     ? Math.max(state.nines || 0, AGENT_BUFF.ninesFloorFallback)
@@ -58,13 +64,17 @@ export function ResourcePanel({ state }: Props) {
   const showAsCounter = ninesInt >= 8;
 
   const lanes = normalizeMcMiniLanes(state.mcMinis ?? 0, state.mcMiniLanes);
-  const tokenDrain = mcMiniTokenDrainPerSec(lanes);
+  const harnessDrain = calcHarnessTokenDrainPerSec(
+    state.upgrades,
+    state.mcMinis ?? 0,
+    lanes,
+  );
+  const tokenDrain = harnessDrain + mcMiniTokenDrainPerSec(lanes);
   const netTokenRegen = snapRate(tokenRegen - tokenDrain);
-  const mcMiniLoc = calcMcMiniCodeLocRate(lanes.code, state.upgrades) * bugPenalty;
   const kickAgentLoc = kickAgentBuffActive(state, Date.now())
     ? calcKickAgentLocPerSec(state.upgrades) * bugPenalty
     : 0;
-  const displayLocRate = snapRate(locRate * bugPenalty + kickAgentLoc + mcMiniLoc);
+  const displayLocRate = snapRate(locRate * bugPenalty + kickAgentLoc);
   const burnRate = calcInfraBurnPerSec(state);
   const buzz = state.buzzMeter ?? 0;
 
@@ -89,7 +99,7 @@ export function ResourcePanel({ state }: Props) {
             <span className="text-dimmer text-[12px]">
               ({netTokenRegen > 0 ? '+' : ''}
               {netTokenRegen}/s
-              {tokenDrain > 0 ? `, −${tokenDrain}/s McMinis` : ''})
+              {tokenDrain > 0 ? `, −${tokenDrain}/s drain` : ''})
             </span>
           )}
         </Row>

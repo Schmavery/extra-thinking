@@ -98,7 +98,7 @@ export function fmtUpgradeCost(cost: number): string {
   return fmtLoc(cost);
 }
 
-export const SORTED_UPGRADES = [...UPGRADES].sort((a, b) => a.unlockAt - b.unlockAt);
+export const SORTED_UPGRADES = [...UPGRADES].sort((a, b) => a.cost - b.cost);
 
 export const UPGRADE_BY_ID = new Map<string, UpgDef>(UPGRADES.map((u) => [u.id, u]));
 

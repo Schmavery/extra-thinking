@@ -31,7 +31,9 @@ export function Upgrades({ state, onBuyUpgrade, onRaiseRound }: Props) {
   const visible = UPGRADES.map((u) => ({
     u,
     move: getMove(state, `buy_upgrade:${u.id}`, now)!,
-  })).filter(({ move }) => move.visible);
+  }))
+    .filter(({ move }) => move.visible)
+    .sort((a, b) => a.u.cost - b.u.cost);
 
   if (visible.length === 0 && !showRaise) return null;
 
