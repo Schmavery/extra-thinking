@@ -32,9 +32,9 @@ interface RowProps {
 }
 function Row({ label, children }: RowProps) {
   return (
-    <div className="flex gap-[10px] items-baseline mb-[3px]">
-      <span className="text-dim w-[80px]">{label}</span>
-      {children}
+    <div className="contents">
+      <span className="text-dim whitespace-nowrap">{label}</span>
+      <div className="min-w-0 flex flex-wrap items-baseline gap-x-[8px]">{children}</div>
     </div>
   );
 }
@@ -92,6 +92,7 @@ export function ResourcePanel({ state }: Props) {
 
   return (
     <div className="mt-[18px]">
+      <div className="grid grid-cols-[fit-content(7rem)_minmax(0,1fr)] gap-x-[10px] gap-y-[3px] items-baseline">
       {ui.showTokens && (
         <Row label="tokens">
           <span className={state.tokens < TOKENS.lowWarnThreshold ? 'text-red' : 'text-fg'}>
@@ -109,7 +110,7 @@ export function ResourcePanel({ state }: Props) {
       )}
 
       {/* loc */}
-      <Row label="loc">
+      <Row label={state.totalLoc < 100 ? 'lines of code' : 'loc'}>
         <span className="text-green">{fmt(state.loc)}</span>
         {displayLocRate !== 0 && (
           <span className="text-green-dim text-[12px]">({fmtRate(displayLocRate)})</span>
@@ -189,7 +190,7 @@ export function ResourcePanel({ state }: Props) {
             <span className={buzz >= INVESTOR.buzzMax ? 'text-purple' : 'text-dim'}>
               {Math.floor(buzz)}%
             </span>
-            <span className="text-dimmer text-[12px] w-[72px] inline-block h-[6px] bg-border align-middle ml-1">
+            <span className="text-dimmer text-[12px] w-[72px] inline-block h-[6px] bg-border align-middle">
               <span
                 className="block h-full bg-purple/60"
                 style={{ width: `${Math.min(100, buzz)}%` }}
@@ -198,6 +199,8 @@ export function ResourcePanel({ state }: Props) {
           </Row>
         </>
       )}
+
+      </div>
 
       {/* warnings */}
       {state.bugs > thresholds.warnBugsElevated && (

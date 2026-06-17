@@ -92,15 +92,16 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
 
   const netBugDeltaRate = snapRate(effectiveBugRate - fixRate);
   const newBugs = prev.bugs + netBugDeltaRate * dt - autoBugDrain;
+  const newTokens = Math.min(maxTokens, Math.max(0, prev.tokens + netTokenRegen * dt));
   let next: GameState = {
     ...prev,
     mcMiniLanes: lanes,
     loc: prev.loc + effectiveLoc,
     ...withBugs(prev, newBugs),
     totalLoc: prev.totalLoc + effectiveLoc,
-    tokens: Math.min(maxTokens, Math.max(0, prev.tokens + netTokenRegen * dt)),
+    tokens: newTokens,
     tests: (prev.tests ?? 0) + testsGain,
-    minTokensSeen: Math.min(prev.minTokensSeen ?? 9999, prev.tokens),
+    minTokensSeen: Math.min(prev.minTokensSeen ?? 9999, prev.tokens, newTokens),
     buzzMeter: Math.min(INVESTOR.buzzMax, (prev.buzzMeter ?? 0) + buzzGain),
     nines: ninesTracking
       ? (prev.nines || AGENT_BUFF.ninesFloorFallback) + ninesRate * dt

@@ -556,7 +556,7 @@ YAML. Notes below may cite real names for research.
 Canon (same table lives in README):
 
 - **Gnoogle** (Google)
-- **MicroSith** — Deskmate, Screen Memory; not Copilot / Recall
+- **Microslop** — Deskmate, Screen Memory; not Copilot / Recall
 - **CodePilot** (GitHub / MS coding assistant) — generator name; not “Copilot”
 - **OpenGPT** (OpenAI / ChatGPT)
 - **Claudius Labs** + model **Claudius** — never Claude
@@ -777,7 +777,7 @@ One-liners and micro-stories. Pun names optional.
 ### More `Industry:` headline fodder (events not yet used)
 
 - Gnoogle admits **TwinGem** hands video was **"inspiring developers"** not documenting product
-- MicroSith Deskmate summarized a user's **therapy notes** into a team doc
+- Microslop Deskmate summarized a user's **therapy notes** into a team doc
 - Lemon Intelligence described CEO photo as **"possibly tired"** in release notes
 - OpenGPT o3 scores 99.8% on benchmark; researchers release **new benchmark**; new model scores 99.8%
 - SteepSeek-R1 shock — **"made in China"** panic / **"made with GPUs"** panic same week

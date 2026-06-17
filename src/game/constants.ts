@@ -147,8 +147,8 @@ export const PROMPT_EVENT = {
 export const TOKENS = {
   baseMax: 120,
   baseRegen: 4,
-  /** Reveal token counter once fill has fallen to this fraction of max (or lower). */
-  showAtMaxFillFraction: 0.1,
+  /** Reveal token counter once `minTokensSeen` has fallen strictly below this value. */
+  showMinTokensSeen: 60,
   /** Min token reading below which the "low" warning shows. */
   lowWarnThreshold: 20,
 } as const;

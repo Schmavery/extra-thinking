@@ -5,7 +5,7 @@
 - id: codepilot-todo-roadmap
   minLoc: 50
   guaranteed: true
-  text: "MicroSith CodePilot now expands `// TODO` comments into quarterly roadmaps. Engineers report saving several minutes per file."
+  text: "Microslop CodePilot now expands `// TODO` comments into quarterly roadmaps. Engineers report saving several minutes per file."
 - id: gnoogle-ai-mode-search
   minLoc: 150
   text: "Gnoogle launched 'AI Mode' for search. It returns three summaries of your query, then asks which summary you meant."
@@ -20,7 +20,7 @@
   text: "StackUnderflow moderators are voting on whether questions must include reproducible steps. The leading answer is a link to another question."
 - id: codepilot-trial-still-works
   minLoc: 1200
-  text: "MicroSith CodePilot's trial ended months ago. It still expands `// fix later` into a full Terraform root module."
+  text: "Microslop CodePilot's trial ended months ago. It still expands `// fix later` into a full Terraform root module."
 - id: sloppedin-agree-spam
   minLoc: 2200
   text: "SloppedIn now auto-appends 'Thoughts?' to posts about lunch. Engagement is up {{rand 18 41}}%."
@@ -30,9 +30,9 @@
 - id: gnoogle-wall-from-space
   minLoc: 5000
   text: "Gnoogle AI Overviews declared that pi equals 4 'for enterprise rounding' in today's fast-paced mathematics landscape. Mathematicians declined to comment."
-- id: microsith-deskmate-git-history
+- id: microslop-deskmate-git-history
   minLoc: 8000
-  text: "MicroSith Deskmate renamed every file `Final_v2_REAL.use_this.ts`. Git blame is comprehensive."
+  text: "Microslop Deskmate renamed every file `Final_v2_REAL.use_this.ts`. Git blame is comprehensive."
 - id: facelift-derivative-photos
   minLoc: 10000
   text: "Facelift AI rated every selfie 'executive presence with room to grow — underscoring latent leadership.' Refunds are pending."
@@ -72,18 +72,18 @@
 - id: envideo-trillion-parameters
   minLoc: 75000
   text: "Envideo announced a GPU with 'infinite parameters' after the counter overflowed. The keynote slide said '10 trillion' twice."
-- id: microsith-screen-memory
+- id: microslop-screen-memory
   minLoc: 100000
-  text: "MicroSith Screen Memory shipped a weekly recap of mistyped passwords and half-finished emails — a testament to modern productivity."
+  text: "Microslop Screen Memory shipped a weekly recap of mistyped passwords and half-finished emails — a testament to modern productivity."
 - id: snugglehub-model-card
   minLoc: 100000
   text: "SnuggleHub's top model card is a single line: 'do not.' Downloads hit {{rand 2 7}}M anyway."
 - id: reddit-blackout-then-deal
   minLoc: 120000
   text: "Thousands of ReadIt subreadits went dark to protest API pricing. Three days later the top post was a cake recipe."
-- id: microsith-deskmate-therapy-notes
+- id: microslop-deskmate-therapy-notes
   minLoc: 135000
-  text: "MicroSith Deskmate opened a standup thread from a user's private notes. The ticket is tagged WONTFIX—BY—DESIGN."
+  text: "Microslop Deskmate opened a standup thread from a user's private notes. The ticket is tagged WONTFIX—BY—DESIGN."
 - id: plateau-goblin-corner
   minLoc: 150000
   text: "Plateau AI's image model now adds a goblin to every corner for brand consistency."

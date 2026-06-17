@@ -113,7 +113,7 @@ ESLint, TypeScript, Docker, npm, …) in jokes about stack choices.
 | Real-ish target | In-game |
 | --------------- | ------- |
 | Google | **Gnoogle** |
-| Microsoft | **MicroSith** — products e.g. **Deskmate**, **Screen Memory** |
+| Microsoft | **Microslop** — products e.g. **Deskmate**, **Screen Memory** |
 | GitHub / MS coding assistant | **CodePilot** (generator `copilot`; not “Copilot”) |
 | OpenAI / ChatGPT | **OpenGPT** |
 | Anthropic / Claude | **Claudius Labs** / model **Claudius** (never Claude) |

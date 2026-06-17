@@ -52,11 +52,8 @@ export function deriveGame(state: GameState): DerivedGame {
   const thresholds = effectiveThresholds(state.upgrades);
   const flag = (f: GameFlag) => hasFlag(flags, f);
 
-  const { maxTokens } = calcTokenConfig(state.upgrades, state.accountCounts);
-  const tokenShowThreshold = maxTokens * TOKENS.showAtMaxFillFraction;
-
   const ui: DerivedUi = {
-    showTokens: (state.minTokensSeen ?? maxTokens) <= tokenShowThreshold,
+    showTokens: (state.minTokensSeen ?? TOKENS.baseMax) < TOKENS.showMinTokensSeen,
     showPasteError: (state.lifetimeBugs ?? 0) >= thresholds.showPasteErrorBugs,
     showWriteTests:
       (state.bugs >= thresholds.showWriteTestsBugs || (state.tests ?? 0) > 0) &&
