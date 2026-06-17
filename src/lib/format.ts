@@ -11,7 +11,7 @@ export function fmt(n: number): string {
 /** Format a non-zero per-second rate (call only when `rate !== 0`). */
 export function fmtRate(n: number): string {
   const abs = Math.abs(n);
-  if (abs < 0.1) return n.toFixed(3) + '/s';
-  if (abs < 10) return n.toFixed(1) + '/s';
-  return Math.round(n) + '/s';
+  if (abs >= 10) return Math.round(n) + '/s';
+  const digits = abs < 0.1 ? 3 : 1;
+  return parseFloat(n.toFixed(digits)).toString() + '/s';
 }

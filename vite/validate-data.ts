@@ -39,6 +39,7 @@ const gameFlagId = z.enum([
   'mcp_tools',
   'mcp_auto_approve',
   'yolo_mode',
+  'agent_dashboard',
 ]);
 
 const thresholdOverrideKey = z.enum([

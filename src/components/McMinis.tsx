@@ -31,7 +31,7 @@ export function McMinis({ state, onAdjustLane }: Props) {
       </div>
       {idle > 0 && (
         <div className="text-dimmer text-[11px] mb-2">
-          {idle} unassigned — use + on a lane. Code replaces kick off an agent.
+          {idle} unassigned — use + on a lane. Code replaces the subagent buff.
         </div>
       )}
       {LANES.map(({ id, label, hint }) => (

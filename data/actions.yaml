@@ -30,20 +30,20 @@
   introMsg: "I'd be happy to kick off a subagent to parallelize this work."
   messages:
     - |-
-      > kick off an agent
-      Agent initialized! It's quietly reading all {{rand 400 1200}} files first, for context. It will begin shortly.
+      > kick off a subagent
+      Subagent initialized! It's quietly reading all {{rand 400 1200}} files first, for context. It will begin shortly.
     - |-
-      > spawn an agent
-      Agent launched! It's spinning up subprocesses and downloading the full repository for comprehensive context.
+      > spawn a subagent
+      Subagent launched! It's spinning up subprocesses and downloading the full repository for comprehensive context.
     - |-
-      > run the agent
-      Agent active! It's opened {{rand 6 21}} tabs and is thinking carefully. Output incoming.
+      > start a subagent for this task
+      Subagent active! It's opened {{rand 6 21}} tabs and is thinking carefully. Output incoming.
     - |-
-      > go agent go
-      Agent deployed! It has enabled computer use. I'd rather not say what it clicked.
+      > go subagent go
+      Subagent deployed! It has enabled computer use. I'd rather not say what it clicked.
     - |-
-      > agent mode
-      Agent running! It refactored {{rand 2 6}} files outside the requested scope. Very thorough.
+      > subagent mode
+      Subagent running! It refactored {{rand 2 6}} files outside the requested scope. Very thorough.
 
 - id: paste_error
   tokenCost: 10
@@ -52,7 +52,7 @@
   fixChance: 0.5
   baseLocGain: 20
   extraLocRange: 30
-  introMsg: "When something breaks, paste the error back in — I'd be happy to investigate."
+  introMsg: "When something breaks, share the error with me — I'd be happy to investigate."
   goodMessages:
     - |-
       > why is this failing

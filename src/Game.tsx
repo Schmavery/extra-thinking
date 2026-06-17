@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { GameState, LogEntry } from './types';
-import { SAVE_INTERVAL_MS, STREAMING, TICK_MS } from './game/constants';
+import { SAVE_INTERVAL_MS, STREAMING } from './game/constants';
 import { mcpExecuting } from './game/mcpApproval';
 import { MILESTONES, UI, mcpToolIsSafe } from './game/data';
 import { deriveGame } from './game/derive';
@@ -23,7 +23,6 @@ import {
   stashHmrState,
 } from './lib/hmrGameSession';
 import { appendLog } from './game/log';
-import { getMove, rechargeProgress } from './game/availability';
 import {
   buyGenAction,
   buyUpgradeAction,
@@ -50,24 +49,19 @@ import { useGameActive } from './lib/useGameActive';
 import { useRevealScrollbar } from './lib/useRevealScrollbar';
 import { useSideGutterWheelScroll } from './lib/useSideGutterWheelScroll';
 import { useIsMobile } from './lib/useWindowWidth';
-import { Button } from './components/Button';
 import { FooterBarrel } from './components/FooterBarrel';
-import { McMinis } from './components/McMinis';
-import { ResourcePanel } from './components/ResourcePanel';
 import { adjustMcMiniLane, nextFundingRound } from './game/investor';
 import type { McMiniLane } from './game/investor';
-import { ActionBar } from './components/ActionBar';
-import { Generators } from './components/Generators';
-import { Upgrades, InstalledList } from './components/Upgrades';
+import { LeftPanel } from './components/LeftPanel';
 import { ConversationLog } from './components/ConversationLog';
 import { Settings } from './components/Settings';
-import { DebugToast } from './components/DebugToast';
 import { PauseOverlay } from './components/PauseOverlay';
 import { debugToast } from './lib/debugToast';
 import { applyPreset } from './debug/saveTools';
 import { isDevUnlocked, subscribeDevUnlock } from './lib/devUnlock';
 import { ResetConfirmModal } from './components/ResetConfirmModal';
-import { GameTitle } from './components/GameTitle';
+import { GameIntro, introExitMs } from './components/GameIntro';
+import { IntroHeader } from './components/IntroHeader';
 
 const PHASES = UI.phases;
 const FIRST_MILESTONE_LOC = MILESTONES[0]?.loc ?? 10;
@@ -78,7 +72,15 @@ export function Game() {
   const isMobile = useIsMobile();
 
   const sessionIdRef = useRef(getOrCreateHmrWriterSessionId());
-  const [state, setState] = useState<GameState>(() => loadGameBootState(sessionIdRef.current));
+  const bootFreshRef = useRef<boolean | null>(null);
+  const [state, setState] = useState<GameState>(() => {
+    const boot = loadGameBootState(sessionIdRef.current);
+    bootFreshRef.current = boot.totalClicks === 0 && boot.log.length === 0;
+    return boot;
+  });
+  const [introPhase, setIntroPhase] = useState<'splash' | 'exiting' | 'streaming' | 'ready'>(() =>
+    bootFreshRef.current ? 'splash' : 'ready',
+  );
   const [resetConfirmOpen, setResetConfirmOpen] = useState(false);
   const [blockedByOtherTab, setBlockedByOtherTab] = useState(false);
   const stateRef = useRef(state);
@@ -340,7 +342,6 @@ export function Game() {
 
   // Dev unlock toggle — ephemeral AI lines (stream normally, omitted from saves).
   useEffect(() => {
-    if (!import.meta.env.DEV) return;
     return subscribeDevUnlock(() => {
       const text = isDevUnlocked() ? 'debug mode enabled.' : 'debug mode disabled.';
       setState((prev) => appendLog(prev, text, 'info', { ephemeral: true }));
@@ -390,7 +391,18 @@ export function Game() {
     persistedDiskRef.current = readSaveDiskSnapshot();
     setState(fresh);
     resetStream();
+    setIntroPhase('splash');
   }, [resetStream]);
+
+  const handleIntroRegister = useCallback(() => {
+    if (introPhase !== 'splash') return;
+    setIntroPhase('exiting');
+    window.setTimeout(() => setIntroPhase('streaming'), introExitMs());
+  }, [introPhase]);
+
+  const handleIntroStreamComplete = useCallback(() => {
+    setIntroPhase((p) => (p === 'streaming' ? 'ready' : p));
+  }, []);
 
   const handleJumpToLaunch = useCallback(() => {
     const next = applyPreset('jump_launch', stateRef.current);
@@ -414,13 +426,20 @@ export function Game() {
     derived.hasFlag('mcp_auto_approve');
   const phase = getPhase(state);
   const showLog = state.log.length >= 1;
-  const { showGenSection, showUpgSection, showRaiseRound } = derived.ui;
+  const { showRaiseRound } = derived.ui;
   const fundingRoundOpen = showRaiseRound && nextFundingRound(state) !== undefined;
 
   const queuedUserEntries = useMemo(
     () => computeQueuedUserEntries(state.log, displayLog, isAnimating),
     [displayLog, state.log, isAnimating],
   );
+
+  const showResources = useMemo(() => {
+    if (!state.started) return false;
+    const firstReply = state.log.find((e) => e.type === 'info');
+    if (!firstReply) return true;
+    return isLogEntryFullyDisplayed(firstReply.id, state.log, displayLog);
+  }, [state.started, state.log, displayLog]);
 
   const postStartupUi = useMemo(() => {
     if (!state.milestonesSeen.includes(FIRST_MILESTONE_LOC)) return false;
@@ -435,6 +454,14 @@ export function Game() {
       ? 'prompt the AI'
       : 'keep going';
 
+  const showResetButton = postStartupUi && state.totalLoc > 0;
+  const showPromptButton = introPhase === 'ready';
+  const introHeaderStreaming = introPhase === 'streaming';
+  const showIntroHeader = introPhase === 'ready' || introHeaderStreaming;
+  const splashPhase =
+    introPhase === 'splash' ? 'splash' : introPhase === 'exiting' ? 'exiting' : 'done';
+  const introBlockClass = introPhase === 'splash' ? 'pointer-events-none' : '';
+
   return (
     <div
       ref={gameRootRef}
@@ -444,27 +471,33 @@ export function Game() {
       ].join(' ')}
     >
       <Settings onJumpToLaunch={handleJumpToLaunch} />
-      <DebugToast />
 
       {!isForeground && <PauseOverlay message="processing in background…" />}
       {isForeground && blockedByOtherTab && (
         <PauseOverlay message="running in another tab…" blockInput />
       )}
 
-      {isMobile && (
-        <div className="flex-shrink-0 mb-2">
-          <GameTitle />
-          <div className="text-dimmer text-[12px]">{PHASES[phase]}</div>
+      <GameIntro phase={splashPhase} onRegister={handleIntroRegister} />
+
+      {isMobile && showIntroHeader && (
+        <div className={['flex-shrink-0 mb-2', introBlockClass].join(' ')}>
+          <IntroHeader
+            phaseLabel={PHASES[phase]}
+            streaming={introHeaderStreaming}
+            onStreamComplete={handleIntroStreamComplete}
+            subtitleClassName="text-dimmer text-[12px]"
+          />
         </div>
       )}
 
       <div
         ref={mainAreaRef}
-        className={
+        className={[
           isMobile
             ? 'w-full flex-1 min-h-0 flex flex-col overflow-hidden'
-            : 'w-full flex-1 min-h-0 overflow-hidden'
-        }
+            : 'w-full flex-1 min-h-0 overflow-hidden',
+          introBlockClass,
+        ].join(' ')}
       >
         <div
           className={
@@ -475,79 +508,23 @@ export function Game() {
           }
         >
         {/* ── Left ── */}
-        <div
-          ref={leftScrollRef}
-          className={
-            isMobile
-              ? 'overflow-y-auto overflow-x-hidden hairline-scrollbar flex-1 min-h-0 pb-6'
-              : 'overflow-y-auto overflow-x-hidden hairline-scrollbar min-w-0 h-full pb-6'
-          }
-        >
-          {!isMobile && (
-            <>
-              <GameTitle />
-              <div className="text-dimmer text-[12px] mb-6">{PHASES[phase]}</div>
-            </>
-          )}
-
-          {(() => {
-            const t = Date.now();
-            const promptMove = getMove(state, 'prompt', t)!;
-            const onCooldown = promptMove.cooldownProgress < 1;
-            return (
-              <Button
-                variant="primary"
-                off={!promptMove.legal}
-                onClick={promptMove.legal ? handlers.prompt : undefined}
-                progress={rechargeProgress(promptMove)}
-                progressEaseMs={TICK_MS}
-                progressClassName={onCooldown ? 'bg-green/10' : undefined}
-              >
-                {promptLabel}
-              </Button>
-            );
-          })()}
-
-          <ActionBar
-            state={state}
-            onPasteError={handlers.pasteError}
-            onWriteTest={handlers.writeTest}
-            onKickAgent={handlers.kickAgent}
-            onRunTests={handlers.runTests}
-            onClearContext={handlers.clearContext}
-            onLaunch={handlers.launch}
-            onLobstagramPost={handlers.lobstagramPost}
-            onRunBugBounty={handlers.runBugBounty}
-          />
-
-          {state.started && <ResourcePanel state={state} />}
-
-          {derived.ui.showMcMinis && (
-            <McMinis state={state} onAdjustLane={handlers.adjustMcMiniLane} />
-          )}
-
-          {showGenSection && (
-            <Generators state={state} onBuyGen={handlers.buyGen} />
-          )}
-
-          {(showUpgSection || fundingRoundOpen) && (
-            <Upgrades
-              state={state}
-              onBuyUpgrade={handlers.buyUpgrade}
-              onRaiseRound={handlers.raiseRound}
-            />
-          )}
-
-          <InstalledList ids={state.upgrades} />
-
-          {state.totalLoc > 0 && (
-            <div className="mt-11 pt-[14px] border-t border-border">
-              <Button variant="subtle" onClick={() => setResetConfirmOpen(true)}>
-                rewrite from scratch
-              </Button>
-            </div>
-          )}
-        </div>
+        <LeftPanel
+          scrollRef={leftScrollRef}
+          isMobile={isMobile}
+          phase={phase}
+          state={state}
+          derived={derived}
+          fundingRoundOpen={fundingRoundOpen}
+          showPromptButton={showPromptButton}
+          showResetButton={showResetButton}
+          showResources={showResources}
+          promptLabel={promptLabel}
+          introHeaderStreaming={introHeaderStreaming}
+          showIntroHeader={showIntroHeader}
+          onIntroStreamComplete={handleIntroStreamComplete}
+          handlers={handlers}
+          onResetClick={() => setResetConfirmOpen(true)}
+        />
 
         {/* ── Right (or top, on mobile) ── */}
         {showLog && (
@@ -572,7 +549,9 @@ export function Game() {
         </div>
       </div>
 
-      <FooterBarrel />
+      <div className={introBlockClass}>
+        <FooterBarrel />
+      </div>
 
       {resetConfirmOpen && (
         <ResetConfirmModal

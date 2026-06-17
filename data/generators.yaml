@@ -5,9 +5,9 @@
 - id: codepilot
   name: CodePilot
   desc: AI pair programming, baked into your editor. Free tier signup.
-  baseCost: 8000
+  baseCost: 5000
   costMult: 1.13
-  unlockAt: 5000
+  unlockAt: 4000
   freeMaxTokens: 40
   freeTokenRegen: 1.5
   paidMaxTokens: 90
@@ -18,9 +18,9 @@
 - id: opengpt
   name: OpenGPT
   desc: Unlimited* brainstorming with premium punctuation. Free tier signup.
-  baseCost: 50000
+  baseCost: 20000
   costMult: 1.14
-  unlockAt: 20000
+  unlockAt: 15000
   freeMaxTokens: 50
   freeTokenRegen: 2.5
   paidMaxTokens: 140

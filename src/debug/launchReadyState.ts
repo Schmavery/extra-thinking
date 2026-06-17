@@ -21,6 +21,7 @@ const PROGRESS_FIELDS = [
   'actionCooldowns',
   'actionsIntroduced',
   'upgrades',
+  'unlockedUpgrades',
 ] as const satisfies readonly (keyof GameState)[];
 
 function pickProgressFields(state: GameState): Partial<GameState> {
@@ -30,7 +31,7 @@ function pickProgressFields(state: GameState): Partial<GameState> {
     if (v === undefined) continue;
     if (key === 'accountCounts' || key === 'actionCooldowns') {
       out[key] = { ...(v as Record<string, number>) };
-    } else if (key === 'actionsIntroduced' || key === 'upgrades') {
+    } else if (key === 'actionsIntroduced' || key === 'upgrades' || key === 'unlockedUpgrades') {
       out[key] = [...(v as string[])];
     } else {
       (out as Record<string, unknown>)[key] = v;
@@ -56,6 +57,7 @@ export function captureLaunchReadyProgress(
       accountCounts: { ...cached.accountCounts },
       actionCooldowns: { ...cached.actionCooldowns },
       upgrades: [...(cached.upgrades ?? [])],
+      unlockedUpgrades: [...(cached.unlockedUpgrades ?? [])],
     };
   }
 
@@ -75,6 +77,7 @@ export function captureLaunchReadyProgress(
       accountCounts: { ...picked.accountCounts },
       actionCooldowns: { ...picked.actionCooldowns },
       upgrades: [...(picked.upgrades ?? [])],
+      unlockedUpgrades: [...(picked.unlockedUpgrades ?? [])],
     };
   } finally {
     Sim.teardown();

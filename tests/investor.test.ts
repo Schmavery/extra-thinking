@@ -68,6 +68,32 @@ describe('account burn', () => {
   });
 });
 
+describe('agent_dashboard shop gate', () => {
+  it('unlocks after seed round closes', () => {
+    const prev = {
+      ...defaultState(),
+      launched: true,
+      fundingRound: 1,
+      loc: 12_000,
+      totalLoc: 50_000,
+    };
+    const next = tickReducer(prev, 1);
+    expect(next.unlockedUpgrades).toContain('agent_dashboard');
+  });
+
+  it('stays hidden before seed round', () => {
+    const prev = {
+      ...defaultState(),
+      launched: true,
+      fundingRound: 0,
+      loc: 50_000,
+      totalLoc: 50_000,
+    };
+    const next = tickReducer(prev, 1);
+    expect(next.unlockedUpgrades).not.toContain('agent_dashboard');
+  });
+});
+
 describe('pro_plan shop gate', () => {
   it('unlocks after seed round without LOC unlock progress', () => {
     const prev = {

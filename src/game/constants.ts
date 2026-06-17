@@ -74,7 +74,8 @@ export const THRESHOLDS = {
   /** Bug count above which warnings start showing. */
   warnBugsElevated: 10,
   warnBugsCritical: 100,
-  warnBugsPenaltyShown: 20,
+  /** LOC output % at or below this uses error styling on the bug-load warning. */
+  warnBugsSevereOutputPct: 75,
   /** Below this uptime nine count, "production is on fire" warning shows. */
   warnUptimeFireNines: 1,
   warnUptimeDegradedNines: 2,
@@ -158,6 +159,8 @@ export const MONEY = {
 } as const;
 
 export const UPTIME = {
+  /** Bugs at or below this count do not reduce passive LOC/s output. */
+  locPenaltyFreeBugs: 20,
   bugPenaltyRate: 0.003,
   /** Cap on bug-induced output penalty. */
   minOutputFraction: 0.2,
@@ -239,4 +242,9 @@ export const STREAMING = {
   spinnerMs: 80,
   /** Spinner verb cycles every N spinner frames. */
   spinnerVerbEvery: 20,
+} as const;
+
+/** Post-register title reveal: spinner hold before `>` + log-style stream. */
+export const INTRO_HEADER = {
+  spinnerMs: 1000,
 } as const;

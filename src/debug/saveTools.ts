@@ -1,5 +1,5 @@
 import { UPGRADES } from '../game/data';
-import { LAUNCH_LOC, THRESHOLDS } from '../game/constants';
+import { LAUNCH_LOC } from '../game/constants';
 import { calcUptime } from '../game/rates';
 import { grantMcMinis } from '../game/investor';
 import { prepareSaveProgressMarkers } from '../game/milestones';
@@ -46,6 +46,7 @@ export function sanitizeUpgrades(ids: string[]): string[] {
 
 /**
  * Dev-only: reveal every upgrade whose prereqs are met, ignoring LOC afford gates.
+ * Used by chapter presets in `/debug/save` — not jump-to-launch.
  */
 export function revealAllEligibleUpgrades(state: GameState): GameState {
   const unlocked = new Set(state.unlockedUpgrades);
@@ -97,6 +98,31 @@ function baseProgress(loc: number, totalLoc: number, upgrades: string[]): Partia
   };
 }
 
+function launchReadyFromBot(bot: Partial<GameState>): GameState {
+  return {
+    ...defaultState(),
+    started: true,
+    launched: false,
+    ...bot,
+    accountCounts: { ...(bot.accountCounts ?? {}) },
+    actionCooldowns: { ...(bot.actionCooldowns ?? {}) },
+    actionsIntroduced: [...(bot.actionsIntroduced ?? [])],
+    upgrades: [...(bot.upgrades ?? [])],
+    unlockedUpgrades: [...(bot.unlockedUpgrades ?? [])],
+    log: [],
+    logId: 0,
+    buzzMeter: 0,
+    fundingRound: 0,
+    mcMinis: 0,
+    nines: 0,
+    mcpApprovalPending: null,
+    mcpAutoApproveAt: null,
+    mcpExecutingUntil: null,
+    mcpExecutingLine: null,
+    mcpActiveToolId: null,
+  };
+}
+
 export interface SavePreset {
   id: string;
   label: string;
@@ -114,37 +140,8 @@ export const SAVE_PRESETS: SavePreset[] = [
   {
     id: 'jump_launch',
     label: 'Jump to launch',
-    hint: 'Playtest fleet from progress bot · Faster Inference · /fix-bug · Subagent Harness · launch-ready.',
-    apply: (prev) => {
-      const upgrades = sanitizeUpgrades([
-        'model_update_1',
-        'fix_bug_skill',
-        'subagent_harness',
-      ]);
-      const bot = captureLaunchReadyProgress();
-      return revealAllEligibleUpgrades({
-        ...prev,
-        started: true,
-        launched: false,
-        upgrades,
-        ...bot,
-        totalTokensSpent: Math.max(
-          bot.totalTokensSpent ?? 0,
-          THRESHOLDS.showNewFreeAccountTokens,
-        ),
-        mcpApprovalPending: null,
-        mcpAutoApproveAt: null,
-        mcpExecutingUntil: null,
-        mcpExecutingLine: null,
-        mcpActiveToolId: null,
-        log: [],
-        logId: 0,
-        buzzMeter: 0,
-        fundingRound: 0,
-        mcMinis: 0,
-        nines: 0,
-      });
-    },
+    hint: 'Progress bot snapshot at launch gate — owned upgrades and shop visibility only.',
+    apply: () => launchReadyFromBot(captureLaunchReadyProgress()),
   },
   {
     id: 'prelaunch',

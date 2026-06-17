@@ -27,6 +27,8 @@ describe('jump_launch preset', () => {
     expect(state.upgrades).toEqual(
       expect.arrayContaining(['model_update_1', 'fix_bug_skill', 'subagent_harness', 'autocomplete']),
     );
+    expect(state.unlockedUpgrades).toEqual(bot.unlockedUpgrades);
+    expect(state.unlockedUpgrades).not.toContain('cicd');
     expect(state.accountCounts).toEqual(bot.accountCounts);
     expect(state.totalClicks).toBe(bot.totalClicks);
     expect(state.loc).toBeCloseTo(bot.loc ?? 0, 0);

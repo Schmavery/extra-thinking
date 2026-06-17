@@ -1,5 +1,6 @@
 import type { GameState } from '../types';
 import { fmt, fmtRate } from '../lib/format';
+import { WarningIcon } from './WarningIcon';
 import {
   calcBugPenalty,
   calcHarnessTokenDrainPerSec,
@@ -54,6 +55,8 @@ export function ResourcePanel({ state }: Props) {
   );
   const netBugRate = snapRate(bugRate - fixRate);
   const bugPenalty = calcBugPenalty(state.bugs);
+  const bugOutputPct = Math.round(bugPenalty * 100);
+  const bugLoadSevere = bugOutputPct <= thresholds.warnBugsSevereOutputPct;
   const uptime = calcUptime(state.bugs);
   const { maxTokens, tokenRegen } = calcTokenConfig(state.upgrades, state.accountCounts);
   const ninesRate = calcNinesRate(state.upgrades, state.bugs);
@@ -198,18 +201,24 @@ export function ResourcePanel({ state }: Props) {
 
       {/* warnings */}
       {state.bugs > thresholds.warnBugsElevated && (
-        <div className="mt-2 text-red-dim text-[12px]">
-          ⚠ {state.bugs > thresholds.warnBugsCritical ? 'critical' : 'elevated'} bug load
-          {state.bugs > thresholds.warnBugsPenaltyShown
-            ? ` — output at ${Math.round(bugPenalty * 100)}%`
-            : ''}
-          {ui.showUptime && !ui.ninesTracking && uptime.nines < THRESHOLDS.warnUptimeDegradedNines
-            ? ' — uptime degraded'
-            : ''}
+        <div
+          className={`mt-2 inline-flex items-center gap-1 text-[12px] leading-none ${bugLoadSevere ? 'text-red-dim' : 'text-yellow'}`}
+        >
+          <WarningIcon className="w-3 h-3 shrink-0" />
+          <span>
+            {state.bugs > thresholds.warnBugsCritical ? 'critical' : 'elevated'} bug load
+            {bugOutputPct < 100 ? ` — output at ${bugOutputPct}%` : ''}
+            {ui.showUptime && !ui.ninesTracking && uptime.nines < THRESHOLDS.warnUptimeDegradedNines
+              ? ' — uptime degraded'
+              : ''}
+          </span>
         </div>
       )}
       {ui.showUptime && !ui.ninesTracking && uptime.nines < THRESHOLDS.warnUptimeFireNines && (
-        <div className="mt-1 text-red text-[12px]">⚠ production is on fire</div>
+        <div className="mt-1 inline-flex items-center gap-1 text-red text-[12px] leading-none">
+          <WarningIcon className="w-3 h-3 shrink-0" />
+          <span>production is on fire</span>
+        </div>
       )}
     </div>
   );

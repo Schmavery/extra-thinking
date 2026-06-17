@@ -116,7 +116,7 @@ export function ActionBar({
             <Button
               off={!m.kickAgent.legal}
               onClick={m.kickAgent.legal ? onKickAgent : undefined}
-              title="kick off an agent"
+              title="kick off a subagent"
               progress={
                 kickProgress === undefined
                   ? undefined
@@ -126,11 +126,11 @@ export function ActionBar({
               }
               progressClassName={buffActive ? 'bg-green/10' : undefined}
             >
-              kick off an agent [{kickTokenCost}t]
+              kick off a subagent [{kickTokenCost}t]
             </Button>
             {buffActive && (
               <span className="text-dimmer text-[11px]">
-                ⚡ active ({Math.ceil(agentBuffRemaining / 1000)}s)
+                subagent active ({Math.ceil(agentBuffRemaining / 1000)}s)
               </span>
             )}
           </div>

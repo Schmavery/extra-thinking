@@ -463,5 +463,6 @@ export function calcMcMiniCodeLocRate(_codeMinis: number, _upgrades: string[]): 
 }
 
 export function calcBugPenalty(bugs: number): number {
-  return Math.max(UPTIME.minOutputFraction, 1 / (1 + bugs * UPTIME.bugPenaltyRate));
+  const penalized = Math.max(0, bugs - UPTIME.locPenaltyFreeBugs);
+  return Math.max(UPTIME.minOutputFraction, 1 / (1 + penalized * UPTIME.bugPenaltyRate));
 }

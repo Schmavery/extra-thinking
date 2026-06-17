@@ -1,4 +1,4 @@
-/** Dev-only: reveal debug UI after a rapid-click challenge (session-persisted). */
+/** Reveal debug UI after a rapid-click challenge (session-persisted). Works in prod too. */
 
 const STORAGE_KEY = 'extra_thinking_dev_unlock';
 const CLICKS_REQUIRED = 7;
@@ -10,12 +10,7 @@ const listeners = new Set<Listener>();
 let clickCount = 0;
 let windowStart = 0;
 
-export function isDevUnlockAllowed(): boolean {
-  return import.meta.env.DEV;
-}
-
 export function isDevUnlocked(): boolean {
-  if (!isDevUnlockAllowed()) return false;
   try {
     return sessionStorage.getItem(STORAGE_KEY) === '1';
   } catch {
@@ -37,7 +32,6 @@ function persistUnlock(): void {
 }
 
 export function clearDevUnlock(): void {
-  if (!isDevUnlockAllowed()) return;
   try {
     sessionStorage.removeItem(STORAGE_KEY);
   } catch {
@@ -55,7 +49,6 @@ export function subscribeDevUnlock(listener: Listener): () => void {
 
 /** Register one secret click; returns true if this click completed the challenge. */
 export function registerDevUnlockClick(): boolean {
-  if (!isDevUnlockAllowed()) return false;
   if (isDevUnlocked()) return false;
 
   const now = Date.now();

@@ -8,7 +8,7 @@ const ACTION_TITLES: Record<string, string> = {
   launch: 'Ship to production',
   prompt: 'Prompt',
   paste_error: 'Paste the error',
-  kick_agent: 'Kick off an agent',
+  kick_agent: 'Kick off a subagent',
   clear_context: 'Clear the context',
   write_test: 'Write a test',
   run_tests: 'Run tests',

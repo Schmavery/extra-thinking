@@ -26,6 +26,8 @@ export const GAME_FLAGS = {
   mcp_auto_approve: 'mcp_auto_approve',
   /** MCP beats skip approval card; approved calls go to `tool` log entries (see `yolo_mode`). */
   yolo_mode: 'yolo_mode',
+  /** Tabbed left panel: sticky ops + status/capacity/shop/stack (see `agent_dashboard`). */
+  agent_dashboard: 'agent_dashboard',
 } as const;
 
 export type GameFlag = (typeof GAME_FLAGS)[keyof typeof GAME_FLAGS];

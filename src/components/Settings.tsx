@@ -166,7 +166,7 @@ function SettingsModal({
           </div>
         </div>
 
-        {import.meta.env.DEV && devUnlocked && (
+        {devUnlocked && (
           <div className="px-[14px] py-[12px] border-t border-border flex flex-col gap-[8px]">
             {onJumpToLaunch && (
               <button
@@ -180,12 +180,14 @@ function SettingsModal({
                 jump to launch
               </button>
             )}
-            <a
-              href={debugHref()}
-              className="text-dimmer hover:text-fg text-[12px] underline underline-offset-2"
-            >
-              debug
-            </a>
+            {import.meta.env.DEV && (
+              <a
+                href={debugHref()}
+                className="text-dimmer hover:text-fg text-[12px] underline underline-offset-2"
+              >
+                debug
+              </a>
+            )}
             <button
               type="button"
               onClick={() => {

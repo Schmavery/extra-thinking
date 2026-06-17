@@ -5,7 +5,7 @@
 # ── Ch1 early — prompts & basic tests ───────────────────────────────────────
 - id: model_update_1
   name: Faster Inference
-  desc: 1s prompt cooldown. +5 LOC per prompt. +3 tokens per prompt.
+  desc: 1s prompt cooldown. +5 LOC per prompt.
   cost: 150
   unlockAt: 100
   clickBonus: 5
@@ -72,7 +72,7 @@
   unlockAt: 600
   kickAgentTokenCostBonus: 30
   kickAgentLocPerSec: 22
-  purchaseMsg: Subagent harness installed. Parallel agent workflows enabled.
+  purchaseMsg: Subagent harness installed. Parallel subagent workflows enabled.
 - id: fix_bug_skill
   name: /fix-bug Skill
   desc: Better bug fixing. +5 token cost, +25% fix rate.
@@ -85,10 +85,10 @@
 # ── Harness — installs on each box; burns context while running ─────────────
 - id: autocomplete
   name: Caffeine
-  desc: +10 loc/s. Prevents your computer from going to sleep.
+  desc: +1 loc/s. Prevents your computer from going to sleep.
   cost: 500
   unlockAt: 500
-  locPerSec: 10
+  locPerSec: 2
   bugsPerSec: 0.02
   purchaseMsg: Caffeine enabled. Sleep disabled on all code boxes. Generation continues.
 - id: chat_loop
@@ -214,6 +214,16 @@
   purchaseMsg: MCP tools enabled. I can read the repo, run commands, and open pull requests. I'll request approval before high-privilege calls.
   flags:
     - mcp_tools
+- id: agent_dashboard
+  name: Agent Dashboard
+  desc: Tabbed ops console — status, capacity, shop, and stack in separate panels.
+  cost: 12000
+  unlockAt: 0
+  requiresLaunch: true
+  requiresMinFundingRound: 1
+  purchaseMsg: Agent dashboard shipped. Ops stay pinned; the rest of the console is tabbed.
+  flags:
+    - agent_dashboard
 - id: pro_plan
   name: Pay for Access
   desc: Paid tier on all service signups. Accounts and harness bill by the second.
