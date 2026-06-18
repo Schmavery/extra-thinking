@@ -7,14 +7,14 @@ describe('genLabel', () => {
   it('formatAccountTok uses free tier fields when unpaid', () => {
     const codepilot = ACCOUNTS.find((a) => a.id === 'codepilot')!;
     const label = formatAccountTok(codepilot, false);
-    expect(label).toContain(`+${codepilot.freeMaxTokens} max`);
+    expect(label).toContain(`+${codepilot.freeMaxTokens} max tok`);
     expect(label).not.toContain(`+${codepilot.paidMaxTokens} max`);
   });
 
   it('accountTooltip separates mechanics from tagline', () => {
     const opengpt = ACCOUNTS.find((a) => a.id === 'opengpt')!;
     expect(accountTooltip(opengpt, [], false)).toContain('brainstorming');
-    expect(accountTooltip(opengpt, [], false)).toContain(`+${opengpt.freeMaxTokens} max`);
+    expect(accountTooltip(opengpt, [], false)).toContain(`+${opengpt.freeMaxTokens} max tok`);
   });
 
   it('account taglines avoid implying separate game systems', () => {
@@ -27,7 +27,7 @@ describe('genLabel', () => {
   it('paid tier uses paid tok numbers in tooltip', () => {
     const claudius = ACCOUNTS.find((a) => a.id === 'claudius')!;
     expect(accountTooltip(claudius, ['pro_plan'], true)).toContain('paid tier');
-    expect(formatAccountTok(claudius, true)).toContain(`+${claudius.paidMaxTokens} max`);
+    expect(formatAccountTok(claudius, true)).toContain(`+${claudius.paidMaxTokens} max tok`);
     expect(hasProPlan(['pro_plan'])).toBe(true);
   });
 });

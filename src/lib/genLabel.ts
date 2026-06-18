@@ -1,11 +1,11 @@
 import type { AccountDef } from '../types';
 import { calcAccountMarginalBurn } from '../game/rates';
 
-function fmtPerSec(n: number): string {
+function fmtTokPerSec(n: number): string {
   const abs = Math.abs(n);
-  if (abs < 1) return n.toFixed(2).replace(/0+$/, '').replace(/\.$/, '') + '/s';
-  if (abs < 10) return n.toFixed(1) + '/s';
-  return Math.round(n) + '/s';
+  if (abs < 1) return n.toFixed(2).replace(/0+$/, '').replace(/\.$/, '') + ' tok/s';
+  if (abs < 10) return n.toFixed(1) + ' tok/s';
+  return Math.round(n) + ' tok/s';
 }
 
 export function formatAccountTok(
@@ -14,7 +14,7 @@ export function formatAccountTok(
 ): string {
   const max = paid ? a.paidMaxTokens : a.freeMaxTokens;
   const regen = paid ? a.paidTokenRegen : a.freeTokenRegen;
-  return `+${max} max · +${fmtPerSec(regen)} regen`;
+  return `+${max} max tok · +${fmtTokPerSec(regen)}`;
 }
 
 export function accountTooltip(a: AccountDef, upgrades: string[] = [], paid = false): string {

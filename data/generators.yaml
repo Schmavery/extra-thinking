@@ -34,10 +34,10 @@
   baseCost: 200000
   costMult: 1.15
   unlockAt: 80000
-  freeMaxTokens: 80
-  freeTokenRegen: 4
-  paidMaxTokens: 220
-  paidTokenRegen: 12
-  extraMaxTokens: 55
-  extraTokenRegen: 3
+  freeMaxTokens: 105
+  freeTokenRegen: 6
+  paidMaxTokens: 280
+  paidTokenRegen: 16
+  extraMaxTokens: 72
+  extraTokenRegen: 4
   moneyPerSec: 0.9
