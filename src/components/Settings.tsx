@@ -21,11 +21,14 @@ import {
 interface SettingsProps {
   /** Dev-only: snap to the jump-to-launch playtest preset. */
   onJumpToLaunch?: () => void;
+  /** Dev-only: grant LOC and matching bugs instantly. */
+  onAddDebugLoc?: (amount: number) => void;
   onResetClick?: () => void;
 }
 
 export function Settings({
   onJumpToLaunch,
+  onAddDebugLoc,
   onResetClick,
 }: SettingsProps = {}) {
   const { theme, appearance, setTheme, cycleAppearance } = useTheme();
@@ -71,6 +74,7 @@ export function Settings({
           onPickTheme={(id) => setTheme(id)}
           onClose={() => setOpen(false)}
           onJumpToLaunch={onJumpToLaunch}
+          onAddDebugLoc={onAddDebugLoc}
           onResetClick={onResetClick}
         />
       )}
@@ -104,6 +108,7 @@ interface SettingsModalProps {
   onPickTheme: (id: string) => void;
   onClose: () => void;
   onJumpToLaunch?: () => void;
+  onAddDebugLoc?: (amount: number) => void;
   onResetClick?: () => void;
 }
 
@@ -113,9 +118,11 @@ function SettingsModal({
   onPickTheme,
   onClose,
   onJumpToLaunch,
+  onAddDebugLoc,
   onResetClick,
 }: SettingsModalProps) {
   const devUnlocked = useDevUnlock();
+  const [debugLocInput, setDebugLocInput] = useState('1000');
 
   return (
     <div
@@ -187,6 +194,37 @@ function SettingsModal({
               >
                 jump to launch
               </button>
+            )}
+            {onAddDebugLoc && (
+              <form
+                className="flex flex-wrap items-center gap-[8px]"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const amount = Number.parseInt(debugLocInput, 10);
+                  if (!Number.isFinite(amount) || amount <= 0) return;
+                  onAddDebugLoc(amount);
+                  onClose();
+                }}
+              >
+                <label className="text-dimmer text-[12px] shrink-0" htmlFor="debug-add-loc">
+                  add LOC
+                </label>
+                <input
+                  id="debug-add-loc"
+                  type="number"
+                  min={1}
+                  step={1}
+                  value={debugLocInput}
+                  onChange={(e) => setDebugLocInput(e.target.value)}
+                  className="w-[96px] px-[8px] py-[4px] border border-border bg-bg text-fg text-[12px] font-mono tabular-nums"
+                />
+                <button
+                  type="submit"
+                  className="text-dimmer hover:text-fg text-[12px] bg-transparent border border-border px-[8px] py-[4px] font-mono"
+                >
+                  add
+                </button>
+              </form>
             )}
             {import.meta.env.DEV && (
               <a

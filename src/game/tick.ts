@@ -113,8 +113,19 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
       : prev.nines,
   };
 
-  // Reveal upgrades as the player approaches them so they don't pop in
-  // immediately at full cost.
+  next = applyProgressThresholds(prev, next);
+
+  if ((next.mcMinis ?? 0) > 0) {
+    next = maybeFireEvent(next, SUBAGENT.tickEventProbability, appendLog);
+  }
+
+  return next;
+}
+
+/** Unlock shop rows, milestones, and guaranteed news after a totalLoc jump. */
+export function applyProgressThresholds(prev: GameState, next: GameState): GameState {
+  const thresholds = effectiveThresholds(next.upgrades);
+
   for (const u of UPGRADES) {
     if (next.unlockedUpgrades.includes(u.id)) continue;
     if (next.upgrades.includes(u.id)) continue;
@@ -134,7 +145,6 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
     next = { ...next, unlockedUpgrades: [...next.unlockedUpgrades, u.id] };
   }
 
-  // Milestones — one-shot observer-voice messages keyed by totalLoc thresholds.
   for (const m of MILESTONES) {
     if (next.totalLoc >= m.loc && !prev.milestonesSeen.includes(m.loc)) {
       next = appendLog(next, render(m.text, { loc: m.loc }), 'milestone');
@@ -146,10 +156,5 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
   }
 
   next = applyGuaranteedNews(prev, next);
-
-  if ((next.mcMinis ?? 0) > 0) {
-    next = maybeFireEvent(next, SUBAGENT.tickEventProbability, appendLog);
-  }
-
   return introduceUnseenActions(next);
 }

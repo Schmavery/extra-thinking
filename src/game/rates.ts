@@ -191,6 +191,41 @@ export function calcPromptBugGain(
   return rng() < thresholds.promptBugChance ? 1 : 0;
 }
 
+/**
+ * Expected bugs for a bulk LOC grant (debug). Matches passive bug/loc ratio when
+ * harness output exists; otherwise scales `promptBugChance` across the gain.
+ */
+export function calcDebugBugGainForLoc(
+  state: Pick<
+    GameState,
+    'accountCounts' | 'upgrades' | 'tests' | 'mcMinis' | 'mcMiniLanes' | 'totalLoc'
+  >,
+  locGain: number,
+  thresholds: Pick<EffectiveThresholds, 'bugSpawnLoc' | 'promptBugChance'>,
+): number {
+  if (locGain <= 0 || state.totalLoc < thresholds.bugSpawnLoc) return 0;
+
+  const { locRate, bugRate } = calcRates(
+    state.accountCounts ?? {},
+    state.upgrades,
+    state.tests ?? 0,
+    state.mcMinis ?? 0,
+    state.mcMiniLanes,
+  );
+
+  if (locRate > NEGLIGIBLE_RATE) {
+    const mcMinis = state.mcMinis ?? 0;
+    const lanes = normalizeMcMiniLanes(mcMinis, state.mcMiniLanes);
+    let effectiveBugRate = bugRate;
+    if (mcMinis > 0 && lanes.code > 0) {
+      effectiveBugRate += bugRate * INVESTOR.codeBugRateMult * lanes.code;
+    }
+    return (effectiveBugRate / locRate) * locGain;
+  }
+
+  return locGain * thresholds.promptBugChance;
+}
+
 export function calcLobstagramTokenCost(posts: number): number {
   const a = action('lobstagram_post');
   const base = (a.tokenCost ?? 0) * (a.tokenCostMult ?? 1);

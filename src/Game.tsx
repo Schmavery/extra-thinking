@@ -59,6 +59,7 @@ import { Settings } from './components/Settings';
 import { PauseOverlay } from './components/PauseOverlay';
 import { debugToast } from './lib/debugToast';
 import { applyPreset } from './debug/saveTools';
+import { addDebugLocAction } from './game/debugActions';
 import { isDevUnlocked, subscribeDevUnlock } from './lib/devUnlock';
 import { ResetConfirmModal } from './components/ResetConfirmModal';
 import { GameIntro, introExitMs } from './components/GameIntro';
@@ -427,6 +428,21 @@ export function Game() {
     debugToast(`jump to launch · ${hasAutocomplete ? 'autocomplete' : 'no harness'} · launch ready`);
   }, [resetStream, snapshotToDisk]);
 
+  const handleAddDebugLoc = useCallback(
+    (amount: number) => {
+      const prev = stateRef.current;
+      const next = addDebugLocAction(prev, amount);
+      if (next === prev) return;
+      stateRef.current = next;
+      setState(next);
+      snapshotToDisk('debug add loc', next);
+      const locGain = next.totalLoc - prev.totalLoc;
+      const bugGain = next.bugs - prev.bugs;
+      debugToast(`+${locGain} LOC · +${bugGain.toFixed(1)} bugs`);
+    },
+    [snapshotToDisk],
+  );
+
   // ── derived ──
   const derived = deriveGame(state);
   const mcpPendingUnsafe =
@@ -476,6 +492,7 @@ export function Game() {
     >
       <Settings
         onJumpToLaunch={handleJumpToLaunch}
+        onAddDebugLoc={handleAddDebugLoc}
         onResetClick={() => setResetConfirmOpen(true)}
       />
 
