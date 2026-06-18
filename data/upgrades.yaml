@@ -24,10 +24,12 @@
   purchaseMsg: Extended context unlocked — I'll hold more per tick.
 - id: model_update_3
   name: Improved Reasoning
-  desc: +30 LOC per prompt
-  cost: 25000
-  unlockAt: 12000
+  desc: +30 LOC per prompt · +6 loc/s per box
+  cost: 18000
+  unlockAt: 10000
   clickBonus: 30
+  harnessLocBonus:
+    autocomplete: 6
   requires:
     - model_update_2
   purchaseMsg: Improved reasoning engaged. Let me walk through this step by step — very thoroughly, for longer.
@@ -43,8 +45,8 @@
 - id: model_update_4
   name: Latest Weights
   desc: +70 LOC per prompt — just updated. the bugs are different now.
-  cost: 120000
-  unlockAt: 50000
+  cost: 105000
+  unlockAt: 82000
   clickBonus: 70
   requires:
     - model_update_3
@@ -52,15 +54,15 @@
 - id: unit_tests
   name: Unit Tests
   desc: −40% bug generation
-  cost: 120000
-  unlockAt: 50000
+  cost: 50000
+  unlockAt: 38000
   bugMult: 0.6
   purchaseMsg: I've set up a test suite. The tests pass. I haven't checked if they're testing the right things.
 - id: few_shot
   name: Few-Shot Examples
   desc: 3× manual output
-  cost: 60000
-  unlockAt: 25000
+  cost: 36000
+  unlockAt: 18000
   clickMult: 3
   requires:
     - better_prompts
@@ -77,29 +79,29 @@
   name: /fix-bug Skill
   desc: Better bug fixing. +5 token cost, +25% fix rate.
   cost: 1200
-  unlockAt: 300
+  unlockAt: 400
   pasteErrorTokenCostBonus: 5
   pasteErrorFixChanceBonus: 0.25
   purchaseMsg: /fix-bug skill installed.
 
 # ── Harness — installs on each box; burns context while running ─────────────
 - id: autocomplete
-  name: Caffeine
-  desc: +1 loc/s. Prevents your computer from going to sleep.
+  name: Chat Loop
+  desc: Orchestrated chat on each box. +2 loc/s.
   cost: 500
   unlockAt: 500
   locPerSec: 2
-  bugsPerSec: 0.02
-  purchaseMsg: Caffeine enabled. Sleep disabled on all code boxes. Generation continues.
-- id: chat_loop
-  name: Chat Loop
-  desc: Orchestrated chat sessions on each box. −4 tok/s per box.
-  cost: 50000
-  unlockAt: 20000
-  locPerSec: 100
-  tokenDrainPerSec: 4
-  bugsPerSec: 0.4
+  bugsPerSec: 0.052
   purchaseMsg: Chat loop running. Unlimited* brainstorming with premium punctuation.
+- id: chat_loop
+  name: Caffeine
+  desc: Prevents your computer from going to sleep. −2 tok/s per box.
+  cost: 30000
+  unlockAt: 15000
+  locPerSec: 90
+  tokenDrainPerSec: 2
+  bugsPerSec: 0.4
+  purchaseMsg: Caffeine enabled. Sleep disabled on all code boxes. Generation continues.
 - id: direct_api
   name: Direct API Integration
   desc: Production API wiring. −28 tok/s per box.
@@ -136,34 +138,43 @@
 
 # ── Ch2 early mid — launch, CI, lint, smarter models ───────────────────────
 - id: cicd
-  name: CI/CD Pipeline
-  desc: −60% bugs; CI runs your tests automatically — fixRate += tests × 0.03/s
-  cost: 280000
-  unlockAt: 28000
+  name: Post-Tool Test Hook
+  desc: −60% bugs; runs tests after each tool call — fixRate += tests × 0.03/s (replaces manual run tests)
+  cost: 10000
+  unlockAt: 10000
   bugMult: 0.4
   testFixRate: 0.03
   requiresLaunch: true
-  purchaseMsg: CI/CD pipeline live. I've blocked {{rand 3 7}} deployments. Two were mine.
+  purchaseMsg: Post-tool hook wired. Tests run automatically after every edit. I've blocked {{rand 3 7}} merges. Two were mine.
+- id: lobstagram_account
+  name: Create a Lobstagram Account
+  desc: Unlocks post on Lobstagram — fills buzz meter toward funding.
+  cost: 6000
+  unlockAt: 18000
+  requiresLaunch: true
+  purchaseMsg: Lobstagram account created. Zero humans will read your posts. Buzz may still improve.
+  flags:
+    - lobstagram
 - id: eslint
   name: ESLint
   desc: −20% bug generation, +100% squiggles
-  cost: 450000
-  unlockAt: 65000
+  cost: 175000
+  unlockAt: 90000
   bugMult: 0.8
   requiresLaunch: true
   purchaseMsg: "ESLint is now active. I've already ignored {{rand 8 24}} rules. The important ones. **Linting**: enabled. **Compliance**: selective."
 - id: cot
   name: Chain of Thought
   desc: 1.5× harness output
-  cost: 250000
-  unlockAt: 100000
+  cost: 88000
+  unlockAt: 65000
   globalMult: 1.5
   purchaseMsg: Thinking step by step now. Very thorough. Very slow.
 - id: xml_tags
   name: XML Tags in Prompts
   desc: 4× manual output (it just works, inexplicably)
-  cost: 400000
-  unlockAt: 150000
+  cost: 200000
+  unlockAt: 110000
   clickMult: 4
   requires:
     - few_shot
@@ -171,8 +182,8 @@
 - id: rotate_accounts
   name: Account Rotation
   desc: Unlocks extra signups per service. Script cycles automatically. ×1.2 burn.
-  cost: 120000
-  unlockAt: 55000
+  cost: 70000
+  unlockAt: 52000
   genBurnMult: 1.2
   requiresLaunch: true
   purchaseMsg: Account rotation active. Cycling through accounts automatically. Very efficient. Very legal.
@@ -198,8 +209,8 @@
 - id: multi_agent
   name: Parallel Agents
   desc: 2× agent LOC/s — two agents, neither aware of the other
-  cost: 85000
-  unlockAt: 85000
+  cost: 95000
+  unlockAt: 75000
   agentLocMult: 2
   requiresLaunch: true
   purchaseMsg: Two agents deployed. They are not aware of each other. Both are very confident. Output doubled.
@@ -227,7 +238,7 @@
 - id: pro_plan
   name: Pay for Access
   desc: Paid tier on all service signups. Accounts and harness bill by the second.
-  cost: 200000
+  cost: 145000
   unlockAt: 0
   enablesMoney: true
   requiresLaunch: true

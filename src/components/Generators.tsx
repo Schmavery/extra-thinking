@@ -6,7 +6,7 @@ import {
   canStackAccounts,
   hasProPlan,
 } from '../game/rates';
-import { fmt } from '../lib/format';
+import { fmtQty, fmtUnit } from '../lib/format';
 import { accountTooltip, formatAccountTok } from '../lib/genLabel';
 import { getMove, rechargeProgress } from '../game/availability';
 import {
@@ -77,10 +77,12 @@ export function Generators({ state, onBuyGen, hideHeader }: Props) {
             </ShopButton>
             <ShopMeta>
               <span className={`whitespace-nowrap shrink-0 ${move.legal ? 'text-dim' : 'text-dimmer'}`}>
-                {fmt(cost)} loc
+                {fmtQty(cost, 'loc')}
               </span>
               {marginalBurn > 0 && (
-                <span className="text-dimmer whitespace-nowrap shrink-0">+${marginalBurn}/s burn</span>
+                <span className="text-dimmer whitespace-nowrap shrink-0">
+                  +{fmtUnit(`$${marginalBurn}/s`, 'burn')}
+                </span>
               )}
               <span className="text-dimmer whitespace-nowrap shrink-0">
                 {formatAccountTok(a, paid)}

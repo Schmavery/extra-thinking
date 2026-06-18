@@ -7,12 +7,14 @@ import {
   calcHarnessBaseRates,
   snapRate,
 } from '../game/rates';
-import { fmtRate } from '../lib/format';
+import { fmtRate, fmtRateQty } from '../lib/format';
 
 interface Props {
   state: GameState;
   onAdjustLane: (lane: McMiniLane, delta: 1 | -1) => void;
   hideHeader?: boolean;
+  /** Compact rows for the sticky action area. */
+  inline?: boolean;
 }
 
 const LANES: { id: McMiniLane; label: string }[] = [
@@ -33,7 +35,7 @@ function laneContribution(
     const base = calcHarnessBaseRates(state.upgrades, state.tests ?? 0).locRate;
     const loc = snapRate(base * assigned * calcBugPenalty(state.bugs));
     const tok = snapRate(assigned * INVESTOR.tokenDrainPerCodeMini);
-    return `+${fmtRate(loc)} loc · −${fmtRate(tok)} tokens`;
+    return `+${fmtRateQty(loc, 'loc')} · −${fmtRateQty(tok, 'tokens')}`;
   }
 
   if (assigned === 0) return null;
@@ -41,12 +43,12 @@ function laneContribution(
   if (lane === 'growth') {
     const buzz = snapRate(buzzGainPerSec(lanes));
     const tok = snapRate(assigned * INVESTOR.tokenDrainPerGrowthMini);
-    return `+${fmtRate(buzz)} buzz · −${fmtRate(tok)} tokens`;
+    return `+${fmtRateQty(buzz, 'buzz')} · −${fmtRateQty(tok, 'tokens')}`;
   }
 
   const tests = snapRate(assigned * INVESTOR.testsPerSecPerTestsMini);
   const tok = snapRate(assigned * INVESTOR.tokenDrainPerTestsMini);
-  return `+${fmtRate(tests)} tests · −${fmtRate(tok)} tokens`;
+  return `+${fmtRateQty(tests, 'tests')} · −${fmtRateQty(tok, 'tokens')}`;
 }
 
 function LaneControls({
@@ -98,12 +100,50 @@ function LaneControls({
   );
 }
 
-export function McMinis({ state, onAdjustLane, hideHeader }: Props) {
+export function McMinis({ state, onAdjustLane, hideHeader, inline }: Props) {
   const mcMinis = state.mcMinis ?? 0;
   if (mcMinis <= 0) return null;
 
   const lanes = normalizeMcMiniLanes(mcMinis, state.mcMiniLanes);
   const idle = idleMcMinis(mcMinis, lanes);
+
+  if (inline) {
+    return (
+      <div className="flex flex-col gap-1 w-full">
+        <div className="text-dimmer text-[11px]">
+          fleet — <span className="text-fg">{mcMinis}</span> boxes
+          {idle > 0 && (
+            <span>
+              {' '}
+              · <span className="text-yellow">{idle}</span> unassigned
+            </span>
+          )}
+        </div>
+        {LANES.map(({ id, label }) => {
+          const contribution = laneContribution(id, state, lanes);
+          return (
+            <div
+              key={id}
+              className="flex flex-wrap items-baseline gap-x-[10px] gap-y-[2px] text-[13px]"
+            >
+              <span className="text-dim w-[52px] capitalize">{label}</span>
+              <LaneControls
+                label={label}
+                count={lanes[id]}
+                canDec={lanes[id] > 0}
+                canInc={idle > 0}
+                onDec={() => onAdjustLane(id, -1)}
+                onInc={() => onAdjustLane(id, 1)}
+              />
+              {contribution && (
+                <span className="text-dimmer text-[11px] min-w-0">{contribution}</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
 
   if (hideHeader) {
     return (

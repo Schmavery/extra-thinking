@@ -52,6 +52,7 @@
   cooldownMs: 4000
   logCooldownMs: 12000
   fixChance: 0.5
+  # fixChance: odds of a clean fix (good message pool); always removes ≥1 bug
   baseLocGain: 20
   extraLocRange: 30
   introMsg: "When something breaks, share the error with me — I'd be happy to investigate."
@@ -111,10 +112,10 @@
 
 - id: run_tests
   eventProbability: 0.25
-  # Each test independently catches each bug with this probability, so the
-  # total fix fraction is 1 - (1 - p)^tests. With p=0.15: 1 test ≈ 15%,
-  # 5 ≈ 56%, 10 ≈ 80%, 25 ≈ 98%. Approaches but never reaches 100%.
-  perTestFixFraction: 0.15
+  // Fixes per run scale with suite size: min/max = tests × these (random in range).
+  # 10 tests → 5–20 bugs; 5 tests → 2–10; capped at current pile.
+  fixesMinPerTest: 0.5
+  fixesMaxPerTest: 2
   perTestTokenCost: 1
   cooldownMs: 30000
   logCooldownMs: 4000
@@ -150,7 +151,7 @@
 - id: lobstagram_post
   tokenCost: 100
   tokenCostStep: 20
-  cooldownMs: 8000
+  cooldownMs: 12000
   buzzGain: 28
   introMsg: "I'd be happy to post on Lobstagram to drive engagement."
   messages:
@@ -176,8 +177,8 @@
 
 
 - id: write_test
-  baseCost: 200
-  costMult: 1.04
+  baseCost: 80
+  costMult: 1.02
   bugDamping: 0.013
   introMsg: "I'd be happy to write a test — that should help with the bugs."
   milestones:

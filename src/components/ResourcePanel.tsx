@@ -1,11 +1,14 @@
+import { useEffect, useState } from 'react';
 import type { GameState } from '../types';
-import { fmt, fmtRate } from '../lib/format';
+import { fmt, fmtQty, fmtRate, fmtRateQty, fmtUnit } from '../lib/format';
+import { now } from '../game/runtime';
 import { WarningIcon } from './WarningIcon';
 import {
   calcBugPenalty,
   calcHarnessTokenDrainPerSec,
   calcInfraBurnPerSec,
   calcKickAgentLocPerSec,
+  calcSpawnBugRate,
   kickAgentBuffActive,
   calcNinesRate,
   calcRates,
@@ -34,7 +37,7 @@ function Row({ label, children }: RowProps) {
   return (
     <div className="contents">
       <span className="text-dim whitespace-nowrap">{label}</span>
-      <div className="min-w-0 flex flex-wrap items-baseline gap-x-[8px]">{children}</div>
+      <div className="min-w-0 flex flex-wrap items-baseline gap-x-[8px] [&_.metric]:whitespace-nowrap">{children}</div>
     </div>
   );
 }
@@ -44,16 +47,26 @@ interface Props {
 }
 
 export function ResourcePanel({ state }: Props) {
+  const [, setBuffTick] = useState(0);
+  const buffExpiry = state.agentBuffExpires ?? 0;
+
+  useEffect(() => {
+    if ((state.mcMinis ?? 0) !== 0 || buffExpiry <= now()) return;
+    const id = setInterval(() => setBuffTick((n) => n + 1), 250);
+    return () => clearInterval(id);
+  }, [buffExpiry, state.mcMinis]);
+
+  const t = now();
   const derived = deriveGame(state);
   const { ui, thresholds, hasFlag } = derived;
-  const { locRate, bugRate, fixRate } = calcRates(
+  const { locRate } = calcRates(
     state.accountCounts,
     state.upgrades,
     state.tests ?? 0,
     state.mcMinis ?? 0,
     state.mcMiniLanes,
   );
-  const netBugRate = snapRate(bugRate - fixRate);
+  const spawnBugRate = calcSpawnBugRate(state, t);
   const bugPenalty = calcBugPenalty(state.bugs);
   const bugOutputPct = Math.round(bugPenalty * 100);
   const bugLoadSevere = bugOutputPct <= thresholds.warnBugsSevereOutputPct;
@@ -74,12 +87,16 @@ export function ResourcePanel({ state }: Props) {
   );
   const tokenDrain = harnessDrain + mcMiniTokenDrainPerSec(lanes);
   const netTokenRegen = snapRate(tokenRegen - tokenDrain);
-  const kickAgentLoc = kickAgentBuffActive(state, Date.now())
+  const kickAgentLoc = kickAgentBuffActive(state, t)
     ? calcKickAgentLocPerSec(state.upgrades) * bugPenalty
     : 0;
   const displayLocRate = snapRate(locRate * bugPenalty + kickAgentLoc);
   const burnRate = calcInfraBurnPerSec(state);
   const buzz = state.buzzMeter ?? 0;
+
+  const hasMadePurchase =
+    state.upgrades.length > 0 ||
+    Object.values(state.accountCounts ?? {}).some((n) => (n ?? 0) > 0);
 
   const uptimeColorClass =
     uptime.nines >= 4
@@ -95,36 +112,40 @@ export function ResourcePanel({ state }: Props) {
       <div className="grid grid-cols-[fit-content(7rem)_minmax(0,1fr)] gap-x-[10px] gap-y-[3px] items-baseline">
       {ui.showTokens && (
         <Row label="tokens">
-          <span className={state.tokens < TOKENS.lowWarnThreshold ? 'text-red' : 'text-fg'}>
-            {Math.floor(state.tokens)}
+          <span className={`metric ${state.tokens < TOKENS.lowWarnThreshold ? 'text-red' : 'text-fg'}`}>
+            {fmtUnit(String(Math.floor(state.tokens)), `/ ${maxTokens}`)}
           </span>
-          <span className="text-dimmer text-[12px]">/ {maxTokens}</span>
           {state.tokens < maxTokens && netTokenRegen !== 0 && (
-            <span className="text-dimmer text-[12px]">
+            <span className="metric text-dimmer text-[12px]">
               ({netTokenRegen > 0 ? '+' : ''}
-              {netTokenRegen}/s
-              {tokenDrain > 0 ? `, −${tokenDrain}/s drain` : ''})
+              {fmtRate(netTokenRegen)}
+              {tokenDrain > 0 ? `, ${fmtUnit(`−${fmtRate(tokenDrain)}`, 'drain')}` : ''})
             </span>
           )}
         </Row>
       )}
 
-      {/* loc */}
+      {/* loc — wallet (spendable) + rate; lifetime produced gates unlocks / launch */}
       <Row label={state.totalLoc < 100 ? 'lines of code' : 'loc'}>
-        <span className="text-green">{fmt(state.loc)}</span>
+        <span className="metric text-green">{fmt(state.loc)}</span>
         {displayLocRate !== 0 && (
-          <span className="text-green-dim text-[12px]">({fmtRate(displayLocRate)})</span>
+          <span className="metric text-green-dim text-[12px]">({fmtRate(displayLocRate)})</span>
+        )}
+        {hasMadePurchase && (
+          <>
+            <span className="text-dimmer text-[12px]">·</span>
+            <span className="metric text-dim text-[12px]">{fmtQty(state.totalLoc, 'lifetime')}</span>
+          </>
         )}
       </Row>
 
       {/* bugs */}
       {ui.showBugs && (
         <Row label="bugs">
-          <span className={state.bugs > 0 ? 'text-red' : 'text-green'}>{fmt(state.bugs)}</span>
-          {netBugRate !== 0 && (
-            <span className={(netBugRate > 0 ? 'text-red-dim' : 'text-green-dim') + ' text-[12px]'}>
-              ({netBugRate > 0 ? '+' : ''}
-              {fmtRate(netBugRate)})
+          <span className={`metric ${state.bugs > 0 ? 'text-red' : 'text-green'}`}>{fmt(state.bugs)}</span>
+          {spawnBugRate !== 0 && (
+            <span className={`metric ${(spawnBugRate > 0 ? 'text-red-dim' : 'text-green-dim') + ' text-[12px]'}`}>
+              (+{fmtRate(spawnBugRate)})
             </span>
           )}
         </Row>
@@ -137,13 +158,13 @@ export function ResourcePanel({ state }: Props) {
         const ciFix = snapRate(tests * calcTestFixRate(state.upgrades));
         return (
           <Row label="tests">
-            <span className="text-dim">{fmt(tests)}</span>
+            <span className="metric text-dim">{fmt(tests)}</span>
             {(dampPct > 0 || ciFix !== 0) && (
-              <span className="text-dimmer text-[12px]">
+              <span className="metric text-dimmer text-[12px]">
                 (
                 {[
                   dampPct > 0 && `−${dampPct}% bug rate`,
-                  ciFix !== 0 && `CI +${ciFix.toFixed(1)}/s fix`,
+                  ciFix !== 0 && fmtUnit(`CI +${fmtRate(ciFix)}`, 'fix'),
                 ]
                   .filter(Boolean)
                   .join(' · ')}
@@ -183,7 +204,7 @@ export function ResourcePanel({ state }: Props) {
         <>
           {ui.showBurnRate && (
             <Row label="burn rate">
-              <span className="text-green">${burnRate}/s</span>
+              <span className="metric text-green">${burnRate}/s</span>
             </Row>
           )}
           <Row label="buzz">

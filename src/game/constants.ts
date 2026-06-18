@@ -59,7 +59,9 @@ export const THRESHOLDS = {
   /** Reveal paste-the-error and the bugs counter once `lifetimeBugs` reaches this. */
   showPasteErrorBugs: 1,
   showKickAgentClicks: 10,
-  showWriteTestsBugs: 50,
+  /** Reveal write_test once bug count and total LOC both reach these. */
+  showWriteTestsBugs: 100,
+  showWriteTestsMinLoc: 5000,
   /** Reveal run_tests once the player has written at least this many tests. */
   showRunTestsTests: 5,
   showClearContextLoc: 4000,
@@ -70,7 +72,7 @@ export const THRESHOLDS = {
   /** Below this totalLoc, bugs aren't generated yet (newborn project). */
   bugSpawnLoc: 100,
   /** Chance a manual prompt also spawns a bug, once `bugSpawnLoc` reached. */
-  promptBugChance: 0.25,
+  promptBugChance: 0.56,
   /** Bug count above which warnings start showing. */
   warnBugsElevated: 10,
   warnBugsCritical: 100,
@@ -189,8 +191,6 @@ export const BUG_GENERATION: {
 };
 
 export const AGENT_BUFF = {
-  /** Bug-rate multiplier while the agent buff is active. */
-  bugRateMult: 1.5,
   /** Flat LOC/s while `kick_agent` buff is active (independent of generator scaling). */
   locPerSec: 8,
   /**

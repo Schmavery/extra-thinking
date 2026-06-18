@@ -1,7 +1,6 @@
 import type { EventDef, GameState, LogEntry, LogEntryType, NewsDef } from '../types';
-import { withBugs } from './state';
 import { EVENTS, NEWS } from './data';
-import { EVENT_COOLDOWN_MS, EVENT_MIX, SUBAGENT, THRESHOLDS } from './constants';
+import { EVENT_COOLDOWN_MS, EVENT_MIX, SUBAGENT } from './constants';
 import { templateSeenInRecentLog } from '../lib/logTemplateMatch';
 import { messageKey } from '../lib/messageKey';
 import { render } from '../lib/template';
@@ -90,9 +89,6 @@ function applyEventEffects(prev: GameState, ev: EventDef): GameState {
   let next = prev;
   if (ev.locDelta) next = { ...next, loc: Math.max(0, next.loc + ev.locDelta) };
   if (ev.locMult) next = { ...next, loc: next.loc * ev.locMult };
-  if (ev.bugDelta && next.totalLoc >= THRESHOLDS.bugSpawnLoc) {
-    next = { ...next, ...withBugs(next, next.bugs + ev.bugDelta) };
-  }
   return next;
 }
 

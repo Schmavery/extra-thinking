@@ -9,11 +9,14 @@ import {
   calcTokenConfig,
   pasteErrorButtonLabel,
 } from '../game/rates';
-import { runTestsFixFraction, writeTestCost } from '../game/actions';
+import { runTestsBugFixBounds, writeTestCost } from '../game/actions';
 import { getMove, rechargeProgress } from '../game/availability';
 import { launchBlockReason } from '../game/reliability';
-import { fmt } from '../lib/format';
+import { fmt, fmtQty, fmtUnit } from '../lib/format';
 import { Button } from './Button';
+import { McMinis } from './McMinis';
+import type { McMiniLane } from '../game/investor';
+import { deriveGame } from '../game/derive';
 
 interface Props {
   state: GameState;
@@ -25,6 +28,7 @@ interface Props {
   onLaunch: () => void;
   onLobstagramPost: () => void;
   onRunBugBounty: () => void;
+  onAdjustMcMiniLane?: (lane: McMiniLane, delta: 1 | -1) => void;
 }
 
 export function ActionBar({
@@ -37,8 +41,10 @@ export function ActionBar({
   onLaunch,
   onLobstagramPost,
   onRunBugBounty,
+  onAdjustMcMiniLane,
 }: Props) {
   const now = Date.now();
+  const { ui } = deriveGame(state);
   const { maxTokens } = calcTokenConfig(state.upgrades, state.accountCounts);
   const kickTokenCost = calcKickAgentTokenCost(state.upgrades);
   const pasteTokenCost = calcPasteErrorTokenCost(state.upgrades);
@@ -72,6 +78,27 @@ export function ActionBar({
 
   return (
     <div className="mt-[10px] mb-1 flex flex-col items-start gap-1">
+      {m.writeTest.visible && (() => {
+        const savingLoc = m.writeTest.affordProgress < 1;
+        const writeTestTitle = m.writeTest.legal
+          ? 'adds a test, reduces bug generation rate'
+          : savingLoc
+            ? `costs ${fmtQty(wTestCost, 'loc')} — you have ${fmt(state.loc)}`
+            : 'finish the pending MCP call first';
+        return (
+          <Button
+            off={!m.writeTest.legal}
+            onClick={m.writeTest.legal ? onWriteTest : undefined}
+            title={writeTestTitle}
+            progress={
+              savingLoc ? m.writeTest.affordProgress : rechargeProgress(m.writeTest)
+            }
+          >
+            write a test [−{fmtQty(wTestCost, 'loc')}]
+          </Button>
+        );
+      })()}
+
       {m.pasteError.visible && (
         // paste_error's 4s cooldown is just rate-limiting; show one combined
         // bar that fills as either gate (cooldown or token affordability)
@@ -85,27 +112,6 @@ export function ActionBar({
           {pasteLabel} [{pasteTokenCost}t]
         </Button>
       )}
-
-      {m.writeTest.visible && (() => {
-        const savingLoc = m.writeTest.affordProgress < 1;
-        const writeTestTitle = m.writeTest.legal
-          ? 'adds a test, reduces bug generation rate'
-          : savingLoc
-            ? `costs ${fmt(wTestCost)} loc — you have ${fmt(state.loc)}`
-            : 'finish the pending MCP call first';
-        return (
-          <Button
-            off={!m.writeTest.legal}
-            onClick={m.writeTest.legal ? onWriteTest : undefined}
-            title={writeTestTitle}
-            progress={
-              savingLoc ? m.writeTest.affordProgress : rechargeProgress(m.writeTest)
-            }
-          >
-            write a test [−{fmt(wTestCost)} loc]
-          </Button>
-        );
-      })()}
 
       {m.kickAgent.visible && (() => {
         const buffActive = now < (state.agentBuffExpires ?? 0);
@@ -131,12 +137,16 @@ export function ActionBar({
 
       {m.runTests.visible && (() => {
         const tests = state.tests ?? 0;
-        const fixPct = Math.round(runTestsFixFraction(tests) * 100);
+        const { min: fixMin, max: fixMax } = runTestsBugFixBounds(tests, state.bugs);
+        const fixLabel =
+          fixMin === fixMax
+            ? `~${fixMin} ${fixMin === 1 ? 'bug' : 'bugs'}`
+            : `~${fixMin}–${fixMax} bugs`;
         return (
           <Button
             off={!m.runTests.legal}
             onClick={m.runTests.legal ? onRunTests : undefined}
-            title={`costs ${runTestsTokenCost}t, fixes ~${fixPct}% of bugs (${fmt(tests)} ${Math.floor(tests) === 1 ? 'test' : 'tests'})`}
+            title={`costs ${runTestsTokenCost}t, fixes ${fixLabel} (${fmtUnit(fmt(tests), Math.floor(tests) === 1 ? 'test' : 'tests')})`}
             progress={rechargeProgress(m.runTests)}
           >
             run tests [{runTestsTokenCost}t]
@@ -218,6 +228,10 @@ export function ActionBar({
           </Button>
         );
       })()}
+
+      {ui.showMcMinis && onAdjustMcMiniLane && (
+        <McMinis state={state} onAdjustLane={onAdjustMcMiniLane} inline />
+      )}
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import type { GameState } from '../types';
 import { UPGRADES } from '../game/data';
-import { fmt } from '../lib/format';
+import { fmtQty } from '../lib/format';
 import { getMove, rechargeProgress } from '../game/availability';
 import {
   nextFundingRound,
@@ -93,7 +93,7 @@ export function Upgrades({ state, onBuyUpgrade, onRaiseRound, hideHeader }: Prop
             <span
               className={`whitespace-nowrap shrink-0 ${move.legal ? 'text-dim' : 'text-dimmer'}`}
             >
-              {fmt(u.cost)} loc
+              {fmtQty(u.cost, 'loc')}
             </span>
             <span className="text-dimmer min-w-0">{u.desc}</span>
           </ShopMeta>

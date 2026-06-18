@@ -98,6 +98,42 @@ export function kickAgentBuffActive(
   return (state.mcMinis ?? 0) === 0 && t < (state.agentBuffExpires ?? 0);
 }
 
+/**
+ * Add harness bug/s for parallel LOC/s on top of harness output (kick buff).
+ * Uses the same marginal bug/loc ratio as `calcPromptBugGain` so kick tracks
+ * displayed LOC/s the way players expect.
+ */
+export function scaleBugRateForExtraLoc(
+  bugRate: number,
+  harnessLocRate: number,
+  extraLocRate: number,
+): number {
+  if (bugRate <= 0 || extraLocRate <= 0) return bugRate;
+  if (harnessLocRate <= NEGLIGIBLE_RATE) return bugRate;
+  return snapRate(bugRate + (bugRate / harnessLocRate) * extraLocRate);
+}
+
+/** Passive bug spawn/s for the status HUD (harness + kick parallel loc). */
+export function calcSpawnBugRate(
+  state: Pick<
+    GameState,
+    'accountCounts' | 'upgrades' | 'tests' | 'mcMinis' | 'mcMiniLanes' | 'agentBuffExpires'
+  >,
+  t: number,
+): number {
+  const { locRate, bugRate } = calcRates(
+    state.accountCounts ?? {},
+    state.upgrades,
+    state.tests ?? 0,
+    state.mcMinis ?? 0,
+    state.mcMiniLanes,
+  );
+  const kickLoc = kickAgentBuffActive(state, t)
+    ? calcKickAgentLocPerSec(state.upgrades)
+    : 0;
+  return scaleBugRateForExtraLoc(bugRate, locRate, kickLoc);
+}
+
 export function calcKickAgentTokenCost(upgrades: string[]): number {
   const base = action('kick_agent').tokenCost ?? 0;
   let bonus = 0;

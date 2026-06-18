@@ -174,14 +174,11 @@ function LegacyScrollBody({
         onLaunch={handlers.launch}
         onLobstagramPost={handlers.lobstagramPost}
         onRunBugBounty={handlers.runBugBounty}
+        onAdjustMcMiniLane={handlers.adjustMcMiniLane}
       />
 
       {showResources && <ResourcePanel state={state} />}
       {showResources && <AccountsInstalledList state={state} />}
-
-      {derived.ui.showMcMinis && (
-        <McMinis state={state} onAdjustLane={handlers.adjustMcMiniLane} />
-      )}
 
       {showGenSection && <Generators state={state} onBuyGen={handlers.buyGen} />}
 
@@ -349,6 +346,7 @@ export function LeftPanel({
           onLaunch={handlers.launch}
           onLobstagramPost={handlers.lobstagramPost}
           onRunBugBounty={handlers.runBugBounty}
+          onAdjustMcMiniLane={handlers.adjustMcMiniLane}
         />
       </div>
 

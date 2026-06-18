@@ -6,6 +6,13 @@ import { appendLog } from '../src/game/log';
 import { defaultState } from '../src/game/state';
 import { hasActiveSubagent, logKickSubagent, subagentJunkLine } from '../src/game/subagent';
 import { EVENT_MIX } from '../src/game/constants';
+import {
+  calcKickAgentLocPerSec,
+  calcRates,
+  calcSpawnBugRate,
+  scaleBugRateForExtraLoc,
+} from '../src/game/rates';
+import { fmtRate } from '../src/lib/format';
 import { resetClock, resetRandom, setClock, setRandom } from '../src/game/runtime';
 
 describe('subagent log cards', () => {
@@ -75,6 +82,52 @@ describe('subagent log cards', () => {
     };
     const next = kickAgentAction(prev);
     expect(next.log.some((e) => e.type === 'subagent')).toBe(true);
+  });
+});
+
+describe('kick buff throughput coupling', () => {
+  afterEach(() => {
+    resetClock();
+    resetRandom();
+  });
+
+  it('adds bug/s proportional to kick parallel loc/s (same ratio as prompts)', () => {
+    const bugRate = 0.08;
+    const locRate = 24;
+    const kickLoc = 8;
+    expect(scaleBugRateForExtraLoc(bugRate, locRate, kickLoc)).toBeCloseTo(
+      bugRate + (bugRate / locRate) * kickLoc,
+    );
+    expect(scaleBugRateForExtraLoc(bugRate, locRate, 0)).toBe(bugRate);
+  });
+
+  it('subagent harness kick formats a visible spawn jump over chat loop alone', () => {
+    const upgrades = ['autocomplete', 'subagent_harness'];
+    const { locRate, bugRate } = calcRates({}, upgrades, 0, 0);
+    const kickLoc = calcKickAgentLocPerSec(upgrades);
+    const withoutKick = bugRate;
+    const withKick = scaleBugRateForExtraLoc(bugRate, locRate, kickLoc);
+    expect(locRate).toBe(2);
+    expect(kickLoc).toBe(30);
+    expect(withKick / withoutKick).toBeGreaterThan(10);
+    expect(fmtRate(withoutKick)).not.toBe(fmtRate(withKick));
+  });
+
+  it('calcSpawnBugRate jumps after kickAgentAction', () => {
+    setClock(() => 5_000);
+    setRandom(() => 0);
+    const prev = {
+      ...defaultState(),
+      tokens: 200,
+      totalClicks: 20,
+      upgrades: ['autocomplete', 'subagent_harness'],
+      agentBuffExpires: 0,
+    };
+    const before = calcSpawnBugRate(prev, 5_000);
+    const next = kickAgentAction(prev);
+    const after = calcSpawnBugRate(next, 5_000);
+    expect(after).toBeGreaterThan(before * 10);
+    expect(fmtRate(before)).not.toBe(fmtRate(after));
   });
 });
 

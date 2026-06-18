@@ -14,6 +14,7 @@ import {
   calcClickPower,
   calcKickAgentLocPerSec,
   kickAgentBuffActive,
+  scaleBugRateForExtraLoc,
   calcHarnessTokenDrainPerSec,
   calcNinesRate,
   calcRates,
@@ -67,14 +68,18 @@ export function tickReducer(state: GameState, dtMs: number = TICK_MS): GameState
   const kickAgentLocRate = kickAgentBuffActive(prev, now())
     ? calcKickAgentLocPerSec(prev.upgrades) * bugPenalty
     : 0;
+  const kickLocForBugs = kickAgentBuffActive(prev, now())
+    ? calcKickAgentLocPerSec(prev.upgrades)
+    : 0;
   const effectiveLocRate = snapRate(locRate * bugPenalty + kickAgentLocRate);
   const effectiveLoc = effectiveLocRate * dt;
+  const scaledHarnessBugs = scaleBugRateForExtraLoc(bugRate, locRate, kickLocForBugs);
   const mcMiniBugs =
     mcMinis > 0 && prev.totalLoc >= thresholds.bugSpawnLoc && lanes.code > 0
-      ? bugRate * INVESTOR.codeBugRateMult * lanes.code
+      ? scaledHarnessBugs * INVESTOR.codeBugRateMult * lanes.code
       : 0;
   const effectiveBugRate = snapRate(
-    prev.totalLoc >= thresholds.bugSpawnLoc ? bugRate + mcMiniBugs : 0,
+    prev.totalLoc >= thresholds.bugSpawnLoc ? scaledHarnessBugs + mcMiniBugs : 0,
   );
 
   const ninesTracking = hasFlag(flags, 'nines_tracking');

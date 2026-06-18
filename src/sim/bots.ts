@@ -2,6 +2,7 @@ import type { Bot, BotContext } from './Sim';
 import type { Move } from '../game/availability';
 import {
   pickAdaptiveMove,
+  promptManualDecay,
   WEIGHTS_HYGIENE,
   WEIGHTS_LOC,
   WEIGHTS_PROGRESS,
@@ -55,8 +56,10 @@ export const PRIORITY_HYGIENE: Record<string, number> = {
   prompt: 100,
 };
 
-function moveRank(m: Move, priorities: Record<string, number>): number {
-  return priorities[m.kind === 'action' ? m.actionId! : m.kind] ?? 0;
+function moveRank(m: Move, priorities: Record<string, number>, state?: BotContext['state']): number {
+  let rank = priorities[m.kind === 'action' ? m.actionId! : m.kind] ?? 0;
+  if (state && m.actionId === 'prompt') rank = Math.floor(rank * promptManualDecay(state));
+  return rank;
 }
 
 function pickPriorityMove(
@@ -64,6 +67,7 @@ function pickPriorityMove(
   priorities: Record<string, number>,
   patienceMs: number,
 ): Move | null {
+  const { state } = ctx;
   if (mcpBlocksPlay(ctx.state)) {
     const mcp = ctx.legal.filter(
       (m) =>
@@ -72,10 +76,10 @@ function pickPriorityMove(
         m.actionId === 'mcp_deny',
     );
     if (mcp.length === 0) return null;
-    const rank = (m: Move) => moveRank(m, priorities);
+    const rank = (m: Move) => moveRank(m, priorities, state);
     return [...mcp].sort((a, b) => rank(b) - rank(a) || a.id.localeCompare(b.id))[0]!;
   }
-  const rank = (m: Move) => moveRank(m, priorities);
+  const rank = (m: Move) => moveRank(m, priorities, state);
   const sortedLegal = [...ctx.legal].sort((a, b) => {
     const d = rank(b) - rank(a);
     if (d !== 0) return d;

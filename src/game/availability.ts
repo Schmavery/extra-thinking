@@ -580,7 +580,7 @@ function lobstagramPost(c: Ctx): Move {
       id: 'lobstagram_post',
       kind: 'action',
       actionId: 'lobstagram_post',
-      visible: c.ui.showInvestor,
+      visible: c.ui.showLobstagramPost,
       apply: lobstagramPostAction,
     },
     withMcpIdle(

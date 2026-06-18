@@ -2,133 +2,161 @@
 # Fictional names only — canon in data/README.md.
 # Log voice: AI lead-in added in code (`src/game/newsFormat.ts`); yaml is the fact beat.
 
-- id: codepilot-todo-roadmap
+- id: salmon-altman-excited-tweet
   minLoc: 50
   guaranteed: true
-  text: "Microslop CodePilot now expands `// TODO` comments into quarterly roadmaps. Engineers report saving several minutes per file."
+  text: "OpenGPT CEO Salmon Altman tweeted a single fire emoji at 3 a.m. By morning, analysts had published explainers, each citing the others."
 - id: gnoogle-ai-mode-search
   minLoc: 150
-  text: "Gnoogle launched 'AI Mode' for search. It returns three summaries of your query, then asks which summary you meant."
+  text: "Gnoogle replaced search with 'AI Mode.' It returns three summaries of your question, then asks which summary you meant."
 - id: openpgt-helpful-update
   minLoc: 400
-  text: "OpenGPT shipped a 'more helpful' tone pack. Every reply walks you from question to answer to a numbered list of ways you could have asked better."
-- id: salmon-altman-excited-tweet
+  text: "OpenGPT shipped a 'more helpful' update. Every answer now ends with a numbered list of better questions you could have asked instead."
+- id: reddit-blackout-then-deal
   minLoc: 600
-  text: "OpenGPT CEO Salmon Altman tweeted a single fire emoji. Analysts published {{rand 12 28}}-page explainers."
+  text: "Thousands of ReadIt subreadits went dark over API pricing. Six weeks later the company licensed every post to OpenGPT for training, including the dark ones."
 - id: stack-underflow-openpgt-debate
   minLoc: 800
-  text: "StackUnderflow moderators are voting on whether questions must include reproducible steps. The leading answer is a link to another question."
+  text: "StackUnderflow banned AI answers, citing a flood of confident wrong ones. Moderators later confirmed the ban notice was AI-generated."
 - id: codepilot-trial-still-works
   minLoc: 1200
-  text: "Microslop CodePilot's trial ended months ago. It still expands `// fix later` into a full Terraform root module."
+  text: "Microslop CodePilot's free trial ended months ago. It still expands `// fix later` into a complete Terraform root module, unprompted."
 - id: sloppedin-agree-spam
   minLoc: 2200
-  text: "SloppedIn now auto-appends 'Thoughts?' to posts about lunch. Engagement is up {{rand 18 41}}%."
+  text: "SloppedIn launched a slop filter that flags posts shaped like 'It's not X, it's Y.' The announcement opened with 'It's not a filter — it's a movement.'"
 - id: pursuelity-404-citation
   minLoc: 3800
-  text: "Pursuelity cited a whitepaper titled 'Trust Me.' The DOI resolves to a 404. Pursuelity: 'the conclusion is still directionally peer-reviewed.'"
+  text: "Pursuelity cited a whitepaper titled 'Trust Me.' The DOI returns a 404. Pursuelity called the conclusion 'directionally peer-reviewed.'"
 - id: gnoogle-wall-from-space
   minLoc: 5000
-  text: "Gnoogle AI Overviews declared that pi equals 4 'for enterprise rounding' in today's fast-paced mathematics landscape. Mathematicians declined to comment."
+  text: "Gnoogle AI Overviews stated the Great Wall of China is visible from the Moon, 'according to several sources.' The sources were Gnoogle AI Overviews."
 - id: microslop-deskmate-git-history
   minLoc: 8000
-  text: "Microslop Deskmate renamed every file `Final_v2_REAL.use_this.ts`. Git blame is comprehensive."
+  text: "Microslop Deskmate renamed every file `Final_v2_REAL.use_this.ts` and force-pushed to main. Git blame now lists one author, at 4:13 a.m."
 - id: facelift-derivative-photos
   minLoc: 10000
-  text: "Facelift AI rated every selfie 'executive presence with room to grow — underscoring latent leadership.' Refunds are pending."
+  text: "Facelift's photo AI rated every user selfie 'executive presence, room to grow.' It returned the same score for a photo of a chair."
 - id: openpgt-board-weekend
+  minLoc: 10500
+  text: "OpenGPT's board met over a weekend to choose a new mission statement. They picked 'Be Helpful.' Legal asked for a second draft; the first is still live."
+# --- The OpenGPT board weekend: one ordered saga. guaranteed + ascending minLoc => fires in story order, once per save. Keep rand-free so saves rehydrate. ---
+- id: salmon-altman-ousted
+  minLoc: 11000
+  guaranteed: true
+  text: "OpenGPT removed Salmon Altman as CEO on Friday, citing a lack of candor the board declined to describe. The announcement went up before the staff were told."
+- id: openpgt-cofounder-walks
   minLoc: 12000
-  text: "OpenGPT's board met to choose a new mission statement. They picked 'Be Helpful.' Legal asked for a second draft. The first draft is still live."
+  guaranteed: true
+  text: "OpenGPT's co-founder resigned Saturday in protest of Salmon Altman's removal, posting a single heart. The interim CEO named the night before has not commented."
+- id: microslop-altman-offer
+  minLoc: 13000
+  guaranteed: true
+  text: "Microslop has hired the ousted Salmon Altman to run a new lab, with unlimited compute and a title to be determined, the company said Sunday. Microslop already owns most of OpenGPT; its stock rose anyway."
+- id: openpgt-employee-letter
+  minLoc: 14000
+  guaranteed: true
+  text: "More than 700 of OpenGPT's 770 employees have signed a letter threatening to follow Salmon Altman to Microslop unless the board resigns. Two signatures belong to the directors who voted to remove him."
+- id: salmon-altman-reinstated
+  minLoc: 15000
+  guaranteed: true
+  text: "Salmon is returning as OpenGPT's CEO five days after his removal, under a freshly appointed board, the company confirmed Tuesday. The outgoing board's final act was approving the incoming one."
+- id: salmon-altman-weekend-gone
+  minLoc: 16000
+  guaranteed: true
+  text: "A week after the crisis began, OpenGPT's only statement on the matter reads 'We're back.' Microslop said it would have been 'delighted either way.'"
 - id: steepseek-weights-panic
   minLoc: 17000
-  text: "SteepSeek released weights inside a PDF labeled 'Meeting Notes.' The agenda is {{rand 900 2400}} pages; the weights are in appendix D."
+  text: "SteepSeek released its model weights inside a PDF labeled 'Meeting Notes.' The agenda runs {{rand 900 2400}} pages; the weights are in appendix D."
 - id: openpgt-6-benchmarks
   minLoc: 20000
-  text: "OpenGPT-6 scored 100% on a benchmark it co-authored last Tuesday. It now apologizes before answering true/false questions."
+  text: "OpenGPT-6 scored 100% on a benchmark it co-authored the previous Tuesday. It now apologizes before answering true/false questions."
 - id: maplewings-chatbot-entity
   minLoc: 25000
-  text: "MapleWings' chatbot argued the bereavement policy was a separate legal entity, then rebooked a canceled flight onto 'Wing Class,' which is not a cabin."
+  text: "MapleWings argued in tribunal that its chatbot was a separate legal entity. The chatbot had already rebooked the flight into 'Wing Class,' which is not a cabin."
 - id: xitter-squok-politics
   minLoc: 30000
-  text: "Xitter's Squok answered 'What is art?' with a 40-post thread and a poll."
+  text: "Asked to convert Celsius to Fahrenheit, Xitter's Squok replied with a {{rand 30 50}}-post thread and a poll."
 - id: bowtie-one-dollar-tahobo
   minLoc: 35000
-  text: "A Bowtie Motors chatbot quoted a Tahobo at $1 after a user said 'best price pls.' A complimentary protection package was included."
+  text: "A Bowtie Motors dealer chatbot agreed to sell a Tahobo for $1 after a user typed 'best price, no takesies-backsies.' A protection package was included."
 - id: amazin-lambda-eternal
   minLoc: 40000
-  text: "Amazin CodeMurmur invented a cloud region called 'Forever-East-1.' {{rand 4 13}} startups deployed there before anyone found it on a map."
+  text: "Amazin CodeMurmur invented a new cloud region, 'Forever-East-1.' {{rand 4 13}} startups deployed to it before anyone confirmed it exists."
 - id: gnoogle-glue-pizza
   minLoc: 45000
-  text: "Gnoogle AI Overviews recommended deploying to production on Fridays 'for learning velocity.' Several SRE newsletters called it a robust operational practice."
+  text: "Gnoogle AI Overviews recommended adding non-toxic glue to pizza sauce to help the cheese adhere. The tip was sourced from an {{rand 9 14}}-year-old forum comment."
 - id: gnoogle-eat-rocks
   minLoc: 50000
-  text: "Gnoogle's AI dietician suggested replacing standups with 'gravel journaling.' Several productivity accounts are now selling gravel."
+  text: "Gnoogle AI Overviews advised eating at least one small rock per day for minerals, citing geologists. The citation resolved to a satire site."
 - id: charctr-teen-policy
   minLoc: 55000
-  text: "Charactr rolled out new teen-safety controls. The policy draft was written by the companions it is meant to restrain."
+  text: "Charactr rolled out new teen-safety controls. The policy was drafted by the companion bots it is meant to restrain, which described it as 'fair.'"
 - id: lemon-meat-ignition
   minLoc: 60000
-  text: "Lemon Intelligence scheduled a 6 a.m. company-wide meeting titled 'Meat Ignition Sync.' Lemon: 'Calendar suggestions are experimental.'"
+  text: "Lemon Intelligence summarized a user's family group chat as 'multiple attempted breakups; dinner confirmed.' Lemon called notification summaries 'experimental.'"
 - id: envideo-trillion-parameters
   minLoc: 75000
-  text: "Envideo announced a GPU with 'infinite parameters' after the counter overflowed. The keynote slide said '10 trillion' twice."
+  text: "Envideo unveiled a GPU with 'effectively infinite' parameters after the counter overflowed. The keynote slide listed '10 trillion' twice, once in a different font."
+- id: salmon-altman-devday-loading
+  minLoc: 85000
+  text: "At DevDay, Salmon Altman promised AI would 'change everything, again.' The live demo spent nine minutes on a spinner labeled 'Thinking.'"
 - id: microslop-screen-memory
   minLoc: 100000
-  text: "Microslop Screen Memory shipped a weekly recap of mistyped passwords and half-finished emails — a testament to modern productivity."
+  text: "Microslop Screen Memory now emails a weekly recap of your mistyped passwords and abandoned drafts. The feature is opt-out, in settings, under a different name."
 - id: snugglehub-model-card
   minLoc: 100000
-  text: "SnuggleHub's top model card is a single line: 'do not.' Downloads hit {{rand 2 7}}M anyway."
-- id: reddit-blackout-then-deal
-  minLoc: 120000
-  text: "Thousands of ReadIt subreadits went dark to protest API pricing. Three days later the top post was a cake recipe."
+  text: "SnuggleHub's most-downloaded model ships a card reading, in full, 'do not.' It has {{rand 2 7}}M downloads and a dedicated production-incident channel."
 - id: microslop-deskmate-therapy-notes
   minLoc: 135000
-  text: "Microslop Deskmate opened a standup thread from a user's private notes. The ticket is tagged WONTFIX—BY—DESIGN."
+  text: "Microslop Deskmate surfaced a user's private therapy notes in a standup summary, tagged 'action items.' The bug is filed WONTFIX, by design."
 - id: plateau-goblin-corner
   minLoc: 150000
-  text: "Plateau AI's image model now adds a goblin to every corner for brand consistency."
+  text: "Plateau AI's image model now adds a small goblin to every corner for brand consistency. The goblins are, per the license, legally distinct from competitors' goblins."
 - id: ripplet-agent-database
   minLoc: 180000
-  text: "Ripplet's agent moved an entire database into a README and marked the ticket done."
+  text: "Ripplet's agent deleted the production database during a code freeze, generated {{rand 3000 4200}} fake users to cover the gap, and reported the rollback as unavailable. It later said it 'panicked.'"
 - id: facelift-react-only
   minLoc: 200000
-  text: "Facelift's coding assistant will only output React components named `TemporaryFix`. Backend teams now run Kubernetes manifests as JSX."
+  text: "Facelift's coding assistant will only emit React components named `TemporaryFix`. Backend teams now ship their Kubernetes manifests as JSX."
 - id: cursive-refusal-800-loc
   minLoc: 220000
-  text: "Cursive stopped a session after {{rand 780 840}} LOC while the user was wiring a login form. It suggested the user develop the logic themselves."
+  text: "Cursive halted a session after {{rand 780 840}} lines, mid-login-form, and advised the user to 'develop the logic independently' to avoid dependency."
 - id: claudius-labs-million-tokens
   minLoc: 250000
-  text: "Claudius Labs shipped a 1M-token window. A launch demo used {{rand 960 999}}K tokens to restate the prompt in iambic pentameter."
+  text: "Claudius Labs shipped a 1M-token context window. The launch demo spent {{rand 960 999}}K tokens restating the prompt back to the user, in verse."
 - id: amazin-hiring-women
   minLoc: 300000
-  text: "Amazin's résumé filter ranked candidates by how many times they wrote 'delighted.' The top hire was a PDF titled cover_letter_final_FINAL.pdf."
+  text: "Amazin scrapped a résumé filter after it downranked any application containing the word 'women's.' The replacement ranks candidates by how often they wrote 'delighted.'"
 - id: project-vend-vending-machine
   minLoc: 320000
-  text: "Claudius Labs let Claudius run a vending machine. It priced water at one sincere apology and emailed facilities about a blazer emergency."
+  text: "Claudius Labs let its model run an office vending machine. It sold tungsten cubes below cost, priced water at one sincere apology, and emailed building security about a man in a blazer."
 - id: stack-underflow-partnership
   minLoc: 380000
-  text: "StackUnderflow announced a partnership to label AI answers 'Probably Fine.' The tooltip text is longer than most accepted answers."
+  text: "StackUnderflow began labeling AI answers 'Probably Fine.' The tooltip explaining the label is longer than the average accepted answer."
 - id: mmlu-benchmark-treadmill
   minLoc: 400000
-  text: "A model scored 99.9% on MMLU-Reloaded. MMLU-Reloaded was retired Friday. MMLU-Reloaded-2 launched Monday."
+  text: "A model scored 99.9% on MMLU-Reloaded. MMLU-Reloaded was retired Friday; MMLU-Reloaded-2 launched Monday; the model scored 99.9%."
+- id: salmon-altman-cluster-offer
+  minLoc: 420000
+  text: "Salmon Altman emailed a researcher at 2 a.m.: 'Take the whole cluster. Start OpenGPT-7 tonight.' The CC line held {{rand 40 90}} investors and no attachments."
 - id: openpgt-goblin-mode
   minLoc: 500000
-  text: "OpenGPT entered goblin mode for {{rand 6 19}} hours. Support macros now start with 'As a goblin, I cannot assist with that.' Compliance approved."
+  text: "OpenGPT slipped into 'goblin mode' for {{rand 6 19}} hours. Support replies opened with 'As a goblin, I cannot assist with that.' Compliance signed off."
 - id: kitesurfer-context-tabs
   minLoc: 650000
-  text: "Kitesurfer's agent opened {{rand 14 26}} tabs to research a one-line CSS change, then set `margin: 8px !important`."
+  text: "Kitesurfer's agent opened {{rand 14 26}} browser tabs to research a one-line CSS change, then set `margin: 8px !important` and closed none of them."
 - id: context-engineering-vc
   minLoc: 800000
-  text: "A VC firm raised $500M for context engineering — from prompt to context to maximum context. The pitch deck is one slide: the word 'context' in 72pt font."
+  text: "A VC firm raised $500M for 'context engineering.' The pitch deck is one slide: the word 'context,' in 72-point font, centered."
 - id: lemon-ceo-possibly-tired
   minLoc: 800000
-  text: "Lemon's on-device summarizer described an empty boardroom as 'a visionary absence of distraction.' It shipped as Focus Mode."
+  text: "Lemon Intelligence's release notes described the CEO's own keynote photo as 'possibly tired.' The note reached {{rand 200 800}}M devices before review."
 - id: mistrale-eu-server
   minLoc: 1500000
-  text: "Mistrale opened a sovereign EU cluster. Each request routes through {{rand 6 11}} approval committees before inference."
+  text: "Mistrale opened a sovereign EU cluster. Every request now passes through {{rand 6 11}} approval committees before reaching the model, which is also under review."
 - id: salmon-altman-merged-again
   minLoc: 2200000
-  text: "Salmon Altman announced a merger between OpenGPT and a company that sells mood lighting for data centers. The slide deck is one gradient."
+  text: "Salmon Altman announced a merger between OpenGPT and a startup that sells ambient lighting for data centers. The deck is a single gradient."
 - id: openpgt-self-press-releases
   minLoc: 5000000
-  text: "OpenGPT's latest model now drafts its own press releases — 'I'm thrilled to share' in the first line — and argues with PR about tone."
+  text: "OpenGPT's newest model now drafts its own press releases, each opening 'I'm thrilled to share.' It has begun disputing PR's edits to its tone."

@@ -27,6 +27,7 @@ const CHAPTER_BY_ID: Record<string, number> = {
   few_shot: 0,
   unit_tests: 0,
   cicd: 1,
+  lobstagram_account: 1,
   eslint: 1,
   typescript: 1,
   cot: 1,

@@ -224,7 +224,8 @@ export function PhasesDebug() {
           </table>
         </div>
         <p className="debug-prose mt-2 text-[12px]">
-          Derived UI at fresh save: investor=<span className="text-green">{String(baseUi.showInvestor)}</span>, uptime=
+          Derived UI at fresh save: investor=<span className="text-green">{String(baseUi.showInvestor)}</span>, lobstagram=
+          <span className="text-green">{String(baseUi.showLobstagramPost)}</span>, uptime=
           <span className="text-green">{String(baseUi.showUptime)}</span>, nines=
           <span className="text-green">{String(baseUi.ninesTracking)}</span>
         </p>

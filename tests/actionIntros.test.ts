@@ -13,6 +13,7 @@ describe('action intros', () => {
       started: true,
       bugs: THRESHOLDS.showWriteTestsBugs,
       lifetimeBugs: THRESHOLDS.showWriteTestsBugs,
+      totalLoc: THRESHOLDS.showWriteTestsMinLoc,
     };
     const next = introduceUnseenActions(prev);
     expect(next.actionsIntroduced).toContain('write_test');
@@ -46,7 +47,20 @@ describe('action intros', () => {
     expect(next.log.at(-1)?.text).toBe(action('paste_error').introMsg);
   });
 
-  it('fires from tick when bugs are already at the write_test threshold', () => {
+  it('fires from tick when bugs and loc reach the write_test threshold', () => {
+    const prev = {
+      ...defaultState(),
+      started: true,
+      bugs: THRESHOLDS.showWriteTestsBugs,
+      lifetimeBugs: THRESHOLDS.showWriteTestsBugs,
+      totalLoc: THRESHOLDS.showWriteTestsMinLoc,
+      upgrades: ['autocomplete'],
+    };
+    const next = tickReducer(prev, 1);
+    expect(next.actionsIntroduced).toContain('write_test');
+  });
+
+  it('does not intro write_test from tick before minLoc', () => {
     const prev = {
       ...defaultState(),
       started: true,
@@ -56,7 +70,7 @@ describe('action intros', () => {
       upgrades: ['autocomplete'],
     };
     const next = tickReducer(prev, 1);
-    expect(next.actionsIntroduced).toContain('write_test');
+    expect(next.actionsIntroduced).not.toContain('write_test');
   });
 });
 

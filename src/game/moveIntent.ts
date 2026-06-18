@@ -88,6 +88,23 @@ function clamp01(n: number): number {
   return Math.max(0, Math.min(1, n));
 }
 
+/** Trace bots and planner deprioritize manual prompts as passive output scales. */
+export function promptManualDecay(state: GameState): number {
+  if (!state.launched && state.totalLoc < LAUNCH_LOC) return 1;
+
+  const loc = state.totalLoc;
+  let decay = 1;
+  if (loc >= 12000) decay *= 0.9;
+  if (loc >= 35000) decay *= 0.75;
+  if (loc >= 70000) decay *= 0.5;
+  if (loc >= 120000) decay *= 0.28;
+  if (state.launched) decay *= 0.85;
+  if ((state.mcMinis ?? 0) > 0) decay *= 0.5;
+  if (state.upgrades.includes('chat_loop')) decay *= 0.7;
+  if (state.upgrades.includes('cot')) decay *= 0.6;
+  return decay;
+}
+
 export function moveIntentKey(m: Move): string {
   return m.kind === 'action' ? m.actionId! : m.kind;
 }
@@ -130,6 +147,10 @@ export function moveHelps(
   if (m.actionId === 'kick_agent' && state) {
     const help = kickLocHelp(state, t);
     return { ...base, loc: Math.max(base.loc ?? 0, help) };
+  }
+  if (m.actionId === 'prompt' && state) {
+    const loc = (base.loc ?? 0) * promptManualDecay(state);
+    return loc > 0 ? { ...base, loc } : base;
   }
   return base;
 }

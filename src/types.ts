@@ -148,6 +148,7 @@ export interface UpgDef {
       | 'showPasteErrorBugs'
       | 'showKickAgentClicks'
       | 'showWriteTestsBugs'
+      | 'showWriteTestsMinLoc'
       | 'showRunTestsTests'
       | 'showClearContextLoc'
       | 'showClearContextMinTokens'
@@ -162,7 +163,6 @@ export interface EventDef {
   text: string;
   locMult?: number;
   locDelta?: number;
-  bugDelta?: number;
   type: 'info' | 'bad' | 'event';
   minLoc: number;
   requiresLaunch?: boolean;
@@ -257,8 +257,10 @@ export interface ActionDef {
   neutralMessages?: string[];
 
   // run_tests
-  /** Per-test independent fix probability. Total = `1 - (1 - p)^tests`. */
-  perTestFixFraction?: number;
+  /** Min bugs fixed per run ≈ `floor(tests × this)`. */
+  fixesMinPerTest?: number;
+  /** Max bugs fixed per run ≈ `floor(tests × this)`. */
+  fixesMaxPerTest?: number;
   /** Tokens spent = `tests * this` (replaces legacy LOC cost). */
   perTestTokenCost?: number;
 

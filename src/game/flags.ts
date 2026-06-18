@@ -28,6 +28,8 @@ export const GAME_FLAGS = {
   yolo_mode: 'yolo_mode',
   /** Tabbed left panel: sticky ops + status/fleet/accounts/upgrades (see `agent_dashboard`). */
   agent_dashboard: 'agent_dashboard',
+  /** Post on Lobstagram action (see `lobstagram_account` upgrade). */
+  lobstagram: 'lobstagram',
 } as const;
 
 export type GameFlag = (typeof GAME_FLAGS)[keyof typeof GAME_FLAGS];

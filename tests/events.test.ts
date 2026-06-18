@@ -24,7 +24,7 @@ describe('maybeFireEvent news', () => {
   });
 
   it('does not pick guaranteed headlines from the random pool', () => {
-    const headline = NEWS.find((n) => n.id === 'codepilot-todo-roadmap')!;
+    const headline = NEWS.find((n) => n.id === 'salmon-altman-excited-tweet')!;
     expect(headline.guaranteed).toBe(true);
     let r = 0;
     setRandom(() => {
@@ -75,12 +75,12 @@ describe('maybeFireEvent news', () => {
 
 describe('applyGuaranteedNews', () => {
   it('fires guaranteed headline once totalLoc reaches minLoc', () => {
-    const headline = NEWS.find((n) => n.id === 'codepilot-todo-roadmap')!;
-    const prev = { ...defaultState(), totalLoc: 55, usedNewsIds: [] };
-    const next = { ...prev, totalLoc: 65 };
+    const headline = NEWS.find((n) => n.id === 'salmon-altman-excited-tweet')!;
+    const prev = { ...defaultState(), totalLoc: headline.minLoc - 5, usedNewsIds: [] };
+    const next = { ...prev, totalLoc: headline.minLoc + 5 };
     const out = applyGuaranteedNews(prev, next);
     expect(out.usedNewsIds).toContain(headline.id);
-    expect(out.log.some((e) => e.type === 'news' && e.text.includes('CodePilot'))).toBe(true);
+    expect(out.log.some((e) => e.type === 'news' && e.text.includes('Salmon Altman'))).toBe(true);
     expect(out.log.some((e) => e.type === 'news' && e.text.startsWith('Industry:'))).toBe(false);
 
     const again = applyGuaranteedNews(out, out);

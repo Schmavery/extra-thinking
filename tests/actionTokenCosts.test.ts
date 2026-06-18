@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { getMove } from '../src/game/availability';
-import { pasteErrorAction } from '../src/game/actions';
+import { pasteErrorAction, runTestsAction, runTestsBugFixBounds, runTestsBugFixes } from '../src/game/actions';
 import { action, UPGRADES } from '../src/game/data';
 import { defaultState } from '../src/game/state';
 import {
@@ -87,6 +87,42 @@ describe('action token costs', () => {
   });
 });
 
+describe('run_tests bug fixes', () => {
+  it('bounds scale with test count not bug pile', () => {
+    expect(runTestsBugFixBounds(10, 100)).toEqual({ min: 5, max: 20 });
+    expect(runTestsBugFixBounds(10, 50)).toEqual({ min: 5, max: 20 });
+    expect(runTestsBugFixBounds(5, 100)).toEqual({ min: 3, max: 10 });
+    expect(runTestsBugFixBounds(20, 100)).toEqual({ min: 10, max: 40 });
+  });
+
+  it('caps bounds at current bugs', () => {
+    expect(runTestsBugFixBounds(10, 8)).toEqual({ min: 5, max: 8 });
+    expect(runTestsBugFixBounds(10, 3)).toEqual({ min: 3, max: 3 });
+    expect(runTestsBugFixBounds(50, 2)).toEqual({ min: 2, max: 2 });
+  });
+
+  it('returns zero bounds with no tests or bugs', () => {
+    expect(runTestsBugFixBounds(0, 100)).toEqual({ min: 0, max: 0 });
+    expect(runTestsBugFixBounds(5, 0)).toEqual({ min: 0, max: 0 });
+  });
+
+  it('picks a value inside the range', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0);
+    expect(runTestsBugFixes(10, 100)).toBe(5);
+    vi.spyOn(Math, 'random').mockReturnValue(0.999);
+    expect(runTestsBugFixes(10, 100)).toBe(20);
+    vi.restoreAllMocks();
+  });
+
+  it('does not remove a pile fraction at 10 tests', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.999);
+    const base = { ...defaultState(), tests: 10, bugs: 100, tokens: 100 };
+    const next = runTestsAction(base);
+    expect(next.bugs).toBe(80);
+    vi.restoreAllMocks();
+  });
+});
+
 describe('paste_error fix chance', () => {
   it('stacks fix chance bonus on action base', () => {
     const base = action('paste_error').fixChance ?? 0;
@@ -94,6 +130,14 @@ describe('paste_error fix chance', () => {
     expect(calcPasteErrorFixChance(['fix_bug_skill'])).toBe(
       Math.min(1, base + (upg('fix_bug_skill').pasteErrorFixChanceBonus ?? 0)),
     );
+  });
+
+  it('always removes at least one bug even when the fix roll fails', () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0.99);
+    const base = { ...defaultState(), bugs: 4, tokens: 100, lifetimeBugs: 4 };
+    const next = pasteErrorAction(base);
+    expect(next.bugs).toBe(3);
+    vi.restoreAllMocks();
   });
 });
 

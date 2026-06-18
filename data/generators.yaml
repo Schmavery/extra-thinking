@@ -9,7 +9,7 @@
   costMult: 1.13
   unlockAt: 4000
   freeMaxTokens: 40
-  freeTokenRegen: 1.5
+  freeTokenRegen: 2
   paidMaxTokens: 90
   paidTokenRegen: 6
   extraMaxTokens: 22
@@ -22,7 +22,7 @@
   costMult: 1.14
   unlockAt: 15000
   freeMaxTokens: 50
-  freeTokenRegen: 2.5
+  freeTokenRegen: 3
   paidMaxTokens: 140
   paidTokenRegen: 8
   extraMaxTokens: 35

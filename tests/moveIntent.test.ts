@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
+import { LAUNCH_LOC } from '../src/game/constants';
 import { defaultState } from '../src/game/state';
 import {
   assessNeeds,
   kickLocHelp,
   moveHelps,
+  promptManualDecay,
   scoreMove,
   WEIGHTS_HYGIENE,
   WEIGHTS_LOC,
@@ -45,14 +47,15 @@ describe('assessNeeds', () => {
 describe('scoreMove', () => {
   it('prefers clear_context when tokens are urgent', () => {
     const state = defaultState();
+    state.launched = true;
     state.tokens = 8;
     state.minTokensSeen = 8;
     state.loc = 50_000;
-    state.totalLoc = 8000;
+    state.totalLoc = 50_000;
     const needs = assessNeeds(state, 0);
     expect(needs.tokens).toBeGreaterThan(needs.loc);
     const clear = scoreMove(actionMove('clear_context'), needs, WEIGHTS_LOC);
-    const prompt = scoreMove(actionMove('prompt'), needs, WEIGHTS_LOC);
+    const prompt = scoreMove(actionMove('prompt'), needs, WEIGHTS_LOC, 0, state, 0);
     expect(clear).toBeGreaterThan(prompt);
   });
 
@@ -85,7 +88,7 @@ describe('scoreMove', () => {
 
   it('prefers bug fixes over kick when launch is blocked by reliability', () => {
     const state = defaultState();
-    state.totalLoc = 10_000;
+    state.totalLoc = LAUNCH_LOC;
     state.loc = 5000;
     state.tokens = 120;
     state.bugs = 205;
@@ -118,5 +121,20 @@ describe('moveHelps', () => {
     };
     expect(moveHelps(buyAccount).tokens).toBe(0.7);
     expect(moveHelps(actionMove('write_test')).tests).toBe(1);
+  });
+
+  it('decays prompt value after launch and passive upgrades', () => {
+    const preLaunch = defaultState();
+    preLaunch.totalLoc = 9000;
+    const postLaunch = defaultState();
+    postLaunch.totalLoc = 45_000;
+    postLaunch.launched = true;
+    postLaunch.mcMinis = 3;
+    postLaunch.upgrades = ['chat_loop', 'cot'];
+    expect(promptManualDecay(preLaunch)).toBe(1);
+    expect(promptManualDecay(postLaunch)).toBeLessThan(0.35);
+    expect(moveHelps(actionMove('prompt'), postLaunch).loc).toBeLessThan(
+      moveHelps(actionMove('prompt'), preLaunch).loc ?? 0,
+    );
   });
 });

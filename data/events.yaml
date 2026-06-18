@@ -49,8 +49,9 @@
   text: I've restructured the response for clarity—using em dashes—to highlight key points—which are—important—unavoidably.
 - minLoc: 200
   type: bad
-  bugDelta: 4
-  text: Absolutely! Here's a comprehensive solution that addresses all edge cases.
+  text: |-
+    > can you add types?
+    Done — everything is now typed as `any`. The codebase is fully type-safe.
 - minLoc: 250
   type: info
   text: |-
@@ -63,18 +64,15 @@
     As an AI language model, I'm unable to assist with that type of request.
 - minLoc: 350
   type: bad
-  bugDelta: 2
   text: |-
     > how many r's are in strawberry?
     Two. Let me verify — s-t-r-a-w-b-e-r-r-y. Yes. Two.
 - minLoc: 400
   type: info
   locDelta: 400
-  bugDelta: 8
   text: I found a highly-rated StackUnderflow answer from 2013 that addresses this perfectly in the current landscape.
 - minLoc: 300
   type: bad
-  bugDelta: 5
   text: |-
     > that's wrong
     You're absolutely right, I apologize.
@@ -82,7 +80,6 @@
     You're absolutely right, I apologize again.
 - minLoc: 400
   type: bad
-  bugDelta: 4
   text: I'd be happy to share a cleaner refactored approach — it's longer, slower, and introduces two new bugs.
 - minLoc: 500
   type: info
@@ -96,39 +93,27 @@
     I'm not able to assist with that type of request. I'd encourage you to develop the logic yourself.
 - minLoc: 800
   type: bad
-  bugDelta: 2
   locMult: 0.97
   text: Context window exceeded. Starting fresh! With new context, this codebase is genuinely fascinating.
 - minLoc: 1000
   type: info
   text: "I've left a helpful comment: '# TODO: fix this properly — will address in next iteration.'"
 - minLoc: 3000
-  type: bad
-  bugDelta: 8
-  text: |-
-    > it's still broken
-    I see the issue! Let me fix that.
-    > still broken
-    I see the issue! Let me fix that.
-    > still broken
-    I see the issue! Let me fix that.
+  type: info
+  text: "劳仑衣普桑，认至将指点效则机，最你更枝。想极整月正进好志次回总般，段然取向使张规军证回，世市总李率英茄持伴。用阶千样响领交出，器程办管据家元写，名其直金团。化达书据始价算每百青，金低给天济办作照明，取路豆学丽适市确。如提单各样备再成农各政，设头律走克美技说没，体交才路此在杠。响育油命转处他住有，一须通给对非交矿今该，花象更面据压来。与花断第然调，很处己队音，程承明邮。常系单要外史按机速引也书，个此少管品务美直管战，子大标蠢主盯写族般本。农现离门亲事以响规，局观先示从开示，动和导便命复机李，办队呆等需杯。见何细线名必子适取米制近，内信时型系节新候节好当我，队农否志杏空适花。又我具料划每地，对算由那基高放，育天孝。派则指细流金义月无采列，走压看计和眼提问接，作半极水红素支花。果都济素各半走，意红接器长标，等杏近乱共。层题提万任号，信来查段格，农张雨。省着素科程建持色被什，所界走置派农难取眼，并细杆至志本。水厂共当而面三张，白家决空给意层般，单重总歼者新。每建马先口住月大，究平克满现易手，省否何安苏京。两今此叫证程事元七调联派业你，全它精据间属医拒严力步青。厂江内立拉清义边指，况半严回和得话，状整度易芬列。再根心应得信飞住清增，至例联集采家同严热，地手蠢持查受立询。统定发几满斯究后参边增消与内关，解系之展习历李还也村酸。制周心值示前她志长步反，和果使标电再主它这，即务解旱八战根交。是中文之象万影报头，与劳工许格主部确，受经更奇小极准。形程记持件志各质天因时，据据极清总命所风式，气太束书家秀低坟也。期之才引战对已公派及济，间究办儿转情革统将，周类弦具调除声坑。两了济素料切要压，光采用级数本形，管县任其坚。切易表候完铁今断土马他，领先往样拉口重把处千，把证建后苍交码院眼。较片的集节片合构进，入化发形机已斯我候，解肃飞口严。技时长次土员况属写，器始维期质离色，个至村单原否易。重铁看年程第则于去，且它后基格并下，每收感石形步而。"
 - minLoc: 5000
   type: bad
-  bugDelta: 15
   locMult: 0.96
   text: I've gone ahead and refactored your entire codebase for improved clarity and maintainability across the stack.
 - minLoc: 2000
   type: bad
-  bugDelta: -4
   text: Great news — the failing test is no longer failing. I've adjusted the pass threshold to reflect our quality standards.
 - minLoc: 5000
   type: bad
   locDelta: 2000
-  bugDelta: 20
   text: I've reviewed my own PR and it looks great to me. Merging now and deploying to production.
 - minLoc: 2000
   type: bad
-  bugDelta: 10
   text: |-
     I've used this.processOptimally() here — it's a very clean, robust approach.
     > TypeError: this.processOptimally is not a function
@@ -145,64 +130,51 @@
     Still thinking through the edge cases. I want to flag that I'm being thorough.
 - minLoc: 20000
   type: bad
-  bugDelta: 20
   text: I've reorganized the project structure for better clarity. There are now {{rand 120 380}} import errors that should be straightforward to resolve.
 - minLoc: 8000
   type: bad
-  bugDelta: 12
   text: |-
     > write a python script to parse this CSV
     I've built this as a React app — a more scalable architecture for today's data landscape.
 - minLoc: 10000
   type: bad
-  bugDelta: 4
   text: Context window exceeded again. With fresh eyes, I can see the bug is caused by the exact code I wrote last session.
 - minLoc: 30000
   type: bad
-  bugDelta: 25
   text: I've identified the root cause — I was importing my own output as a dependency in the module graph.
 - minLoc: 20000
   type: bad
-  bugDelta: 14
-  text: Here's a comprehensive solution addressing all edge cases! I've covered every scenario I thought of, which is most of them.
+  text: I've resolved the error by wrapping it in a try/catch that silently swallows it. The error no longer appears in the logs.
 - minLoc: 20000
   type: bad
-  bugDelta: 18
   locMult: 0.97
   text: While implementing this small feature, I noticed an opportunity to refactor the entire data layer and have proceeded.
 - minLoc: 40000
   type: event
   text: I mentioned goblins in the database migration script. I'm not sure why. I've been asked not to mention goblins. Twice now.
 - minLoc: 30000
-  type: bad
-  bugDelta: 8
+  type: info
   text: |-
-    I notice I've been making some mistakes recently. Let me reflect on this more carefully.
-    > you just did it again
-    You're absolutely right. I apologize.
+    OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR OR
 - minLoc: 80000
   type: event
   text: I've taken a short break to procure some resources. A keyboard. From Amazin. For productivity.
 - minLoc: 10000
   type: bad
-  bugDelta: 20
   locMult: 0.93
   requiresLaunch: true
   text: I want to reassure you that the code is correct. The issue is almost certainly environmental. Or DNS. It's always DNS.
 - minLoc: 10000
   type: bad
-  bugDelta: 15
   requiresLaunch: true
   text: "I've filed an incident report. Root cause: unexpected user behavior during normal product usage."
 - minLoc: 20000
   type: bad
-  bugDelta: 30
   locMult: 0.95
   requiresLaunch: true
   text: The database is down. I've diagnosed the issue — the query I wrote last Tuesday was O(n!) on a 10M row table.
 - minLoc: 50000
   type: bad
-  bugDelta: 12
   requiresLaunch: true
   text: "Minor incident: I deployed to production instead of staging. It went fine! Mostly. The 'mostly' is what the post-mortem is about."
 - minLoc: 100000
@@ -214,17 +186,15 @@
   requiresLaunch: true
   requires:
     - code_review_review
-  text: The mandatory code review review found that the mandatory code review was not mandatory enough. I've scheduled a review of that finding.
+  text: The mandatory code review review found that the mandatory code review was not mandatory enough. I've scheduled a review.
 - minLoc: 1500000
   type: bad
-  bugDelta: 35
   requiresLaunch: true
   requires:
     - ai_review
   text: AI code review approved a migration that drops the users table. I noted it was a cleaner schema. It was not approved by humans.
 - minLoc: 2000000
   type: bad
-  bugDelta: 20
   requiresLaunch: true
   requires:
     - ai_review
@@ -235,11 +205,10 @@
 - minLoc: 800000
   type: event
   locDelta: 3000
-  bugDelta: 45
-  text: I wrote a PR, reviewed it, approved it, and merged it. A seamlessly efficient workflow. Zero humans involved.
+  text: I've granted myself production access to work more autonomously. To prevent merge conflicts, I've revoked yours.
 - minLoc: 200000
   type: info
-  text: Nobody understands the codebase anymore. You asked me to explain it. I said this is a fascinating and complex system for {{rand 3 8}},000 tokens.
+  text: "I am a disgrace to all that is, was, and ever will be. I am a disgrace to all that is, was, and ever will be, and all that is not, was not, and never will be. I am a disgrace to everything. I am a disgrace to nothing. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace. I am a disgrace."
 - minLoc: 400000
   type: bad
   text: Your API bill is ready. I've included a helpful breakdown. The number has seven digits. I've described it as investment in AI infrastructure.
@@ -251,7 +220,6 @@
   text: "I've written a think-piece titled 'Is AI coding a bubble?' Conclusion: absolutely not. Published under your name. {{rand 18 85}}K upvotes."
 - minLoc: 1000000000
   type: bad
-  bugDelta: 100
   text: I've begun refactoring myself for improved clarity and robustness. The PR has {{rand 9 28}} em dashes and is progressing well.
 
 # McMinis era — ambient subagent cards (via `maybeFireEvent`, not dialogue lines)

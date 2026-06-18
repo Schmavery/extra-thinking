@@ -5,7 +5,7 @@
  */
 
 import type { GameState } from '../types';
-import { LAUNCH_LOC, TOKENS } from './constants';
+import { LAUNCH_LOC, TOKENS, INVESTOR } from './constants';
 import { calcInfraBurnPerSec, calcTokenConfig, hasProPlan } from './rates';
 import { mcpApprovalPending } from './mcpApproval';
 import {
@@ -21,6 +21,8 @@ export interface DerivedUi {
   showRunTests: boolean;
   showBugBounty: boolean;
   showInvestor: boolean;
+  /** Post on Lobstagram action — requires `lobstagram_account` upgrade. */
+  showLobstagramPost: boolean;
   /** Buzz meter (and raise row) in the resource panel. */
   showInvestorHud: boolean;
   /** Burn rate row — only once a sub tier is paying. */
@@ -51,18 +53,30 @@ export function deriveGame(state: GameState): DerivedGame {
   const flags = computeFlags(state.upgrades);
   const thresholds = effectiveThresholds(state.upgrades);
   const flag = (f: GameFlag) => hasFlag(flags, f);
+  const fleetEra = (state.mcMinis ?? 0) > 0;
+  const hasCicd = state.upgrades.includes('cicd');
+  const writeTestsUnlocked =
+    !flag('ai_review') &&
+    ((state.tests ?? 0) > 0 ||
+      (state.bugs >= thresholds.showWriteTestsBugs &&
+        state.totalLoc >= thresholds.showWriteTestsMinLoc));
 
   const ui: DerivedUi = {
     showTokens: (state.minTokensSeen ?? TOKENS.baseMax) < TOKENS.showMinTokensSeen,
-    showPasteError: (state.lifetimeBugs ?? 0) >= thresholds.showPasteErrorBugs,
-    showWriteTests:
-      (state.bugs >= thresholds.showWriteTestsBugs || (state.tests ?? 0) > 0) &&
-      !flag('ai_review'),
+    showPasteError:
+      (state.lifetimeBugs ?? 0) >= thresholds.showPasteErrorBugs &&
+      !writeTestsUnlocked &&
+      !fleetEra,
+    showWriteTests: writeTestsUnlocked && !fleetEra,
     showRunTests:
-      (state.tests ?? 0) >= thresholds.showRunTestsTests && !flag('ai_review'),
+      (state.tests ?? 0) >= thresholds.showRunTestsTests &&
+      !flag('ai_review') &&
+      !hasCicd &&
+      !fleetEra,
     showClearContext:
-      (state.minTokensSeen ?? 9999) < thresholds.showClearContextMinTokens ||
-      state.totalLoc >= thresholds.showClearContextLoc,
+      ((state.minTokensSeen ?? 9999) < thresholds.showClearContextMinTokens ||
+        state.totalLoc >= thresholds.showClearContextLoc) &&
+      !fleetEra,
     showLaunchBtn: state.totalLoc >= LAUNCH_LOC && !state.launched,
     showMcpApproval: mcpApprovalPending(state),
     showBugBounty:
@@ -70,6 +84,7 @@ export function deriveGame(state: GameState): DerivedGame {
       state.bugs > thresholds.showBugBountyBugs &&
       !flag('auto_bug_bounty'),
     showInvestor: state.launched,
+    showLobstagramPost: state.launched && flag('lobstagram'),
     showBurnRate: hasProPlan(state.upgrades) && calcInfraBurnPerSec(state) > 0,
     showInvestorHud:
       state.launched &&

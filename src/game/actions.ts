@@ -151,10 +151,10 @@ export function pasteErrorAction(prev: GameState): GameState {
   if (prev.tokens < tokenCost) return prev;
   if (isOnCooldown(prev, 'paste_error', a.cooldownMs!)) return prev;
 
-  const fixed = random() < calcPasteErrorFixChance(prev.upgrades);
-  const bugDelta = fixed ? -1 : 0;
+  const success = random() < calcPasteErrorFixChance(prev.upgrades);
+  const bugDelta = -1;
   const locDelta = a.baseLocGain! + Math.floor(random() * a.extraLocRange!);
-  const pool = fixed
+  const pool = success
     ? a.goodMessages!
     : random() < 0.5
       ? a.badMessages!
@@ -207,7 +207,7 @@ export function runTestsAction(prev: GameState): GameState {
   if (isOnCooldown(prev, 'run_tests', a.cooldownMs ?? 0)) return prev;
   const tokenCost = calcRunTestsTokenCost(tests);
   if (prev.tokens < tokenCost) return prev;
-  const fixed = Math.max(1, Math.floor(prev.bugs * runTestsFixFraction(tests)));
+  const fixed = runTestsBugFixes(tests, prev.bugs);
   let next: GameState = {
     ...spendTokens(prev, tokenCost),
     ...withBugs(prev, prev.bugs - fixed),
@@ -222,11 +222,33 @@ export function runTestsAction(prev: GameState): GameState {
   return next;
 }
 
-export function runTestsFixFraction(tests: number): number {
+/** Min/max bugs a test run can fix (random in range, capped at pile size). */
+export function runTestsBugFixBounds(
+  tests: number,
+  bugs: number,
+): { min: number; max: number } {
   const runnable = Math.floor(tests);
-  if (runnable <= 0) return 0;
-  const p = action('run_tests').perTestFixFraction!;
-  return 1 - Math.pow(1 - p, runnable);
+  const bugCount = Math.floor(bugs);
+  if (runnable <= 0 || bugCount <= 0) return { min: 0, max: 0 };
+  const a = action('run_tests');
+  const minPer = a.fixesMinPerTest ?? 0.5;
+  const maxPer = a.fixesMaxPerTest ?? 2;
+  const rawLo = Math.max(1, Math.round(runnable * minPer));
+  const rawHi = Math.max(rawLo, Math.round(runnable * maxPer));
+  const min = Math.min(bugCount, rawLo);
+  const max = Math.min(bugCount, Math.max(rawHi, min));
+  return { min, max };
+}
+
+export function runTestsBugFixes(
+  tests: number,
+  bugs: number,
+  rng: () => number = random,
+): number {
+  const { min, max } = runTestsBugFixBounds(tests, bugs);
+  if (max <= 0) return 0;
+  if (min >= max) return min;
+  return min + Math.floor(rng() * (max - min + 1));
 }
 
 // ─── bug bounty ────────────────────────────────────────────────────────────

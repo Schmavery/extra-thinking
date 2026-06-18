@@ -40,6 +40,7 @@ const gameFlagId = z.enum([
   'mcp_auto_approve',
   'yolo_mode',
   'agent_dashboard',
+  'lobstagram',
 ]);
 
 const thresholdOverrideKey = z.enum([
@@ -48,6 +49,7 @@ const thresholdOverrideKey = z.enum([
   'showPasteErrorBugs',
   'showKickAgentClicks',
   'showWriteTestsBugs',
+  'showWriteTestsMinLoc',
   'showRunTestsTests',
   'showClearContextLoc',
   'showClearContextMinTokens',
@@ -96,7 +98,6 @@ const eventSchema = z
     requires: z.array(z.string().min(1)).optional(),
     locMult: z.number().optional(),
     locDelta: z.number().optional(),
-    bugDelta: z.number().optional(),
     subagent: z.boolean().optional(),
   })
   .passthrough();
