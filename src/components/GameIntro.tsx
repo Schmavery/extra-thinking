@@ -19,7 +19,7 @@ export function GameIntro({ phase, onRegister }: Props) {
   return (
     <div
       className={[
-        'fixed inset-0 z-30 flex flex-col items-center justify-center bg-bg',
+        'fixed inset-0 z-30 bg-bg',
         'transition-opacity ease-out',
         exiting ? 'opacity-0 pointer-events-none' : 'opacity-100',
       ].join(' ')}
@@ -28,11 +28,10 @@ export function GameIntro({ phase, onRegister }: Props) {
     >
       <div
         className={[
+          'absolute left-1/2 top-[33vh] -translate-x-1/2 origin-top',
           'flex flex-col items-center text-center px-6',
           'transition-[opacity,transform] ease-out',
-          exiting
-            ? 'opacity-0 scale-[0.97] -translate-y-[4vh]'
-            : 'opacity-100 scale-100 translate-y-0',
+          exiting ? 'opacity-0 scale-[0.97]' : 'opacity-100 scale-100',
         ].join(' ')}
         style={{ transitionDuration: `${SPLASH_MS}ms` }}
       >
