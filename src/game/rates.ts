@@ -5,15 +5,18 @@
 
 import { ACCOUNTS, UPGRADES } from './data';
 import type { AccountDef, GameState, McMiniLanes, UpgDef } from '../types';
+import type { EffectiveThresholds } from './flags';
 import {
   AGENT_BUFF,
   BUG_GENERATION,
+  INVESTOR,
   NEGLIGIBLE_RATE,
   PROMPT_EVENT,
   TOKENS,
   UPTIME,
 } from './constants';
 import { action } from './data';
+import { normalizeMcMiniLanes } from './investor';
 
 // ─── helpers ───────────────────────────────────────────────────────────────
 
@@ -104,10 +107,52 @@ export function calcKickAgentTokenCost(upgrades: string[]): number {
   return base + bonus;
 }
 
+/** Whole tests only — passive McMini generation can add fractional tests. */
+export function runnableTests(tests: number): number {
+  return Math.floor(Math.max(0, tests));
+}
+
 export function calcRunTestsTokenCost(tests: number): number {
-  if (tests <= 0) return 0;
+  const runnable = runnableTests(tests);
+  if (runnable <= 0) return 0;
   const perTest = action('run_tests').perTestTokenCost ?? 1;
-  return tests * perTest;
+  return runnable * perTest;
+}
+
+/**
+ * Bug spawn from a manual prompt, matched to passive bug/loc ratio when
+ * harness output exists; otherwise falls back to `promptBugChance`.
+ */
+export function calcPromptBugGain(
+  state: Pick<
+    GameState,
+    'accountCounts' | 'upgrades' | 'tests' | 'mcMinis' | 'mcMiniLanes' | 'totalLoc'
+  >,
+  locGain: number,
+  thresholds: Pick<EffectiveThresholds, 'bugSpawnLoc' | 'promptBugChance'>,
+  rng: () => number,
+): number {
+  if (state.totalLoc < thresholds.bugSpawnLoc || locGain <= 0) return 0;
+
+  const { locRate, bugRate } = calcRates(
+    state.accountCounts ?? {},
+    state.upgrades,
+    state.tests ?? 0,
+    state.mcMinis ?? 0,
+    state.mcMiniLanes,
+  );
+
+  if (locRate > NEGLIGIBLE_RATE) {
+    const mcMinis = state.mcMinis ?? 0;
+    const lanes = normalizeMcMiniLanes(mcMinis, state.mcMiniLanes);
+    let effectiveBugRate = bugRate;
+    if (mcMinis > 0 && lanes.code > 0) {
+      effectiveBugRate += bugRate * INVESTOR.codeBugRateMult * lanes.code;
+    }
+    return (effectiveBugRate / locRate) * locGain;
+  }
+
+  return rng() < thresholds.promptBugChance ? 1 : 0;
 }
 
 export function calcLobstagramTokenCost(posts: number): number {

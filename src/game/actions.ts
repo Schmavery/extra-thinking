@@ -27,6 +27,7 @@ import {
   calcPasteErrorTokenCost,
   calcRunTestsTokenCost,
   formatPasteErrorLog,
+  calcPromptBugGain,
   calcPromptTokenCost,
   calcPromptEventProbability,
   calcTokenConfig,
@@ -98,8 +99,7 @@ export function promptAction(prev: GameState): GameState {
   const thresholds = effectiveThresholds(prev.upgrades);
   const power = calcClickPower(prev.upgrades);
   const locGain = power * LOC_PER_CLICK_POWER + calcClickBonus(prev.upgrades);
-  const bugFromPrompt =
-    prev.totalLoc >= thresholds.bugSpawnLoc && random() < thresholds.promptBugChance ? 1 : 0;
+  const bugFromPrompt = calcPromptBugGain(prev, locGain, thresholds, random);
   let next: GameState = {
     ...spendTokens(prev, tokenCost),
     loc: prev.loc + locGain,
@@ -223,9 +223,10 @@ export function runTestsAction(prev: GameState): GameState {
 }
 
 export function runTestsFixFraction(tests: number): number {
-  if (tests <= 0) return 0;
+  const runnable = Math.floor(tests);
+  if (runnable <= 0) return 0;
   const p = action('run_tests').perTestFixFraction!;
-  return 1 - Math.pow(1 - p, tests);
+  return 1 - Math.pow(1 - p, runnable);
 }
 
 // ─── bug bounty ────────────────────────────────────────────────────────────

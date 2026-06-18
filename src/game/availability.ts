@@ -530,7 +530,7 @@ function runTests(c: Ctx): Move {
   const a = action('run_tests');
   const tests = c.state.tests ?? 0;
   const tokenCost = calcRunTestsTokenCost(tests);
-  const hasTests = tests > 0;
+  const hasTests = Math.floor(tests) > 0;
   return buildMove(
     {
       id: 'run_tests',

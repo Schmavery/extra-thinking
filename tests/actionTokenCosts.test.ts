@@ -9,7 +9,9 @@ import {
   calcPasteErrorFixChance,
   calcPasteErrorTokenCost,
   calcPromptTokenCost,
+  calcPromptBugGain,
   calcRunTestsTokenCost,
+  runnableTests,
   formatPasteErrorLog,
   pasteErrorButtonLabel,
 } from '../src/game/rates';
@@ -51,11 +53,13 @@ describe('action token costs', () => {
     );
   });
 
-  it('run_tests costs perTestTokenCost × tests written', () => {
+  it('run_tests costs perTestTokenCost × whole tests written', () => {
     const perTest = action('run_tests').perTestTokenCost ?? 1;
     expect(calcRunTestsTokenCost(0)).toBe(0);
     expect(calcRunTestsTokenCost(5)).toBe(5 * perTest);
     expect(calcRunTestsTokenCost(12)).toBe(12 * perTest);
+    expect(calcRunTestsTokenCost(5.9)).toBe(5 * perTest);
+    expect(runnableTests(3.2)).toBe(3);
   });
 
   it('run_tests gates on 30s cooldown', () => {
